@@ -2,7 +2,7 @@ const downloadCsvBtn = document.getElementById('downloadCsvBtn');
 const deleteFaceBtn = document.getElementById('deleteFaceBtn');
 const facesList = document.getElementById('facesList');
 
-export const API_BASE = 'http://localhost:3001/api'; // Change port if needed
+export const API_BASE = `${window.location.origin}/api`; // ✅ Works both locally and on Render
 
 // 🆕 Generic function to call backend API
 export async function sendToAPI(endpoint, payload) {

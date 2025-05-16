@@ -1,0 +1,247 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 2rem;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.top-nav {
+  position: sticky;
+  top: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  z-index: 1000;
+}
+
+.top-nav .logo {
+  height: 40px;
+  width: auto;
+}
+
+.top-nav h1 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #222;
+}
+
+h1, h2 {
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: #007acc;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+button,
+.btn,
+button.btn,
+button.edit-btn,
+button.save-btn {
+  font-size: 14px;
+  padding: 6px 12px;
+  height: 34px;
+  cursor: pointer;
+  border: 1px solid #000;
+  background-color: #000;
+  color: #fff !important;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+button:hover,
+.btn:hover,
+button.btn:hover,
+button.edit-btn:hover,
+button.save-btn:hover {
+  background-color: #222;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+select,
+input[type="text"],
+input[type="date"],
+input[type="datetime-local"] {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+select:disabled,
+input:disabled {
+  background-color: #f0f0f0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+th {
+  background: #f0f0f0;
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #fafafa;
+}
+
+tbody tr:hover {
+  background-color: #f0f8ff;
+}
+
+td {
+  padding: 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+thead {
+  background-color: #f2f2f2;
+}
+
+.tab-section {
+  display: none;
+}
+
+.tab-section.active {
+  display: block;
+}
+
+.filter-group label {
+  margin-right: 1rem;
+  font-weight: 500;
+}
+
+.filter-group select,
+.filter-group input {
+  margin-right: 1rem;
+  min-width: 150px;
+}
+
+select {
+  font-size: 14px;
+  padding: 4px 8px;
+  height: 32px;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  align-items: center;
+  background: #f7f7f7;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.filter-bar label {
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Container wrapper */
+.container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  max-width: 500px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+/* Logo styling */
+.logo {
+  max-height: 80px;
+  height: auto;
+  width: auto;
+  margin-bottom: 1rem;
+}
+
+/* Status message styles */
+.status {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+.status.success {
+  color: #2ecc71;
+}
+.status.error {
+  color: #e74c3c;
+}
+.status.info {
+  color: #3498db;
+}
+
+/* Optional card wrapper for future UI panels */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Subtle interaction feedback */
+input,
+select,
+button {
+  transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #007acc;
+  outline: none;
+}
+
+/* Optional smoother hover on buttons */
+button:hover,
+.btn:hover {
+  background-color: #1a1a1a;
+}
+
+/* Snapshot preview */
+#snapshot {
+  display: block;
+  margin: 1rem auto;
+  max-width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}

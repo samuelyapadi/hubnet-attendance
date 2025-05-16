@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/styles.css" />
+  <meta charset="UTF-8" />
+  <title>Register Face</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background: #f5f5f5;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    .logo {
+      max-height: 80px;
+      height: auto;
+      width: auto;
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 8px 12px;
+    }
+    video, canvas, img {
+      display: block;
+      margin: 1rem auto;
+      width: 100%;
+      max-width: 320px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .status {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+
+  <!-- Load face-api -->
+  <script type="module">
+    import * as faceapi from 'https://cdn.skypack.dev/face-api.js';
+    window.faceapi = faceapi;
+  </script>
+
+  <!-- Modules -->
+  <script type="module" src="scripts/storage.js" defer></script>
+  <script type="module" src="index.js" defer></script>
+  <script type="module" src="scripts/register.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <!-- ✅ Logo -->
+    <img src="images/hubnetblack.jpg" alt="Hubnet Logo" class="logo" />
+
+    <h1>Register New Employee</h1>
+
+    <label for="username">Name:</label>
+    <input type="text" id="username">
+
+    <label for="department">Department:</label>
+    <select id="department">
+      <option value="">-- Select Department --</option>
+      <option value="THERMAL">THERMAL</option>
+      <option value="SPL">SPL</option>
+      <option value="IMPORTEXPORT">国際航空貨物輸送部</option>
+      <option value="FIELD">フィールド部</option>
+      <option value="NARITAOPS">成田通関部</option>
+      <option value="ART">美術品輸送部</option>
+      <option value="OCEAN">海上貨物輸送部</option>
+      <option value="BIZDEV">事業開発部</option>
+      <option value="IT">IT</option>
+      <option value="FINANCE">財務経理部</option>
+      <option value="QA">品質保証部</option>
+      <option value="HR">人事部</option>
+    </select>
+
+    <label for="joinDate">Join Date:</label>
+    <input type="date" id="joinDate">
+
+    <button id="startCameraBtn">Enable Camera</button>
+    <video id="video" autoplay playsinline></video>
+
+    <button id="capturePhotoBtn">Capture Photo (<span id="photoCount">0</span>/3)</button>
+    <button id="saveUserBtn" disabled>Save Registered Face</button>
+
+    <div class="status" id="status"></div>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="snapshot" alt="Snapshot preview" />
+
+    <!-- ✅ Back to Home -->
+    <div style="margin-top: 2rem;">
+      <a href="index.html" style="
+        font-size: 14px;
+        padding: 6px 12px;
+        background: black;
+        color: white;
+        border: 1px solid #000;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+      ">← Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

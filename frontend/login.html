@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/styles.css" />
+  <meta charset="UTF-8" />
+  <title>Login - Face Attendance</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f9f9f9;
+      font-family: 'Inter', sans-serif;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    .logo {
+      max-height: 80px;
+      height: auto;
+      width: auto;
+      margin-bottom: 1rem;
+    }
+    video, canvas, img {
+      max-width: 100%;
+      width: 100%;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+    button {
+      margin: 0.5rem;
+    }
+    .status {
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+  </style>
+
+  <!-- Load face-api -->
+  <script type="module">
+    import * as faceapi from 'https://cdn.skypack.dev/face-api.js';
+    window.faceapi = faceapi;
+  </script>
+
+  <script type="module" src="scripts/storage.js" defer></script>
+  <script type="module" src="index.js" defer></script>
+  <script type="module" src="scripts/login.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <!-- ✅ Logo at the top -->
+    <img src="images/hubnetblack.jpg" alt="Hubnet Logo" class="logo" style="
+    max-height: 80px;
+    height: auto;
+    width: auto;
+    margin-bottom: 1rem;
+    " />
+
+    <h1>Login</h1>
+    <button id="startCameraBtn">Enable Camera</button>
+    <video id="video" autoplay playsinline></video>
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn">Logout</button>
+    <div class="status" id="status"></div>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <img id="snapshot" alt="Snapshot preview" />
+
+    <!-- ✅ Back to Home -->
+    <div style="margin-top: 2rem;">
+      <a href="index.html" style="
+        font-size: 14px;
+        padding: 6px 12px;
+        background: black;
+        color: white;
+        border: 1px solid #000;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+      ">← Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

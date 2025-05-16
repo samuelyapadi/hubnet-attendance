@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="styles/styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel – Currently Logged-In Employees</title>
+</head>
+<body>
+  <!-- 🔝 Sticky Navigation Bar -->
+  <header class="top-nav">
+    <img src="images/hubnetblack.jpg" alt="Logo" class="logo" />
+    <h1>HUBNET Attendance</h1>
+  </header>
+
+  <div style="height: 24px;"></div>
+
+  <!-- 🔘 Navigation -->
+  <div style="margin-bottom: 2rem;">
+    <a href="employees.html" class="btn">Employees List</a><br><br>
+    <button id="inputWorkLeaveBtn" class="btn">+ Input Work / Leave</button>
+  </div>
+
+  <!-- 📊 Attendance Tab -->
+  <div id="attendanceTab" class="tab-section active">
+    <section>
+      <h2>Current Active Sessions</h2>
+      <label style="margin-bottom: 1rem; display: inline-block;">
+        Sort by Department:
+        <select id="sortDepartment" style="font-size: 14px; padding: 4px 8px;">
+          <option value="">All</option>
+        </select>
+      </label>
+      <table id="activeTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Check-In Time</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- 🔙 Back to Home -->
+  <div style="text-align: center; margin-top: 2rem;">
+    <a href="index.html" style="
+      font-size: 14px;
+      padding: 6px 12px;
+      background: black;
+      color: white;
+      border: 1px solid #000;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-block;">
+      ← Back to Home
+    </a>
+  </div>
+
+  <!-- 📝 Modal for Input -->
+  <div id="manualInputModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
+    <h3>Input Work / Leave</h3>
+    <form id="manualInputForm">
+      <label style="display: flex; align-items: center; gap: 1rem;">Employee:
+        <select id="manualName" required style="flex: 1;"></select>
+      </label><br><br>
+      <label>Check-In:
+        <input type="datetime-local" id="manualCheckIn" required>
+      </label><br><br>
+      <label>Check-Out:
+        <input type="datetime-local" id="manualCheckOut" required>
+      </label><br><br>
+      <label>Type:
+        <select id="manualType">
+          <option value="work">Work</option>
+          <option value="paid_leave">Paid Leave</option>
+          <option value="unpaid_leave">Unpaid Leave</option>
+        </select>
+      </label><br><br>
+
+      <button type="submit" class="btn">Submit</button>
+      <button type="button" class="btn" onclick="document.getElementById('manualInputModal').style.display='none'">Cancel</button>
+    </form>
+  </div>
+
+  <!-- 🧠 JS Modules -->
+  <script type="module">
+    import { fetchAndRenderAttendance, setupActiveTableSorting } from './attendance.js';
+
+    window.fetchAndRenderAttendance = fetchAndRenderAttendance;
+    window.setupActiveTableSorting = setupActiveTableSorting;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const manualType = document.getElementById('manualType');
+
+      setupActiveTableSorting();
+      fetchAndRenderAttendance();
+
+      const btn = document.getElementById('inputWorkLeaveBtn');
+      const modal = document.getElementById('manualInputModal');
+      const form = document.getElementById('manualInputForm');
+      const nameSelect = document.getElementById('manualName');
+
+      btn.onclick = async () => {
+        const res = await fetch('/api/users');
+        const users = await res.json();
+        nameSelect.innerHTML = users.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
+        modal.style.display = 'block';
+      };
+
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        const checkIn = new Date(document.getElementById('manualCheckIn').value);
+        const checkOut = new Date(document.getElementById('manualCheckOut').value);
+        const type = document.getElementById('manualType').value;
+        const diffMs = checkOut - checkIn;
+        const hoursUsed = type === 'work' ? 0 : parseFloat((diffMs / 3600000).toFixed(2));
+
+        const payload = {
+          name: document.getElementById('manualName').value,
+          checkIn: checkIn.toISOString(),
+          checkOut: checkOut.toISOString(),
+          type,
+          hoursUsed,
+        };
+
+        const res = await fetch('/api/sessions/manual', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          alert('✅ Entry added!');
+          modal.style.display = 'none';
+          fetchAndRenderAttendance();
+        } else {
+          alert('❌ Failed to add entry.');
+        }
+      };
+    });
+  </script>
+</body>
+</html>

@@ -2,15 +2,23 @@
 
 let allUsers = [];
 let allSessions = [];
+let leaveBalanceMap = new Map();
 
 export async function fetchAndRenderEmployees() {
-  const [usersRes, sessionsRes] = await Promise.all([
+  const [usersRes, sessionsRes, leaveRes] = await Promise.all([
     fetch('/api/users'),
-    fetch('/api/sessions/all')
+    fetch('/api/sessions/all'),
+    fetch('/api/leave-balance/all')
   ]);
 
   const users = await usersRes.json();
   const sessions = await sessionsRes.json();
+  const leaveData = await leaveRes.json();
+
+  leaveBalanceMap = new Map();
+  leaveData.forEach(entry => {
+    leaveBalanceMap.set(entry.name, entry.formatted);
+  });
 
   allUsers = users;
   allSessions = sessions;
@@ -149,21 +157,11 @@ async function applyCombinedFilters() {
     });
 
     user.totalOvertime = `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`;
-
-    try {
-      const leaveRes = await fetch(`/api/users/${encodeURIComponent(user.name)}/leave-balance`);
-      const leaveData = await leaveRes.json();
-      console.log('Leave Debug:', user.name, leaveData);
-      user.remainingLeave = leaveData?.formatted || '0d 0h';
-    } catch (err) {
-      user.remainingLeave = '-';
-    }
+    user.remainingLeave = leaveBalanceMap.get(user.name) || '0d 0h';
   }));
 
   populateEmployeesTable(filteredUsers);
 }
-
-// The rest of the code remains unchanged
 
 function populateEmployeesTable(users) {
   const tbody = document.querySelector("#employeesTable tbody");

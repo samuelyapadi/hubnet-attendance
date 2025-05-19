@@ -1,7 +1,6 @@
 import { euclideanDistance } from './utils.js';
 import { sendToAPI } from './storage.js';
 
-const canvas = document.getElementById('canvas');
 const video = document.getElementById('video');
 const snapshot = document.getElementById('snapshot');
 const loginBtn = document.getElementById('loginBtn');
@@ -54,11 +53,14 @@ loginBtn.addEventListener('click', async () => {
   }
 
   const descriptor = Array.from(detection.descriptor);
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  snapshot.src = canvas.toDataURL('image/jpeg');
+
+  // ✅ Preview snapshot using a temporary canvas
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = video.videoWidth;
+  tempCanvas.height = video.videoHeight;
+  const ctx = tempCanvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+  snapshot.src = tempCanvas.toDataURL('image/jpeg');
 
   const result = await sendToAPI('login', { descriptor });
   const matchedName = result.match;

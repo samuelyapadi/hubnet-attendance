@@ -8,9 +8,9 @@ const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const status = document.getElementById('status');
 
-let currentUser = null; // Track logged-in user for logout
+let currentUser = null;
 
-// Load face-api.js models once
+// ✅ Load models
 await Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
   faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
@@ -49,19 +49,19 @@ loginBtn.addEventListener('click', async () => {
 
   if (!detection) {
     alert("No face detected. Try again.");
+    restartCameraWithNotice();
     return;
   }
 
-  const inputDescriptor = Array.from(detection.descriptor);
+  const descriptor = Array.from(detection.descriptor);
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   snapshot.src = canvas.toDataURL('image/jpeg');
 
-  const result = await sendToAPI('login', { descriptor: inputDescriptor });
+  const result = await sendToAPI('login', { descriptor });
   const matchedName = result.match;
-  const bestDistance = result.score;
 
   if (matchedName) {
     currentUser = matchedName;
@@ -70,31 +70,27 @@ loginBtn.addEventListener('click', async () => {
       alert(`⚠️ You already have an open session.\nPlease log out before logging in again.`);
     } else {
       alert(`✅ Welcome back, ${matchedName}!\nLogin time: ${new Date().toLocaleTimeString()}`);
-
       try {
         await sendToAPI('attendance', { name: matchedName });
       } catch (err) {
-        console.error('[ATTENDANCE API ERROR]', err);
         alert("⚠️ Could not save attendance.");
       }
     }
 
     const log = JSON.parse(localStorage.getItem('attendanceLog') || '[]');
-    log.push({
-      name: matchedName,
-      time: new Date().toLocaleString()
-    });
+    log.push({ name: matchedName, time: new Date().toLocaleString() });
     localStorage.setItem('attendanceLog', JSON.stringify(log));
 
-    stopCamera(); // ✅ Prevent stuck video
+    stopCamera();
     if (status) status.textContent = '✅ Logged in. Preparing for next user...';
 
     setTimeout(() => {
       if (status) status.textContent = '👤 Next person, please look at the camera...';
-      startCamera(); // ✅ Restart for next person
+      startCamera();
     }, 3000);
   } else {
     alert("❌ No match found.");
+    restartCameraWithNotice();
   }
 });
 
@@ -106,22 +102,25 @@ logoutBtn?.addEventListener('click', async () => {
 
   if (!detection) {
     alert("⚠️ No face detected. Try again.");
+    restartCameraWithNotice();
     return;
   }
 
-  const inputDescriptor = Array.from(detection.descriptor);
-  const result = await sendToAPI('login', { descriptor: inputDescriptor });
+  const descriptor = Array.from(detection.descriptor);
+  const result = await sendToAPI('login', { descriptor });
 
   const matchedName = result.match;
   const isLoggedIn = result.alreadyLoggedIn;
 
   if (!matchedName) {
-    alert("❌ No match found. Please try again.");
+    alert("❌ No match found.");
+    restartCameraWithNotice();
     return;
   }
 
   if (!isLoggedIn) {
-    alert(`⚠️ ${matchedName} is not currently logged in.\nLogout cancelled.`);
+    alert(`⚠️ ${matchedName} is not currently logged in.`);
+    restartCameraWithNotice();
     return;
   }
 
@@ -129,19 +128,23 @@ logoutBtn?.addEventListener('click', async () => {
   if (!confirmLogout) return;
 
   const response = await sendToAPI('logout', { name: matchedName });
-
   if (response.success) {
     alert(`👋 ${matchedName} logged out successfully.`);
-    if (currentUser === matchedName) currentUser = null;
+    currentUser = null;
 
     stopCamera();
-    if (status) status.textContent = "✅ Logged out. Preparing for next user...";
-
+    if (status) status.textContent = '✅ Logged out. Preparing for next user...';
     setTimeout(() => {
-      if (status) status.textContent = "👤 Next person, please look at the camera...";
+      if (status) status.textContent = '👤 Next person, please look at the camera...';
       startCamera();
     }, 3000);
   } else {
     alert(`❌ Logout failed: ${response.error}`);
+    restartCameraWithNotice();
   }
 });
+
+function restartCameraWithNotice() {
+  stopCamera();
+  setTimeout(startCamera, 500);
+}

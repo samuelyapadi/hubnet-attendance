@@ -347,4 +347,52 @@ router.delete('/sessions/:id', async (req, res) => {
   }
 });
 
+// ✅ Batch fetch leave balances for all users
+router.get('/leave-balance/all', async (req, res) => {
+  try {
+    const users = await User.find({});
+    const results = [];
+
+    for (const user of users) {
+      const entitlementDays = calculateLeaveEntitlement(user.joinDate);
+      const totalEntitledHours = entitlementDays * 8;
+
+      const paidLeaveSessions = await Attendance.find({
+        name: user.name,
+        type: 'paid_leave',
+        checkIn: { $exists: true },
+        checkOut: { $exists: true }
+      });
+
+      const hoursUsedRaw = paidLeaveSessions.reduce((sum, s) => {
+        const start = new Date(s.checkIn);
+        const end = new Date(s.checkOut);
+        const msDiff = end - start;
+        const fullDays = Math.floor(msDiff / (1000 * 60 * 60 * 24));
+        const leftoverMs = msDiff % (1000 * 60 * 60 * 24);
+        const leftoverHours = leftoverMs / (1000 * 60 * 60);
+        return sum + (fullDays * 8) + Math.min(leftoverHours, 8);
+      }, 0);
+
+      const hoursUsed = Math.round((hoursUsedRaw + Number.EPSILON) * 2) / 2;
+      const hoursRemaining = Math.max(0, totalEntitledHours - hoursUsed);
+      const days = Math.floor(hoursRemaining / 8);
+      const hours = Math.round((hoursRemaining % 8 + Number.EPSILON) * 2) / 2;
+
+      results.push({
+        name: user.name,
+        hoursRemaining: Math.round(hoursRemaining * 10) / 10,
+        hoursUsed: Math.round(hoursUsed * 10) / 10,
+        entitlementDays,
+        formatted: `${days}d ${hours}h`
+      });
+    }
+
+    res.json(results);
+  } catch (err) {
+    console.error('[LEAVE BALANCE ALL ERROR]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

@@ -2,19 +2,17 @@ import { euclideanDistance } from './utils.js';
 import { sendToAPI } from './storage.js';
 
 const video = document.getElementById('video');
-const snapshot = document.getElementById('snapshot');
-const status = document.getElementById('status');
-const photoCount = document.getElementById('photoCount');
 const capturePhotoBtn = document.getElementById('capturePhotoBtn');
 const saveUserBtn = document.getElementById('saveUserBtn');
 const usernameInput = document.getElementById('username');
 const departmentSelect = document.getElementById('department');
 const joinDateInput = document.getElementById('joinDate');
+const photoCount = document.getElementById('photoCount');
+const status = document.getElementById('status');
 
 let descriptors = [];
 let snapshots = [];
 
-// ✅ Load face-api models
 await Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
   faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
@@ -23,14 +21,14 @@ await Promise.all([
 
 startCamera();
 
-// ✅ Camera helpers
 function startCamera() {
-  navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+  navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
     video.srcObject = stream;
     video.play();
-    if (status) status.textContent = '📸 Ready to capture face photo';
+    if (status) status.textContent = '📸 Camera ready for registration';
   }).catch(err => {
-    alert("Failed to access camera: " + err.message);
+    console.error('Camera error:', err);
+    alert("⚠️ Unable to access camera.");
   });
 }
 
@@ -42,7 +40,11 @@ function stopCamera() {
   }
 }
 
-// ✅ Form validation
+function restartCameraWithNotice() {
+  stopCamera();
+  setTimeout(startCamera, 500);
+}
+
 function validateFormInputs() {
   const isReady =
     usernameInput.value.trim() &&
@@ -51,11 +53,11 @@ function validateFormInputs() {
     descriptors.length === 3;
   saveUserBtn.disabled = !isReady;
 }
+
 usernameInput?.addEventListener('input', validateFormInputs);
 departmentSelect?.addEventListener('change', validateFormInputs);
 joinDateInput?.addEventListener('input', validateFormInputs);
 
-// ✅ Capture photo
 capturePhotoBtn?.addEventListener('click', async () => {
   const username = usernameInput.value.trim();
   if (!username) {
@@ -74,6 +76,7 @@ capturePhotoBtn?.addEventListener('click', async () => {
 
   if (!detection) {
     alert("No face detected. Try again.");
+    restartCameraWithNotice();
     return;
   }
 
@@ -86,7 +89,6 @@ capturePhotoBtn?.addEventListener('click', async () => {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   const imageData = canvas.toDataURL('image/jpeg');
-  snapshot.src = imageData;
   snapshots.push(imageData);
 
   photoCount.textContent = descriptors.length;
@@ -99,7 +101,6 @@ capturePhotoBtn?.addEventListener('click', async () => {
   }
 });
 
-// ✅ Save user
 saveUserBtn?.addEventListener('click', async () => {
   const name = usernameInput.value.trim();
   const department = departmentSelect.value;
@@ -121,27 +122,16 @@ saveUserBtn?.addEventListener('click', async () => {
 
   if (result.success) {
     alert(`✅ Face data for '${name}' has been saved to the database.`);
-
-    // Reset state
     descriptors = [];
     snapshots = [];
     photoCount.textContent = "0";
     saveUserBtn.disabled = true;
+    status.textContent = "✅ Registration complete! Ready for next.";
     departmentSelect.value = "";
     usernameInput.value = "";
     joinDateInput.value = "";
-    delete joinDateInput.dataset.iso;
-
-    // Stop camera & show message
-    stopCamera();
-    status.textContent = "✅ Registration complete! Preparing for next...";
-
-    // Restart camera after delay
-    setTimeout(() => {
-      status.textContent = "👤 Ready for next registration.";
-      startCamera();
-    }, 3000);
   } else {
     alert(`❌ Failed to register: ${result.error || 'Unknown error'}`);
+    restartCameraWithNotice();
   }
 });

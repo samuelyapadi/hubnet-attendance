@@ -133,6 +133,14 @@ logoutBtn?.addEventListener('click', async () => {
   if (response.success) {
     alert(`👋 ${matchedName} logged out successfully.`);
     if (currentUser === matchedName) currentUser = null;
+
+    stopCamera();
+    if (status) status.textContent = "✅ Logged out. Preparing for next user...";
+
+    setTimeout(() => {
+      if (status) status.textContent = "👤 Next person, please look at the camera...";
+      startCamera();
+    }, 3000);
   } else {
     alert(`❌ Logout failed: ${response.error}`);
   }

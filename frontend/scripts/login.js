@@ -6,6 +6,7 @@ const video = document.getElementById('video');
 const snapshot = document.getElementById('snapshot');
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
+const status = document.getElementById('status');
 
 let currentUser = null; // Track logged-in user for logout
 
@@ -15,6 +16,27 @@ await Promise.all([
   faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
   faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models')
 ]);
+
+startCamera();
+
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
+    video.srcObject = stream;
+    video.play();
+    if (status) status.textContent = '📸 Ready for face scan';
+  }).catch(err => {
+    console.error('Camera error:', err);
+    alert("⚠️ Unable to access camera.");
+  });
+}
+
+function stopCamera() {
+  const stream = video?.srcObject;
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+  }
+}
 
 loginBtn.addEventListener('click', async () => {
   loginBtn.disabled = true;
@@ -63,13 +85,19 @@ loginBtn.addEventListener('click', async () => {
       time: new Date().toLocaleString()
     });
     localStorage.setItem('attendanceLog', JSON.stringify(log));
+
+    stopCamera(); // ✅ Prevent stuck video
+    if (status) status.textContent = '✅ Logged in. Preparing for next user...';
+
+    setTimeout(() => {
+      if (status) status.textContent = '👤 Next person, please look at the camera...';
+      startCamera(); // ✅ Restart for next person
+    }, 3000);
   } else {
     alert("❌ No match found.");
   }
 });
 
-// ✅ Logout logic — must be outside loginBtn listener
-// ✅ New logout logic — re-scans face to match correct user
 logoutBtn?.addEventListener('click', async () => {
   const detection = await faceapi
     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
@@ -109,4 +137,3 @@ logoutBtn?.addEventListener('click', async () => {
     alert(`❌ Logout failed: ${response.error}`);
   }
 });
-

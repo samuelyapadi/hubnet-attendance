@@ -21,12 +21,26 @@ await Promise.all([
   faceapi.nets.faceRecognitionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models')
 ]);
 
-// ✅ Enable webcam
-navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-  video.srcObject = stream;
-}).catch(err => {
-  alert("Failed to access camera: " + err.message);
-});
+startCamera();
+
+// ✅ Camera helpers
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+    video.srcObject = stream;
+    video.play();
+    if (status) status.textContent = '📸 Ready to capture face photo';
+  }).catch(err => {
+    alert("Failed to access camera: " + err.message);
+  });
+}
+
+function stopCamera() {
+  const stream = video?.srcObject;
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+  }
+}
 
 // ✅ Form validation
 function validateFormInputs() {
@@ -107,15 +121,26 @@ saveUserBtn?.addEventListener('click', async () => {
 
   if (result.success) {
     alert(`✅ Face data for '${name}' has been saved to the database.`);
+
+    // Reset state
     descriptors = [];
     snapshots = [];
     photoCount.textContent = "0";
     saveUserBtn.disabled = true;
-    status.textContent = "✅ Registration complete! Ready for next.";
     departmentSelect.value = "";
     usernameInput.value = "";
     joinDateInput.value = "";
     delete joinDateInput.dataset.iso;
+
+    // Stop camera & show message
+    stopCamera();
+    status.textContent = "✅ Registration complete! Preparing for next...";
+
+    // Restart camera after delay
+    setTimeout(() => {
+      status.textContent = "👤 Ready for next registration.";
+      startCamera();
+    }, 3000);
   } else {
     alert(`❌ Failed to register: ${result.error || 'Unknown error'}`);
   }

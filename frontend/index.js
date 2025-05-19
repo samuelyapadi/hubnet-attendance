@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (document.getElementById('saveUserBtn')) {
       console.log("📝 Loading registration logic...");
-      await import('./scripts/registration.js');
+      await import('./scripts/register.js');
     }
 
     cameraInitialized = true;

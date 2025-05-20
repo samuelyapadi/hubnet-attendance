@@ -6,6 +6,9 @@ const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const status = document.getElementById('status');
 
+const successSound = new Audio('sounds/success.mp3');
+const failSound = new Audio('sounds/fail.mp3');
+
 let currentUser = null;
 
 // ✅ Load models
@@ -47,6 +50,7 @@ loginBtn.addEventListener('click', async () => {
 
   if (!detection) {
     alert("No face detected. Try again.");
+    failSound.play();
     restartCameraWithNotice();
     return;
   }
@@ -60,8 +64,10 @@ loginBtn.addEventListener('click', async () => {
 
     if (result.alreadyLoggedIn) {
       alert(`⚠️ You already have an open session.\nPlease log out before logging in again.`);
+      failSound.play();
     } else {
       alert(`✅ Welcome back, ${matchedName}!\nLogin time: ${new Date().toLocaleTimeString()}`);
+      successSound.play();
       try {
         await sendToAPI('attendance', { name: matchedName });
       } catch (err) {
@@ -82,6 +88,7 @@ loginBtn.addEventListener('click', async () => {
     }, 3000);
   } else {
     alert("❌ No match found.");
+    failSound.play();
     restartCameraWithNotice();
   }
 });
@@ -94,6 +101,7 @@ logoutBtn?.addEventListener('click', async () => {
 
   if (!detection) {
     alert("⚠️ No face detected. Try again.");
+    failSound.play();
     restartCameraWithNotice();
     return;
   }
@@ -106,12 +114,14 @@ logoutBtn?.addEventListener('click', async () => {
 
   if (!matchedName) {
     alert("❌ No match found.");
+    failSound.play();
     restartCameraWithNotice();
     return;
   }
 
   if (!isLoggedIn) {
     alert(`⚠️ ${matchedName} is not currently logged in.`);
+    failSound.play();
     restartCameraWithNotice();
     return;
   }
@@ -122,6 +132,7 @@ logoutBtn?.addEventListener('click', async () => {
   const response = await sendToAPI('logout', { name: matchedName });
   if (response.success) {
     alert(`👋 ${matchedName} logged out successfully.`);
+    successSound.play();
     currentUser = null;
 
     stopCamera();
@@ -132,6 +143,7 @@ logoutBtn?.addEventListener('click', async () => {
     }, 3000);
   } else {
     alert(`❌ Logout failed: ${response.error}`);
+    failSound.play();
     restartCameraWithNotice();
   }
 });

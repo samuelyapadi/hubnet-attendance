@@ -10,60 +10,60 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/styles.css" />
 
-<style>
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    background: #f9f9f9;
-    font-family: 'Inter', sans-serif;
-  }
-  .container {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-  }
-  .logo {
-    max-height: 80px;
-    height: auto;
-    width: auto;
-    margin-bottom: 1rem;
-  }
-  video {
-    max-width: 100%;
-    width: 100%;
-    margin: 10px 0;
-    border-radius: 6px;
-  }
-  button {
-    margin: 0.5rem;
-  }
-  .status {
-    font-weight: bold;
-    margin-top: 1rem;
-  }
-
-  /* 🔧 iPad/tablet optimization */
-  @media (min-width: 768px) and (max-width: 1024px) {
-    #loginBtn,
-    #logoutBtn {
-      padding: 20px 32px;
-      font-size: 22px;
-      min-height: 60px;
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f9f9f9;
+      font-family: 'Inter', sans-serif;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
       border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
     }
-    .container a {
-      font-size: 16px;
-      padding: 10px 16px;
+    .logo {
+      max-height: 80px;
+      height: auto;
+      width: auto;
+      margin-bottom: 1rem;
     }
-  }
-</style>
+    video {
+      max-width: 100%;
+      width: 100%;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+    button {
+      margin: 0.5rem;
+    }
+    .status {
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    /* 🔧 iPad/tablet optimization */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      #loginBtn,
+      #logoutBtn {
+        padding: 20px 32px;
+        font-size: 22px;
+        min-height: 60px;
+        border-radius: 10px;
+      }
+      .container a {
+        font-size: 16px;
+        padding: 10px 16px;
+      }
+    }
+  </style>
 
   <!-- Load face-api -->
   <script type="module">
@@ -88,5 +88,9 @@
 
     <a href="index.html" class="back-link">← Back to Home</a>
   </div>
+
+  <!-- ✅ Sound feedback -->
+  <audio id="sound-success" src="sounds/success.mp3" preload="auto"></audio>
+  <audio id="sound-fail" src="sounds/fail.mp3" preload="auto"></audio>
 </body>
 </html>

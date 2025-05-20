@@ -10,6 +10,10 @@ const joinDateInput = document.getElementById('joinDate');
 const photoCount = document.getElementById('photoCount');
 const status = document.getElementById('status');
 
+// 🔊 Sound elements
+const soundSuccess = new Audio('sounds/success.mp3');
+const soundFail = new Audio('sounds/fail.mp3');
+
 let descriptors = [];
 let snapshots = [];
 
@@ -76,6 +80,7 @@ capturePhotoBtn?.addEventListener('click', async () => {
 
   if (!detection) {
     alert("No face detected. Try again.");
+    soundFail.play();
     restartCameraWithNotice();
     return;
   }
@@ -122,6 +127,7 @@ saveUserBtn?.addEventListener('click', async () => {
 
   if (result.success) {
     alert(`✅ Face data for '${name}' has been saved to the database.`);
+    soundSuccess.play();
     descriptors = [];
     snapshots = [];
     photoCount.textContent = "0";
@@ -132,6 +138,7 @@ saveUserBtn?.addEventListener('click', async () => {
     joinDateInput.value = "";
   } else {
     alert(`❌ Failed to register: ${result.error || 'Unknown error'}`);
+    soundFail.play();
     restartCameraWithNotice();
   }
 });

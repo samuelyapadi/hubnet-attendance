@@ -249,8 +249,9 @@ button:hover,
 @media (min-width: 768px) {
   body.login-page button,
   body.register-page button {
-    font-size: 18px;
-    padding: 10px 20px;
-    height: auto;
+    font-size: 20px;
+    padding: 16px 28px;
+    min-height: 56px;
+    border-radius: 10px;
   }
 }

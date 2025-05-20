@@ -2,16 +2,26 @@ import { euclideanDistance } from './utils.js';
 import { sendToAPI } from './storage.js';
 
 const video = document.getElementById('video');
+const capturePhotoBtn = document.getElementById('capturePhotoBtn');
+const saveUserBtn = document.getElementById('saveUserBtn');
+const usernameInput = document.getElementById('username');
+const departmentSelect = document.getElementById('department');
+const joinDateInput = document.getElementById('joinDate');
+const photoCount = document.getElementById('photoCount');
+const status = document.getElementById('status');
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
-const status = document.getElementById('status');
 
-const successSound = new Audio('sounds/success.mp3');
-const failSound = new Audio('sounds/fail.mp3');
+// 🔊 Sound elements
+const soundSuccess = new Audio('sounds/success.mp3');
+const soundFail = new Audio('sounds/fail.mp3');
 
-let currentUser = null;
+let descriptors = [];
+let snapshots = [];
+let isCapturing = false;
+let isLoggingIn = false;
+let isLoggingOut = false;
 
-// ✅ Load models
 await Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
   faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
@@ -24,7 +34,7 @@ function startCamera() {
   navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
     video.srcObject = stream;
     video.play();
-    if (status) status.textContent = '📸 Ready for face scan';
+    if (status) status.textContent = '📸 Camera ready for registration';
   }).catch(err => {
     console.error('Camera error:', err);
     alert("⚠️ Unable to access camera.");
@@ -39,9 +49,39 @@ function stopCamera() {
   }
 }
 
-loginBtn.addEventListener('click', async () => {
-  loginBtn.disabled = true;
-  setTimeout(() => (loginBtn.disabled = false), 3000);
+function restartCameraWithNotice() {
+  stopCamera();
+  setTimeout(startCamera, 500);
+}
+
+function validateFormInputs() {
+  const isReady =
+    usernameInput.value.trim() &&
+    departmentSelect.value &&
+    joinDateInput.value &&
+    descriptors.length === 3;
+  saveUserBtn.disabled = !isReady;
+}
+
+usernameInput?.addEventListener('input', validateFormInputs);
+departmentSelect?.addEventListener('change', validateFormInputs);
+joinDateInput?.addEventListener('input', validateFormInputs);
+
+capturePhotoBtn?.addEventListener('click', async () => {
+  if (isCapturing) return;
+  isCapturing = true;
+
+  const username = usernameInput.value.trim();
+  if (!username) {
+    alert("Please enter a name before capturing photos.");
+    isCapturing = false;
+    return;
+  }
+  if (descriptors.length >= 3) {
+    alert("You already have 3 photos. Click 'Save Registered Face'.");
+    isCapturing = false;
+    return;
+  }
 
   const detection = await faceapi
     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
@@ -50,7 +90,85 @@ loginBtn.addEventListener('click', async () => {
 
   if (!detection) {
     alert("No face detected. Try again.");
-    failSound.play();
+    soundFail.play();
+    isCapturing = false;
+    restartCameraWithNotice();
+    return;
+  }
+
+  const descriptor = Array.from(detection.descriptor);
+  descriptors.push(descriptor);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = canvas.toDataURL('image/jpeg');
+  snapshots.push(imageData);
+
+  photoCount.textContent = descriptors.length;
+  status.textContent = `✅ Photo ${descriptors.length} captured.`;
+  validateFormInputs();
+
+  if (descriptors.length === 3) {
+    saveUserBtn.disabled = false;
+    status.textContent = "✅ 3 photos captured. You can now save.";
+  }
+
+  isCapturing = false;
+});
+
+saveUserBtn?.addEventListener('click', async () => {
+  const name = usernameInput.value.trim();
+  const department = departmentSelect.value;
+  const joinDateRaw = joinDateInput?.value;
+  const joinDate = joinDateRaw ? new Date(joinDateRaw).toISOString() : '';
+
+  if (!name || !department || descriptors.length !== 3) {
+    alert("Please complete all fields and capture 3 photos.");
+    return;
+  }
+
+  const result = await sendToAPI('register', {
+    name,
+    department,
+    joinDate,
+    descriptors,
+    snapshots
+  });
+
+  if (result.success) {
+    alert(`✅ Face data for '${name}' has been saved to the database.`);
+    soundSuccess.play();
+    descriptors = [];
+    snapshots = [];
+    photoCount.textContent = "0";
+    saveUserBtn.disabled = true;
+    status.textContent = "✅ Registration complete! Ready for next.";
+    departmentSelect.value = "";
+    usernameInput.value = "";
+    joinDateInput.value = "";
+  } else {
+    alert(`❌ Failed to register: ${result.error || 'Unknown error'}`);
+    soundFail.play();
+    restartCameraWithNotice();
+  }
+});
+
+loginBtn?.addEventListener('click', async () => {
+  if (isLoggingIn || isLoggingOut) return;
+  isLoggingIn = true;
+
+  const detection = await faceapi
+    .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+    .withFaceLandmarks()
+    .withFaceDescriptor();
+
+  if (!detection) {
+    alert("No face detected. Try again.");
+    soundFail.play();
+    isLoggingIn = false;
     restartCameraWithNotice();
     return;
   }
@@ -60,40 +178,35 @@ loginBtn.addEventListener('click', async () => {
   const matchedName = result.match;
 
   if (matchedName) {
-    currentUser = matchedName;
-
     if (result.alreadyLoggedIn) {
       alert(`⚠️ You already have an open session.\nPlease log out before logging in again.`);
-      failSound.play();
+      soundFail.play();
     } else {
       alert(`✅ Welcome back, ${matchedName}!\nLogin time: ${new Date().toLocaleTimeString()}`);
-      successSound.play();
+      soundSuccess.play();
       try {
         await sendToAPI('attendance', { name: matchedName });
       } catch (err) {
         alert("⚠️ Could not save attendance.");
       }
     }
-
-    const log = JSON.parse(localStorage.getItem('attendanceLog') || '[]');
-    log.push({ name: matchedName, time: new Date().toLocaleString() });
-    localStorage.setItem('attendanceLog', JSON.stringify(log));
-
     stopCamera();
-    if (status) status.textContent = '✅ Logged in. Preparing for next user...';
-
     setTimeout(() => {
-      if (status) status.textContent = '👤 Next person, please look at the camera...';
       startCamera();
     }, 3000);
   } else {
     alert("❌ No match found.");
-    failSound.play();
+    soundFail.play();
     restartCameraWithNotice();
   }
+
+  isLoggingIn = false;
 });
 
 logoutBtn?.addEventListener('click', async () => {
+  if (isLoggingOut || isLoggingIn) return;
+  isLoggingOut = true;
+
   const detection = await faceapi
     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks()
@@ -101,7 +214,8 @@ logoutBtn?.addEventListener('click', async () => {
 
   if (!detection) {
     alert("⚠️ No face detected. Try again.");
-    failSound.play();
+    soundFail.play();
+    isLoggingOut = false;
     restartCameraWithNotice();
     return;
   }
@@ -114,41 +228,39 @@ logoutBtn?.addEventListener('click', async () => {
 
   if (!matchedName) {
     alert("❌ No match found.");
-    failSound.play();
+    soundFail.play();
+    isLoggingOut = false;
     restartCameraWithNotice();
     return;
   }
 
   if (!isLoggedIn) {
     alert(`⚠️ ${matchedName} is not currently logged in.`);
-    failSound.play();
+    soundFail.play();
+    isLoggingOut = false;
     restartCameraWithNotice();
     return;
   }
 
   const confirmLogout = confirm(`Log out ${matchedName}?`);
-  if (!confirmLogout) return;
+  if (!confirmLogout) {
+    isLoggingOut = false;
+    return;
+  }
 
   const response = await sendToAPI('logout', { name: matchedName });
   if (response.success) {
     alert(`👋 ${matchedName} logged out successfully.`);
-    successSound.play();
-    currentUser = null;
-
+    soundSuccess.play();
     stopCamera();
-    if (status) status.textContent = '✅ Logged out. Preparing for next user...';
     setTimeout(() => {
-      if (status) status.textContent = '👤 Next person, please look at the camera...';
       startCamera();
     }, 3000);
   } else {
     alert(`❌ Logout failed: ${response.error}`);
-    failSound.play();
+    soundFail.play();
     restartCameraWithNotice();
   }
-});
 
-function restartCameraWithNotice() {
-  stopCamera();
-  setTimeout(startCamera, 500);
-}
+  isLoggingOut = false;
+});

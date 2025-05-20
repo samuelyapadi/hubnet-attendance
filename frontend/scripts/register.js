@@ -16,6 +16,7 @@ const soundFail = new Audio('sounds/fail.mp3');
 
 let descriptors = [];
 let snapshots = [];
+let isCapturing = false;
 
 await Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
@@ -63,13 +64,18 @@ departmentSelect?.addEventListener('change', validateFormInputs);
 joinDateInput?.addEventListener('input', validateFormInputs);
 
 capturePhotoBtn?.addEventListener('click', async () => {
+  if (isCapturing) return;
+  isCapturing = true;
+
   const username = usernameInput.value.trim();
   if (!username) {
     alert("Please enter a name before capturing photos.");
+    isCapturing = false;
     return;
   }
   if (descriptors.length >= 3) {
     alert("You already have 3 photos. Click 'Save Registered Face'.");
+    isCapturing = false;
     return;
   }
 
@@ -81,6 +87,7 @@ capturePhotoBtn?.addEventListener('click', async () => {
   if (!detection) {
     alert("No face detected. Try again.");
     soundFail.play();
+    isCapturing = false;
     restartCameraWithNotice();
     return;
   }
@@ -104,6 +111,8 @@ capturePhotoBtn?.addEventListener('click', async () => {
     saveUserBtn.disabled = false;
     status.textContent = "✅ 3 photos captured. You can now save.";
   }
+
+  isCapturing = false;
 });
 
 saveUserBtn?.addEventListener('click', async () => {

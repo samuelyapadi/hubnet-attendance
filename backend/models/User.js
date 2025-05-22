@@ -7,7 +7,28 @@ const userSchema = new mongoose.Schema({
   overtime: { type: String },
   descriptors: [[Number]],
   snapshots: [String],
-  joinDate: { type: Date, required: true }, // ✅ New field for paid leave calculation
+  joinDate: { type: Date, required: true }, // ✅ For leave tracking
+
+  // ✅ NEW: Weekly recurring schedule
+  customSchedule: {
+    type: Map,
+    of: {
+      label: { type: String, default: '' },
+      time: { type: String, required: true }
+    },
+    default: {}
+  },
+
+  // ✅ NEW: Manual one-day overrides (optional)
+  manualShifts: {
+    type: Map,
+    of: {
+      label: { type: String, default: '' },
+      time: { type: String, required: true }
+    },
+    default: {}
+  },
+
   createdAt: { type: Date, default: Date.now }
 });
 

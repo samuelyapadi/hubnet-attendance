@@ -395,4 +395,35 @@ router.get('/leave-balance/all', async (req, res) => {
   }
 });
 
+///add or update custom sched or manualshifts
+router.patch('/users/:name', async (req, res) => {
+  const { name } = req.params;
+  const { customSchedule, manualShifts } = req.body;
+
+  try {
+    const user = await User.findOne({ Name });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found'});
+
+    if (customSchedule) {
+      user.customSchedule = {
+        ...Attendance(user.customSchedule || {}),
+        ...customSchedule
+      };
+    }
+
+    if (manualShifts) {
+      user.manualShifts = {
+        ...Attendance(user.manualShifts || {}),
+        ...manualShifts
+      };
+    }
+
+    await user.save();
+    res.json({ success: true});
+  } catch (err) {
+    console.error('[PATCH /users/:name ERROR]', err);
+    res.status(500).json({ success: false, error: err.message});
+  }
+});
+
 module.exports = router;

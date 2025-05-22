@@ -365,24 +365,24 @@ async function submitWeeklyShift() {
     }
   };
 
-  try {
-    const res = await fetch(`/api/users/${encodeURIComponent(employeeName)}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+try {
+  const res = await fetch(`/api/users/by-name/${encodeURIComponent(employeeName)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
 
-    const result = await res.json();
-    if (result.success) {
-      alert(`✅ Weekly shift for ${day} saved!`);
-      closeWeeklyShiftModal();
-    } else {
-      alert('❌ Failed to save weekly shift.');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('❌ Request failed.');
+  const result = await res.json();
+  if (result.success) {
+    alert(`✅ Weekly shift for ${day} saved!`);
+    closeWeeklyShiftModal();
+  } else {
+    alert('❌ Failed to save weekly shift.');
   }
+} catch (err) {
+  console.error(err);
+  alert('❌ Request failed.');
+}
 }
 </script>
 </body>

@@ -232,7 +232,37 @@ router.get('/sessions/all', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch session logs.' });
   }
 });
+///add or update custom sched or manualshifts
+router.patch('/users/by-name/:name', async (req, res) => {
+  const { name } = req.params;
+  const { customSchedule, manualShifts } = req.body;
 
+  try {
+    const user = await User.findOne({ name }); // ✅ correct casing
+
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    if (customSchedule) {
+      user.customSchedule = {
+        ...(user.customSchedule || {}),
+        ...customSchedule
+      };
+    }
+
+    if (manualShifts) {
+      user.manualShifts = {
+        ...(user.manualShifts || {}),
+        ...manualShifts
+      };
+    }
+
+    await user.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[PATCH /users/:name ERROR]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 // Update user department
 router.put('/users/:id', async (req, res) => {
   const { id } = req.params;
@@ -289,38 +319,6 @@ router.patch('/sessions/:id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('[SESSION UPDATE ERROR]', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-///add or update custom sched or manualshifts
-router.patch('/users/:name', async (req, res) => {
-  const { name } = req.params;
-  const { customSchedule, manualShifts } = req.body;
-
-  try {
-    const user = await User.findOne({ name }); // ✅ correct casing
-
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-    if (customSchedule) {
-      user.customSchedule = {
-        ...(user.customSchedule || {}),
-        ...customSchedule
-      };
-    }
-
-    if (manualShifts) {
-      user.manualShifts = {
-        ...(user.manualShifts || {}),
-        ...manualShifts
-      };
-    }
-
-    await user.save();
-    res.json({ success: true });
-  } catch (err) {
-    console.error('[PATCH /users/:name ERROR]', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });

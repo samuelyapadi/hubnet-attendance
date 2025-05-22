@@ -80,4 +80,20 @@ function calculateNightMinutes(startTime, endTime) {
   return nightMinutes;
 }
 
-export { getExpectedShifts, calculateNightMinutes };
+function getWorkMinutes(timeStr) {
+  if (!timeStr || !timeStr.includes('-')) return 0;
+
+  const [start, end] = timeStr.split('-');
+  const [sH, sM] = start.split(':').map(Number);
+  const [eH, eM] = end.split(':').map(Number);
+
+  let startMin = sH * 60 + sM;
+  let endMin = eH * 60 + eM;
+
+  // handle overnight shift
+  if (endMin <= startMin) endMin += 24 * 60;
+
+  return endMin - startMin;
+}
+
+export { getExpectedShifts, calculateNightMinutes, getWorkMinutes };

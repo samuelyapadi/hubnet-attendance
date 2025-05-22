@@ -63,6 +63,26 @@
   <a href="employees.html" class="btn">← Back to Employee List</a>
   <a href="admin.html" class="btn">Back to Admin Dashboard</a>
 
+  <!-- 🔧 Manual Shift Override -->
+  <div style="margin: 1rem 0;">
+    <button class="btn" onclick="openManualShiftModal()">+ Set Manual Shift</button>
+  </div>
+
+  <div id="manualShiftModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
+    <h3>Set Manual Shift for <span id="modalEmployeeName"></span></h3>
+    <label>Date:
+      <input type="date" id="manualShiftDate" required>
+    </label><br><br>
+    <label>Start Time:
+      <input type="time" id="manualShiftStart" required>
+    </label><br><br>
+    <label>End Time:
+      <input type="time" id="manualShiftEnd" required>
+    </label><br><br>
+    <button class="btn" onclick="submitManualShift()">Save</button>
+    <button class="btn" onclick="closeManualShiftModal()">Cancel</button>
+  </div>
+
   <table>
     <thead>
       <tr>
@@ -306,6 +326,55 @@ function resetFilters() {
   document.getElementById('startDate').value = '';
   document.getElementById('endDate').value = '';
   applyFilterAndRender();
+}
+
+function openManualShiftModal() {
+  document.getElementById('modalEmployeeName').textContent = employeeName;
+  document.getElementById('manualShiftDate').value = '';
+  document.getElementById('manualShiftStart').value = '';
+  document.getElementById('manualShiftEnd').value = '';
+  document.getElementById('manualShiftModal').style.display = 'block';
+}
+
+function closeManualShiftModal() {
+  document.getElementById('manualShiftModal').style.display = 'none';
+}
+
+async function submitManualShift() {
+  const date = document.getElementById('manualShiftDate').value;
+  const start = document.getElementById('manualShiftStart').value;
+  const end = document.getElementById('manualShiftEnd').value;
+
+  if (!date || !start || !end) {
+    alert("❌ Please fill in all fields.");
+    return;
+  }
+
+  const shiftTime = `${start}-${end}`;
+  const body = {
+    manualShifts: {
+      [date]: { time: shiftTime }
+    }
+  };
+
+  try {
+    const res = await fetch(`/api/users/${encodeURIComponent(employeeName)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      alert('✅ Manual shift saved!');
+      closeManualShiftModal();
+    } else {
+      alert('❌ Failed to save shift.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('❌ Request failed.');
+  }
 }
 </script>
 </body>

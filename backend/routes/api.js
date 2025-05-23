@@ -4,6 +4,8 @@ const User = require('../models/User');
 const Attendance = require('../models/Attendance');
 
 function calculateLeaveEntitlement(user) {
+  if (!user.joinDate || isNaN(new Date(user.joinDate))) return 0;
+
   const now = new Date();
   const joinDate = new Date(user.joinDate);
   const monthsWorked = (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth());
@@ -166,7 +168,7 @@ router.get('/users/:name/leave-balance', async (req, res) => {
     const user = await User.findOne({ name: req.params.name });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const entitlementDays = calculateLeaveEntitlement(user.joinDate);
+    const entitlementDays = calculateLeaveEntitlement(user);
     const totalEntitledHours = entitlementDays * 8;
 
     const paidLeaveSessions = await Attendance.find({
@@ -366,7 +368,7 @@ router.get('/leave-balance/all', async (req, res) => {
     const results = [];
 
     for (const user of users) {
-      const entitlementDays = calculateLeaveEntitlement(user.joinDate);
+      const entitlementDays = calculateLeaveEntitlement(user);
       const totalEntitledHours = entitlementDays * 8;
 
       const paidLeaveSessions = await Attendance.find({
@@ -390,6 +392,14 @@ router.get('/leave-balance/all', async (req, res) => {
       const hoursRemaining = Math.max(0, totalEntitledHours - hoursUsed);
       const days = Math.floor(hoursRemaining / 8);
       const hours = Math.round((hoursRemaining % 8 + Number.EPSILON) * 2) / 2;
+
+      console.log('[LEAVE DEBUG]', {
+        name: user.name,
+        joinDate: user.joinDate,
+        isPartTime: user.isPartTime,
+        weeklyWorkingDays: user.weeklyWorkingDays,
+        entitlementDays
+      });
 
       results.push({
         name: user.name,

@@ -158,6 +158,87 @@ async function applyCombinedFilters() {
   populateEmployeesTable(filteredUsers);
 }
 
+function populateEmployeesTable(users) {
+  const tbody = document.querySelector("#employeesTable tbody");
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  users.forEach(user => {
+    const userId = user._id;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="text" value="${user.name || ''}" disabled></td>
+      <td>
+        <select disabled style="font-size: 13px; padding: 4px 6px;">
+          ${['THERMAL', 'SPL', 'IMPORTEXPORT', 'FIELD', 'NARITAOPS', 'ART', 'OCEAN', 'BIZDEV', 'IT', 'FINANCE', 'QA', 'HR']
+            .map(dept => {
+              const label = ({
+                IMPORTEXPORT: '国際航空貨物輸送部',
+                FIELD: 'フィールド部',
+                NARITAOPS: '成田通関部',
+                ART: '美術品輸送部',
+                OCEAN: '海上貨物輸送部',
+                BIZDEV: '事業開発部',
+                FINANCE: '財務経理部',
+                QA: '品質保証部',
+                HR: '人事部'
+              })[dept] || dept;
+              return `<option value="${dept}" ${user.department === dept ? 'selected' : ''}>${label}</option>`;
+            }).join('')}
+        </select>
+      </td>
+      <td><button onclick="viewEmployeeLog('${user.name}')">View Logs</button></td>
+      <td><input type="text" value="${user.totalOvertime || '0h 0m'}" disabled></td>
+      <td><input type="text" value="${user.remainingLeave || '-'}" disabled></td>
+      <td>
+        <button onclick="enableEdit(this)">Edit</button>
+        <button onclick="saveUserEdits('${userId}', this)" style="display:none;">Save</button>
+        <button onclick="deleteUser('${userId}')">Delete</button>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+function populateFilters(users, sessions) {
+  const yearSet = new Set();
+  const monthSet = new Set();
+  const deptFilter = document.getElementById('employeeDeptFilter');
+  const monthSelect = document.getElementById('monthSelect');
+  const yearSelect = document.getElementById('yearSelect');
+
+  sessions.forEach(s => {
+    const date = new Date(s.checkIn);
+    if (!isNaN(date)) {
+      yearSet.add(date.getFullYear());
+      monthSet.add(date.getMonth());
+    }
+  });
+
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  yearSelect.innerHTML = '<option value="">All</option>' +
+    [...yearSet].sort((a, b) => b - a).map(y => `<option value="${y}">${y}</option>`).join('');
+
+  monthSelect.innerHTML = '<option value="">All</option>' +
+    [...monthSet].sort((a, b) => a - b).map(m => `<option value="${m}">${monthNames[m]}</option>`).join('');
+
+  const depts = [...new Set(users.map(u => u.department).filter(Boolean))].sort();
+  depts.forEach(dept => {
+    const opt = document.createElement('option');
+    opt.value = dept;
+    opt.textContent = dept;
+    deptFilter.appendChild(opt);
+  });
+
+  updateNameFilterOptions();
+}
+
 export function updateNameFilterOptions() {
   const nameFilter = document.getElementById('employeeNameFilter');
   const deptFilter = document.getElementById('employeeDeptFilter');

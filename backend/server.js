@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path'); // ✅ ADD THIS
+const path = require('path');
 
 const app = express();
 const apiRoutes = require('./routes/api');
@@ -17,13 +17,10 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // ✅ Mount backend API
 app.use('/api', apiRoutes);
 
-// Fallback to index.html (for single-page apps or safe routing)
-app.get('*', (req, res, next) => {
-  if (req.path.includes('.') || req.path.startsWith('/api')) {
-    return next(); // Let static or API handlers take over
-  }
-  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
-});
+// ❌ DO NOT use a wildcard fallback unless building single-page app
+// This caused .js files to be served as HTML, resulting in MIME errors
+// If fallback behavior is needed later, re-add with proper file-type checking
+
 console.log('📦 MONGO_URI from env:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {

@@ -18,7 +18,10 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/api', apiRoutes);
 
 // Fallback to index.html (for single-page apps or safe routing)
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
+  if (req.path.includes('.') || req.path.startsWith('/api')) {
+    return next(); // Let static or API handlers take over
+  }
   res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 console.log('📦 MONGO_URI from env:', process.env.MONGO_URI);

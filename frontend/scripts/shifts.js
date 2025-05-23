@@ -31,12 +31,26 @@ function getExpectedShifts(user, date = new Date()) {
   }
 
   // 2. Custom weekly schedule
-  if (user?.customSchedule) {
-    const dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const today = dayMap[date.getDay()];
-    const schedule = user.customSchedule[today];
-    if (schedule) return schedule;
-  }
+const dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+const today = dayMap[date.getDay()];
+
+// 2. Custom weekly schedule
+if (user?.customSchedule) {
+  const schedule = user.customSchedule[today];
+  if (schedule) return schedule;
+}
+
+// 2.1 Weekly shift pattern override
+if (user?.weeklyShiftPattern?.[today]) {
+  const label = user.weeklyShiftPattern[today];
+  const isWknd = isWeekend(date);
+  const shiftSet = user?.department === "SPL"
+    ? (isWknd ? SPL_SHIFTS.weekend : SPL_SHIFTS.weekday)
+    : [DEFAULT_SHIFT];
+
+  const match = shiftSet.find(s => s.label === label);
+  if (match) return match;
+}
 
   // 3. Fixed default shift
   if (user?.defaultShift) return user.defaultShift;

@@ -63,34 +63,6 @@
   <a href="employees.html" class="btn">← Back to Employee List</a>
   <a href="admin.html" class="btn">Back to Admin Dashboard</a>
 
-<!-- 🔁 Weekly Shift Pattern Modal -->
-<div style="margin: 1rem 0;">
-  <button class="btn" onclick="openWeeklyShiftModal()">+ Set Weekly Shift</button>
-</div>
-
-<div id="weeklyShiftModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
-  <h3>Set Weekly Shift for <span id="modalEmployeeName"></span></h3>
-  <label>Day of Week:
-    <select id="weeklyShiftDay" required>
-      <option value="monday">Monday</option>
-      <option value="tuesday">Tuesday</option>
-      <option value="wednesday">Wednesday</option>
-      <option value="thursday">Thursday</option>
-      <option value="friday">Friday</option>
-      <option value="saturday">Saturday</option>
-      <option value="sunday">Sunday</option>
-    </select>
-  </label><br><br>
-  <label>Start Time:
-    <input type="time" id="weeklyShiftStart" required>
-  </label><br><br>
-  <label>End Time:
-    <input type="time" id="weeklyShiftEnd" required>
-  </label><br><br>
-  <button class="btn" onclick="submitWeeklyShift()">Save</button>
-  <button class="btn" onclick="closeWeeklyShiftModal()">Cancel</button>
-</div>
-
   <table>
     <thead>
       <tr>
@@ -334,55 +306,6 @@ function resetFilters() {
   document.getElementById('startDate').value = '';
   document.getElementById('endDate').value = '';
   applyFilterAndRender();
-}
-
-function openWeeklyShiftModal() {
-  document.getElementById('modalEmployeeName').textContent = employeeName;
-  document.getElementById('weeklyShiftDay').value = 'monday';
-  document.getElementById('weeklyShiftStart').value = '';
-  document.getElementById('weeklyShiftEnd').value = '';
-  document.getElementById('weeklyShiftModal').style.display = 'block';
-}
-
-function closeWeeklyShiftModal() {
-  document.getElementById('weeklyShiftModal').style.display = 'none';
-}
-
-async function submitWeeklyShift() {
-  const day = document.getElementById('weeklyShiftDay').value;
-  const start = document.getElementById('weeklyShiftStart').value;
-  const end = document.getElementById('weeklyShiftEnd').value;
-
-  if (!day || !start || !end) {
-    alert("❌ Please fill in all fields.");
-    return;
-  }
-
-  const shiftTime = `${start}-${end}`;
-  const body = {
-    customSchedule: {
-      [day]: { time: shiftTime }
-    }
-  };
-
-try {
-  const res = await fetch(`/api/users/by-name/${encodeURIComponent(employeeName)}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  const result = await res.json();
-  if (result.success) {
-    alert(`✅ Weekly shift for ${day} saved!`);
-    closeWeeklyShiftModal();
-  } else {
-    alert('❌ Failed to save weekly shift.');
-  }
-} catch (err) {
-  console.error(err);
-  alert('❌ Request failed.');
-}
 }
 </script>
 </body>

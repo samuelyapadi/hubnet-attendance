@@ -123,6 +123,7 @@
         employeeId = user._id;
         if (user.joinDate) {
           document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);
+          document.getElementById('editIsShiftWorker').value = user.isShiftWorker ? "true" : "false";
        }
 
       document.getElementById('editIsPartTime').value = user.isPartTime ? "true" : "false";
@@ -362,13 +363,13 @@ function saveEmployeeInfo() {
 
   const joinDate = document.getElementById('editJoinDate').value;
   const isPartTime = document.getElementById('editIsPartTime').value === 'true';
+  const isShiftWorker = document.getElementById('editIsShiftWorker').value === 'true';
   const weeklyWorkingDays = isPartTime ? Number(document.getElementById('editWeeklyWorkingDays').value) : 5;
 
   fetch(`/api/users/${employeeId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ joinDate, isPartTime, weeklyWorkingDays })
-  })
+    body: JSON.stringify({ joinDate, isPartTime, weeklyWorkingDays, isShiftWorker })
     .then(res => res.json())
     .then(result => {
       if (result.success) {

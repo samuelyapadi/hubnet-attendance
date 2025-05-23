@@ -1,4 +1,4 @@
-import { calculateFullTimeLeaveDays } from './scripts/leaveCalculator.js';
+import { calculateFullTimeLeaveDays } from '/scripts/leaveCalculator.js';
 
 let allUsers = [];
 let allSessions = [];

@@ -11,15 +11,17 @@ const apiRoutes = require('./routes/api');
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 
-// ✅ Serve static frontend files
+// ✅ Serve frontend static files correctly
+app.use('/scripts', express.static(path.join(__dirname, '../frontend/scripts')));
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// ✅ Mount backend API
+// ✅ Backend API routes
 app.use('/api', apiRoutes);
 
-// ❌ DO NOT use a wildcard fallback unless building single-page app
-// This caused .js files to be served as HTML, resulting in MIME errors
-// If fallback behavior is needed later, re-add with proper file-type checking
+// ✅ Fallback for frontend routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+});
 
 console.log('📦 MONGO_URI from env:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI)

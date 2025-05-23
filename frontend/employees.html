@@ -8,7 +8,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Employees List</title>
-  
 </head>
 <body>
   <!-- 🔝 Sticky Navigation Bar -->
@@ -21,25 +20,7 @@
   <a href="admin.html" class="btn">← Back to Admin Dashboard</a>
   <div id="app"></div>
 
-  <script type="module">
-    import {
-      fetchAndRenderEmployees,
-      viewEmployeeLog,
-      enableEdit,
-      saveUserEdits,
-      deleteUser,
-      updateNameFilterOptions,
-      resetEmployeeFilters  
-    } from './employees.js';
-
-    window.viewEmployeeLog = viewEmployeeLog;
-    window.enableEdit = enableEdit;
-    window.saveUserEdits = saveUserEdits;
-    window.deleteUser = deleteUser;
-    window.updateNameFilterOptions = updateNameFilterOptions;
-    window.resetEmployeeFilters = resetEmployeeFilters;
-
-    fetchAndRenderEmployees();
-  </script>
+  <!-- ✅ Main logic with leave calculations -->
+  <script type="module" src="scripts/employees.js"></script>
 </body>
 </html>

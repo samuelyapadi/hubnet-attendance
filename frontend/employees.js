@@ -1,21 +1,32 @@
-import { calculateFullTimeLeaveDays } from '/scripts/leaveCalculator.js';
+// employees.js
 
 let allUsers = [];
 let allSessions = [];
+let leaveBalanceMap = new Map();
 
 export async function fetchAndRenderEmployees() {
-  const [usersRes, sessionsRes] = await Promise.all([
+  const [usersRes, sessionsRes, leaveRes] = await Promise.all([
     fetch('/api/users'),
-    fetch('/api/sessions/all')
+    fetch('/api/sessions/all'),
+    fetch('/api/leave-balance/all')
   ]);
 
-  allUsers = await usersRes.json();
-  allSessions = await sessionsRes.json();
-  window.allUsers = allUsers;
+  const users = await usersRes.json();
+  const sessions = await sessionsRes.json();
+  const leaveData = await leaveRes.json();
+
+  leaveBalanceMap = new Map();
+  leaveData.forEach(entry => {
+    leaveBalanceMap.set(entry.name, entry.formatted);
+  });
+
+  allUsers = users;
+  allSessions = sessions;
+  window.allUsers = users;
 
   clearExistingContent();
   renderUIContainer();
-  populateFilters(allUsers, allSessions);
+  populateFilters(users, sessions);
   applyCombinedFilters();
 }
 
@@ -146,13 +157,7 @@ async function applyCombinedFilters() {
     });
 
     user.totalOvertime = `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`;
-
-    if (user.joinDate) {
-      const days = calculateFullTimeLeaveDays(user.joinDate);
-      user.remainingLeave = `${days}d`;
-    } else {
-      user.remainingLeave = '-';
-    }
+    user.remainingLeave = leaveBalanceMap.get(user.name) || '0d 0h';
   }));
 
   populateEmployeesTable(filteredUsers);

@@ -234,34 +234,38 @@ router.get('/sessions/all', async (req, res) => {
 });
 ///add or update custom sched or manualshifts
 router.patch('/users/by-name/:name', async (req, res) => {
-  const { name } = req.params;
-  const { customSchedule, manualShifts } = req.body;
+const { name } = req.params;
+const { customSchedule, manualShifts } = req.body;
 
-  try {
-    const user = await User.findOne({ name }); // ✅ correct casing
+try {
+  const decodedName = decodeURIComponent(name).trim();
 
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+  console.log('[PATCH /users/by-name] Searching for name:', decodedName);
+  
+  const user = await User.findOne({ name: decodedName });
 
-    if (customSchedule) {
-      user.customSchedule = {
-        ...(user.customSchedule || {}),
-        ...customSchedule
-      };
-    }
+  if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    if (manualShifts) {
-      user.manualShifts = {
-        ...(user.manualShifts || {}),
-        ...manualShifts
-      };
-    }
-
-    await user.save();
-    res.json({ success: true });
-  } catch (err) {
-    console.error('[PATCH /users/:name ERROR]', err);
-    res.status(500).json({ success: false, error: err.message });
+  if (customSchedule) {
+    user.customSchedule = {
+      ...(user.customSchedule || {}),
+      ...customSchedule
+    };
   }
+
+  if (manualShifts) {
+    user.manualShifts = {
+      ...(user.manualShifts || {}),
+      ...manualShifts
+    };
+  }
+
+  await user.save();
+  res.json({ success: true });
+} catch (err) {
+  console.error('[PATCH /users/by-name/:name ERROR]', err);
+  res.status(500).json({ success: false, error: err.message });
+}
 });
 // Update user department
 router.put('/users/:id', async (req, res) => {

@@ -11,15 +11,15 @@ const apiRoutes = require('./routes/api');
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 
-// ✅ Serve frontend static files correctly
+// ✅ Serve frontend static files
 app.use('/scripts', express.static(path.join(__dirname, '../frontend/scripts')));
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// ✅ Backend API routes
+// ✅ Serve backend API routes
 app.use('/api', apiRoutes);
 
-// ✅ Fallback for frontend routes
-app.get('*', (req, res) => {
+// ✅ Safe fallback: only for non-static routes
+app.get(/^\/(?!.*\.\w+$).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 

@@ -9,11 +9,12 @@ function calculateLeaveEntitlement(user) {
   const now = new Date();
   const joinDate = new Date(user.joinDate);
   const monthsWorked = (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth());
-  const halfYears = Math.floor(monthsWorked / 6);
+  const fullYears = Math.floor(monthsWorked / 12);
 
   if (!user.isPartTime || user.weeklyWorkingDays >= 5) {
     const fullTimeTable = [10, 11, 12, 14, 16, 18, 20];
-    return fullTimeTable[Math.min(fullTimeTable.length - 1, halfYears)] || 0;
+    const index = Math.max(0, Math.min(fullTimeTable.length - 1, fullYears));
+    return fullTimeTable[index];
   } else {
     const partTimeTable = {
       4: [7, 8, 9, 10, 12, 13, 15],
@@ -22,7 +23,8 @@ function calculateLeaveEntitlement(user) {
       1: [1, 2, 2, 2, 3, 3, 3]
     };
     const row = partTimeTable[user.weeklyWorkingDays] || [];
-    return row[Math.min(row.length - 1, halfYears)] || 0;
+    const index = Math.max(0, Math.min(row.length - 1, fullYears));
+    return row[index] || 0;
   }
 }
 

@@ -13,7 +13,7 @@ function calculateLeaveEntitlement(user) {
 
   if (!user.isPartTime || user.weeklyWorkingDays >= 5) {
     const fullTimeTable = [10, 11, 12, 14, 16, 18, 20];
-    return fullTimeTable[Math.min(fullTimeTable.length - 1, halfYears - 1)] || 0;
+    return fullTimeTable[Math.min(fullTimeTable.length - 1, halfYears)] || 0;
   } else {
     const partTimeTable = {
       4: [7, 8, 9, 10, 12, 13, 15],
@@ -22,7 +22,7 @@ function calculateLeaveEntitlement(user) {
       1: [1, 2, 2, 2, 3, 3, 3]
     };
     const row = partTimeTable[user.weeklyWorkingDays] || [];
-    return row[Math.min(row.length - 1, halfYears - 1)] || 0;
+    return row[Math.min(row.length - 1, halfYears)] || 0;
   }
 }
 

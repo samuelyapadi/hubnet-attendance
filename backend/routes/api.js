@@ -3,13 +3,25 @@ const router = express.Router();
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
 
-function calculateLeaveEntitlement(joinDate) {
+function calculateLeaveEntitlement(user) {
   const now = new Date();
-  const diffInMs = now - new Date(joinDate);
-  const years = diffInMs / (1000 * 60 * 60 * 24 * 365.25);
-  if (years < 0.5) return 0;
-  const fullYears = Math.floor(years + 0.5);
-  return Math.min(10 + (fullYears - 1), 20); // 10 after 0.5 years, caps at 20
+  const joinDate = new Date(user.joinDate);
+  const monthsWorked = (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth());
+  const halfYears = Math.floor(monthsWorked / 6);
+
+  if (!user.isPartTime || user.weeklyWorkingDays >= 5) {
+    const fullTimeTable = [10, 11, 12, 14, 16, 18, 20];
+    return fullTimeTable[Math.min(fullTimeTable.length - 1, halfYears - 1)] || 0;
+  } else {
+    const partTimeTable = {
+      4: [7, 8, 9, 10, 12, 13, 15],
+      3: [5, 6, 6, 8, 9, 10, 11],
+      2: [3, 4, 4, 5, 6, 6, 7],
+      1: [1, 2, 2, 2, 3, 3, 3]
+    };
+    const row = partTimeTable[user.weeklyWorkingDays] || [];
+    return row[Math.min(row.length - 1, halfYears - 1)] || 0;
+  }
 }
 
 // Register face

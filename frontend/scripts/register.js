@@ -7,6 +7,9 @@ const saveUserBtn = document.getElementById('saveUserBtn');
 const usernameInput = document.getElementById('username');
 const departmentSelect = document.getElementById('department');
 const joinDateInput = document.getElementById('joinDate');
+const isPartTimeSelect = document.getElementById('isPartTime');
+const weeklyWorkingDaysSelect = document.getElementById('weeklyWorkingDays');
+const workingDaysContainer = document.getElementById('workingDaysContainer');
 const photoCount = document.getElementById('photoCount');
 const status = document.getElementById('status');
 
@@ -51,17 +54,26 @@ function restartCameraWithNotice() {
 }
 
 function validateFormInputs() {
+  const isPartTime = isPartTimeSelect.value === 'true';
   const isReady =
     usernameInput.value.trim() &&
     departmentSelect.value &&
     joinDateInput.value &&
+    (!isPartTime || weeklyWorkingDaysSelect.value) &&
     descriptors.length === 3;
+
   saveUserBtn.disabled = !isReady;
 }
 
 usernameInput?.addEventListener('input', validateFormInputs);
 departmentSelect?.addEventListener('change', validateFormInputs);
 joinDateInput?.addEventListener('input', validateFormInputs);
+isPartTimeSelect?.addEventListener('change', () => {
+  const isPartTime = isPartTimeSelect.value === 'true';
+  workingDaysContainer.style.display = isPartTime ? 'block' : 'none';
+  validateFormInputs();
+});
+weeklyWorkingDaysSelect?.addEventListener('change', validateFormInputs);
 
 capturePhotoBtn?.addEventListener('click', async () => {
   if (isCapturing) return;
@@ -120,8 +132,10 @@ saveUserBtn?.addEventListener('click', async () => {
   const department = departmentSelect.value;
   const joinDateRaw = joinDateInput?.value;
   const joinDate = joinDateRaw ? new Date(joinDateRaw).toISOString() : '';
+  const isPartTime = isPartTimeSelect.value === 'true';
+  const weeklyWorkingDays = isPartTime ? Number(weeklyWorkingDaysSelect.value) : 5;
 
-  if (!name || !department || descriptors.length !== 3) {
+  if (!name || !department || !joinDate || descriptors.length !== 3) {
     alert("Please complete all fields and capture 3 photos.");
     return;
   }
@@ -131,7 +145,9 @@ saveUserBtn?.addEventListener('click', async () => {
     department,
     joinDate,
     descriptors,
-    snapshots
+    snapshots,
+    isPartTime,
+    weeklyWorkingDays
   });
 
   if (result.success) {
@@ -145,6 +161,9 @@ saveUserBtn?.addEventListener('click', async () => {
     departmentSelect.value = "";
     usernameInput.value = "";
     joinDateInput.value = "";
+    isPartTimeSelect.value = "false";
+    weeklyWorkingDaysSelect.value = "1";
+    workingDaysContainer.style.display = "none";
   } else {
     alert(`❌ Failed to register: ${result.error || 'Unknown error'}`);
     soundFail.play();

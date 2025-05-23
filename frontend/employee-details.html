@@ -60,6 +60,35 @@
     <p>Paid Leave Remaining: <strong id="leaveBalance">-</strong></p>
   </div>
 
+  <div class="summary">
+  <h2>Edit Employment Info</h2>
+
+  <label>Join Date:
+    <input type="date" id="editJoinDate" />
+  </label>
+
+  <label>Employment Type:
+    <select id="editIsPartTime">
+      <option value="false">Full-Time</option>
+      <option value="true">Part-Time</option>
+    </select>
+  </label>
+
+  <div id="editWorkingDaysContainer" style="display: none;">
+    <label>Weekly Working Days:
+      <select id="editWeeklyWorkingDays">
+        <option value="1">1 day/week</option>
+        <option value="2">2 days/week</option>
+        <option value="3">3 days/week</option>
+        <option value="4">4 days/week</option>
+      </select>
+    </label>
+  </div>
+
+  <button class="btn" onclick="saveEmployeeInfo()">💾 Save Info</button>
+</div>
+
+
   <a href="employees.html" class="btn">← Back to Employee List</a>
   <a href="admin.html" class="btn">Back to Admin Dashboard</a>
 
@@ -82,6 +111,26 @@
     const params = new URLSearchParams(window.location.search);
     const employeeName = params.get('name');
     document.getElementById('employeeName').textContent = `Logs for: ${employeeName}`;
+
+    let employeeId = null;
+
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(users => {
+        const user = users.find(u => u.name === employeeName);
+        if (!user) return;
+
+        employeeId = user._id;
+        if (user.joinDate) {
+          document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);
+       }
+
+      document.getElementById('editIsPartTime').value = user.isPartTime ? "true" : "false";
+      if (user.isPartTime) {
+        document.getElementById('editWorkingDaysContainer').style.display = 'block';
+        document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
+      }
+    });
 
     let allRecords = [];
 
@@ -307,6 +356,41 @@ function resetFilters() {
   document.getElementById('endDate').value = '';
   applyFilterAndRender();
 }
+
+function saveEmployeeInfo() {
+  if (!employeeId) return alert('❌ Employee ID not loaded.');
+
+  const joinDate = document.getElementById('editJoinDate').value;
+  const isPartTime = document.getElementById('editIsPartTime').value === 'true';
+  const weeklyWorkingDays = isPartTime ? Number(document.getElementById('editWeeklyWorkingDays').value) : 5;
+
+  fetch(`/api/users/${employeeId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ joinDate, isPartTime, weeklyWorkingDays })
+  })
+    .then(res => res.json())
+    .then(result => {
+      if (result.success) {
+        alert('✅ Employment info updated.');
+
+        // 🔁 Auto-refresh leave balance
+        fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`)
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
+          });
+
+      } else {
+        alert('❌ Failed to update.');
+      }
+    })
+    .catch(err => {
+      console.error('[Update Error]', err);
+      alert('❌ Update request failed.');
+    });
+}
+
 </script>
 </body>
 </html>

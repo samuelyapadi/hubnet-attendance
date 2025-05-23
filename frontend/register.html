@@ -124,6 +124,22 @@
     <label for="joinDate">Join Date:</label>
     <input type="date" id="joinDate" />
 
+    <label for="isPartTime">Employment Type:</label>
+    <select id="isPartTime" name="isPartTime">
+      <option value="false">Full-Time</option>
+      <option value="true">Part-Time</option>
+    </select>
+
+    <div id="workingDaysContainer" style="display: none;">
+      <label for="weeklyWorkingDays">Weekly Working Days:</label>
+      <select id="weeklyWorkingDays" name="weeklyWorkingDays">
+        <option value="1">1 day/week</option>
+        <option value="2">2 days/week</option>
+        <option value="3">3 days/week</option>
+        <option value="4">4 days/week</option>
+      </select>
+    </div>
+
     <video id="video" autoplay playsinline></video>
 
     <button id="capturePhotoBtn">

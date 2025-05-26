@@ -221,7 +221,7 @@
         }
 
           const partTimeEl = document.getElementById('editIsPartTime');
-partTimeEl.value = user.isPartTime ? "1" : "0";
+          partTimeEl.value = user.isPartTime ? "1" : "0";
 
         if (user.isPartTime) {
           document.getElementById('editWorkingDaysContainer').style.display = 'block';
@@ -231,31 +231,14 @@ partTimeEl.value = user.isPartTime ? "1" : "0";
         }
 
           const shiftWorkerEl = document.getElementById('editIsShiftWorker');
-shiftWorkerEl.value = user.isShiftWorker ? "1" : "0";
+          shiftWorkerEl.value = user.isShiftWorker ? "1" : "0";
         
           document.getElementById('monthlyShiftContainer').style.display = user.isShiftWorker ? 'block' : 'none';
 
       document.getElementById('shiftMonth')?.addEventListener('change', () => {
-  if (!employeeId) return;
-  const month = document.getElementById('shiftMonth').value;
-  if (!month) return;
-
-  fetch(`/api/shifts/${employeeId}/${month}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data || !data.shifts) return;
-      document.getElementById('shiftMon').value = data.shifts.Mon || '';
-      document.getElementById('shiftTue').value = data.shifts.Tue || '';
-      document.getElementById('shiftWed').value = data.shifts.Wed || '';
-      document.getElementById('shiftThu').value = data.shifts.Thu || '';
-      document.getElementById('shiftFri').value = data.shifts.Fri || '';
-      document.getElementById('shiftSat').value = data.shifts.Sat || '';
-      document.getElementById('shiftSun').value = data.shifts.Sun || '';
-    });
-});
-});
-
-    let allRecords = [];
+        if (!employeeId) return;
+        const month = document.getElementById('shiftMonth').value;
+        if (!month) return;
 
     fetch('/api/sessions/all')
       .then(res => res.json())
@@ -274,6 +257,23 @@ shiftWorkerEl.value = user.isShiftWorker ? "1" : "0";
         console.error('[Leave Balance Fetch Error]', err);
         document.getElementById('leaveBalance').textContent = '-';
      });
+
+  fetch(`/api/shifts/${employeeId}/${month}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || !data.shifts) return;
+      document.getElementById('shiftMon').value = data.shifts.Mon || '';
+      document.getElementById('shiftTue').value = data.shifts.Tue || '';
+      document.getElementById('shiftWed').value = data.shifts.Wed || '';
+      document.getElementById('shiftThu').value = data.shifts.Thu || '';
+      document.getElementById('shiftFri').value = data.shifts.Fri || '';
+      document.getElementById('shiftSat').value = data.shifts.Sat || '';
+      document.getElementById('shiftSun').value = data.shifts.Sun || '';
+    });
+});
+});
+
+    let allRecords = [];
 
     function toLocalDatetimeString(dateStr) {
       const date = new Date(dateStr);

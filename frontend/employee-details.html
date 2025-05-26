@@ -75,11 +75,116 @@
   </label>
 
   <label>Shift Worker:
-    <select id="editIsShiftWorker">
-      <option value="false">No</option>
-      <option value="true">Yes</option>
+  <select id="editIsShiftWorker">
+    <option value="false">No</option>
+    <option value="true">Yes</option>
+  </select>
+</label>
+<div id="shiftOptions" style="display: none; margin-top: 0.5rem;">
+  <label>Assigned Shift:
+    <select>
+      <option value="">-- Select --</option>
+      <option>Weekday: 08:30–17:30</option>
+      <option>Weekday: 12:00–21:00</option>
+      <option>Weekday: 13:30–22:30</option>
+      <option>Weekday: 22:30–08:30 (Night)</option>
+      <option>Weekday: 23:50–08:50 (Night)</option>
+      <option>Weekend: 08:30–15:30</option>
+      <option>Weekend: 14:00–21:00</option>
+      <option>Weekend: 15:30–22:30</option>
+      <option>Weekend: 22:30–08:30 (Night)</option>
+      <option>Weekend: 23:50–08:50 (Night)</option>
     </select>
   </label>
+</div>
+
+<div id="monthlyShiftContainer" style="display: none; margin-top: 1rem;">
+  <h3>Monthly Shift Pattern</h3>
+  <label for="shiftMonth">Select Month:</label>
+  <input type="month" id="shiftMonth" />
+
+  <div id="shiftPatternGrid" style="margin-top: 0.5rem;">
+    <label>Monday:
+      <select id="shiftMon">
+        <option value="">--</option>
+        <option value="1">① 08:30–17:30</option>
+        <option value="2">② 12:00–21:00</option>
+        <option value="3">③ 13:30–22:30</option>
+        <option value="4">④ 22:30–08:30</option>
+        <option value="5">⑤ 23:50–08:50</option>
+      </select>
+    </label><br/>
+
+    <label>Tuesday:
+      <select id="shiftTue">
+        <option value="">--</option>
+        <option value="1">① 08:30–17:30</option>
+        <option value="2">② 12:00–21:00</option>
+        <option value="3">③ 13:30–22:30</option>
+        <option value="4">④ 22:30–08:30</option>
+        <option value="5">⑤ 23:50–08:50</option>
+      </select>
+    </label><br/>
+
+    <label>Wednesday:
+      <select id="shiftWed">
+        <option value="">--</option>
+        <option value="1">① 08:30–17:30</option>
+        <option value="2">② 12:00–21:00</option>
+        <option value="3">③ 13:30–22:30</option>
+        <option value="4">④ 22:30–08:30</option>
+        <option value="5">⑤ 23:50–08:50</option>
+      </select>
+    </label><br/>
+
+    <label>Thursday:
+      <select id="shiftThu">
+        <option value="">--</option>
+        <option value="1">① 08:30–17:30</option>
+        <option value="2">② 12:00–21:00</option>
+        <option value="3">③ 13:30–22:30</option>
+        <option value="4">④ 22:30–08:30</option>
+        <option value="5">⑤ 23:50–08:50</option>
+      </select>
+    </label><br/>
+
+    <label>Friday:
+      <select id="shiftFri">
+        <option value="">--</option>
+        <option value="1">① 08:30–17:30</option>
+        <option value="2">② 12:00–21:00</option>
+        <option value="3">③ 13:30–22:30</option>
+        <option value="4">④ 22:30–08:30</option>
+        <option value="5">⑤ 23:50–08:50</option>
+      </select>
+    </label><br/>
+
+    <label>Saturday:
+      <select id="shiftSat">
+        <option value="">--</option>
+        <option value="1">① 08:30–17:30</option>
+        <option value="2">② 12:00–21:00</option>
+        <option value="3">③ 13:30–22:30</option>
+        <option value="4">④ 22:30–08:30</option>
+        <option value="5">⑤ 23:50–08:50</option>
+      </select>
+    </label><br/>
+
+    <label>Sunday:
+      <select id="shiftSun">
+        <option value="">--</option>
+        <option value="1">① 08:30–17:30</option>
+        <option value="2">② 12:00–21:00</option>
+        <option value="3">③ 13:30–22:30</option>
+        <option value="4">④ 22:30–08:30</option>
+        <option value="5">⑤ 23:50–08:50</option>
+      </select>
+    </label><br/>
+  </div>
+
+  <button class="btn" onclick="saveMonthlyShift()">💾 Save Monthly Shift</button>
+</div>
+
 
   <div id="editWorkingDaysContainer" style="display: none;">
     <label>Weekly Working Days:
@@ -131,13 +236,44 @@
         if (user.joinDate) {
           document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);
           document.getElementById('editIsShiftWorker').value = user.isShiftWorker ? "true" : "false";
+        if (user.isShiftWorker) {
+          document.getElementById('shiftOptions').style.display = 'block';
+      } else {
+          document.getElementById('shiftOptions').style.display = 'none';
+    }
        }
 
       document.getElementById('editIsPartTime').value = user.isPartTime ? "true" : "false";
       if (user.isPartTime) {
         document.getElementById('editWorkingDaysContainer').style.display = 'block';
         document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
+    } else {
+        document.getElementById('editWorkingDaysContainer').style.display = 'none';
+    }
+      if (user.isPartTime) {
+        document.getElementById('editWorkingDaysContainer').style.display = 'block';
+        document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
       }
+
+      document.getElementById('shiftMonth')?.addEventListener('change', () => {
+        const month = document.getElementById('shiftMonth').value;
+        if (!month || !employeeId) return;
+
+      fetch(`/api/shifts/${employeeId}/${month}`)
+        .then(res => res.json())
+        .then(data => {
+      if (!data || !data.shifts) return;
+
+      document.getElementById('shiftMon').value = data.shifts.Mon || '';
+      document.getElementById('shiftTue').value = data.shifts.Tue || '';
+      document.getElementById('shiftWed').value = data.shifts.Wed || '';
+      document.getElementById('shiftThu').value = data.shifts.Thu || '';
+      document.getElementById('shiftFri').value = data.shifts.Fri || '';
+      document.getElementById('shiftSat').value = data.shifts.Sat || '';
+      document.getElementById('shiftSun').value = data.shifts.Sun || '';
+    });
+});
+
     });
 
     let allRecords = [];
@@ -202,8 +338,8 @@
 
       yearSelect.addEventListener('change', applyFilterAndRender);
       monthSelect.addEventListener('change', applyFilterAndRender);
-  document.getElementById('startDate')?.addEventListener('change', applyFilterAndRender);
-  document.getElementById('endDate')?.addEventListener('change', applyFilterAndRender);
+      document.getElementById('startDate')?.addEventListener('change', applyFilterAndRender);
+      document.getElementById('endDate')?.addEventListener('change', applyFilterAndRender);
     }
 
     function applyFilterAndRender() {
@@ -226,79 +362,86 @@
       renderLogTable(filtered);
     }
 
-    function renderLogTable(records) {
-      const tbody = document.getElementById('logTable');
-      tbody.innerHTML = '';
-      document.getElementById('sessionCount').textContent = records.length;
+async function renderLogTable(records) {
+  const tbody = document.getElementById('logTable');
+  tbody.innerHTML = '';
+  document.getElementById('sessionCount').textContent = records.length;
 
-      let totalOvertimeMinutes = 0;
+  let totalOvertimeMinutes = 0;
+  const shiftTimes = {
+    '1': '08:30',
+    '2': '12:00',
+    '3': '13:30',
+    '4': '22:30',
+    '5': '23:50'
+  };
 
-      records.forEach(entry => {
-        const checkIn = new Date(entry.checkIn);
-        const checkOut = new Date(entry.checkOut);
-        const workedMs = checkOut - checkIn;
-        const totalMinutes = Math.max(0, Math.round(workedMs / 60000));
-        const adjustedWorked = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
-        let workedTime = '-';
-        let hours = 0;
-        let minutes = 0;
-        if (entry.type === 'work') {
-          hours = Math.floor(adjustedWorked / 60);
-          minutes = adjustedWorked % 60;
-          workedTime = adjustedWorked > 0 ? `${hours}h ${minutes}m` : '-';
-        }
-        let overtimeMinutes = 0;
-        let overtime = '-';
-        if (entry.type === 'work') {
-          overtimeMinutes = Math.max(0, adjustedWorked - 480);
-          overtime = overtimeMinutes > 0 ? `${Math.floor(overtimeMinutes / 60)}h ${overtimeMinutes % 60}m` : '-';
-        }
+  for (const entry of records) {
+    const checkIn = new Date(entry.checkIn);
+    const checkOut = new Date(entry.checkOut);
+    const workedMs = checkOut - checkIn;
+    const totalMinutes = Math.max(0, Math.round(workedMs / 60000));
+    const adjustedWorked = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
 
-        if (overtimeMinutes > 0) totalOvertimeMinutes += overtimeMinutes;
+    const sessionDate = new Date(entry.checkIn);
+    const yearMonth = sessionDate.toISOString().slice(0, 7);
+    const weekDayIndex = sessionDate.getDay();
+    const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const shiftDay = dayMap[weekDayIndex];
 
-        const row = document.createElement('tr');
-        const checkInValue = toLocalDatetimeString(entry.checkIn);
-        const checkOutValue = toLocalDatetimeString(entry.checkOut);
+    let isLate = false;
+    let nightWorkMinutes = 0;
+    try {
+      const shiftRes = await fetch(`/api/shifts/${employeeId}/${yearMonth}`);
+      const shiftData = await shiftRes.json();
+      const shiftCode = shiftData?.shifts?.[shiftDay];
+      const shiftStart = shiftTimes[shiftCode];
+      if (shiftStart) {
+        const [h, m] = shiftStart.split(':').map(Number);
+        const expected = new Date(checkIn);
+        expected.setHours(h, m, 0, 0);
+        isLate = checkIn > expected;
+      }
 
-        row.innerHTML = `
-          <td><input type="datetime-local" value="${checkInValue}" data-id="${entry._id}" data-type="checkIn" disabled></td>
-          <td><input type="datetime-local" value="${checkOutValue}" data-id="${entry._id}" data-type="checkOut" disabled></td>
-          <td>${workedTime}</td>
-          <td>${overtime}</td>
-          <td>
-            <select data-id="${entry._id}" data-type="type" disabled>
-              <option value="work" ${entry.type === 'work' ? 'selected' : ''}>Work</option>
-              <option value="paid_leave" ${entry.type === 'paid_leave' ? 'selected' : ''}>Paid Leave</option>
-              <option value="unpaid_leave" ${entry.type === 'unpaid_leave' ? 'selected' : ''}>Unpaid Leave</option>
-            </select>
-          </td>
-          <td>
-            ${
-              (entry.type === 'paid_leave' || entry.type === 'unpaid_leave') ?
-              (() => {
-                const ms = new Date(entry.checkOut) - new Date(entry.checkIn);
-                const fullDays = Math.floor(ms / (1000 * 60 * 60 * 24));
-                const leftoverMs = ms % (1000 * 60 * 60 * 24);
-                const leftoverHours = Math.round((leftoverMs / (1000 * 60 * 60)) * 2) / 2;
-                return `<input type="text" value="${fullDays}d ${leftoverHours}h" disabled readonly>`;
-              })() : ''
-            }
-          </td>
-          </td>
-          <td>
-            
-            <button class="btn edit-btn" onclick="enableEdit('${entry._id}', this)">✏️ Edit</button>
-            <button class="btn save-btn" onclick="saveSession('${entry._id}')" style="display:none;">📂 Save</button>
-            <button class="btn delete-btn" onclick="deleteSession('${entry._id}')">🗑️ Delete</button>
-          </td>
-        `;
-
-        tbody.appendChild(row);
-      });
-
-      const totalOvertime = `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`;
-      document.getElementById('overtimeCount').textContent = totalOvertime;
+      const ci = checkIn.getHours() + checkIn.getMinutes() / 60;
+      const co = checkOut.getHours() + checkOut.getMinutes() / 60;
+      if (ci < 5) nightWorkMinutes += Math.min(5, co) * 60;
+      if (co > 22) nightWorkMinutes += (co - Math.max(ci, 22)) * 60;
+    } catch (err) {
+      console.warn('[Shift check failed]', err);
     }
+
+    const workedTime = entry.type === 'work'
+      ? `${Math.floor(adjustedWorked / 60)}h ${adjustedWorked % 60}m${isLate ? ' 🚨 Late' : ''}`
+      : '-';
+
+    const overtimeMinutes = entry.type === 'work' ? Math.max(0, adjustedWorked - 480) : 0;
+    const overtime = overtimeMinutes > 0 ? `${Math.floor(overtimeMinutes / 60)}h ${overtimeMinutes % 60}m` : '-';
+    if (overtimeMinutes > 0) totalOvertimeMinutes += overtimeMinutes;
+
+    const nightWork = nightWorkMinutes > 0 ? `${Math.floor(nightWorkMinutes / 60)}h ${nightWorkMinutes % 60}m` : '';
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${toLocalDatetimeString(entry.checkIn)}</td>
+      <td>${toLocalDatetimeString(entry.checkOut)}</td>
+      <td>${workedTime}</td>
+      <td>${overtime}</td>
+      <td>${entry.type}</td>
+      <td>${nightWork}</td>
+      <td>
+        <button class="btn edit-btn" onclick="enableEdit('${entry._id}', this)">✏️ Edit</button>
+        <button class="btn save-btn" onclick="saveSession('${entry._id}')" style="display:none;">📂 Save</button>
+        <button class="btn delete-btn" onclick="deleteSession('${entry._id}')">🗑️ Delete</button>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  }
+
+  const totalOvertime = `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`;
+  document.getElementById('overtimeCount').textContent = totalOvertime;
+}
 
     window.enableEdit = function (sessionId, button) {
       const row = button.closest('tr');
@@ -397,6 +540,46 @@ function saveEmployeeInfo() {
     .catch(err => {
       console.error('[Update Error]', err);
       alert('❌ Update request failed.');
+    });
+}
+
+document.getElementById('editIsShiftWorker').addEventListener('change', () => {
+  const isShift = document.getElementById('editIsShiftWorker').value === 'true';
+  document.getElementById('shiftOptions').style.display = isShift ? 'block' : 'none';
+  document.getElementById('monthlyShiftContainer').style.display = isShift ? 'block' : 'none';
+});
+
+function saveMonthlyShift() {
+  if (!employeeId) return alert('❌ User ID missing');
+  const month = document.getElementById('shiftMonth').value;
+  if (!month) return alert('❌ Please select a month');
+
+  const shifts = {
+    Mon: document.getElementById('shiftMon').value,
+    Tue: document.getElementById('shiftTue').value,
+    Wed: document.getElementById('shiftWed').value,
+    Thu: document.getElementById('shiftThu').value,
+    Fri: document.getElementById('shiftFri').value,
+    Sat: document.getElementById('shiftSat').value,
+    Sun: document.getElementById('shiftSun').value
+  };
+
+  fetch(`/api/shifts/${employeeId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ month, shifts })
+  })
+    .then(res => res.json())
+    .then(result => {
+      if (result.success) {
+        alert('✅ Shift pattern saved!');
+      } else {
+        alert('❌ Failed to save shift pattern.');
+      }
+    })
+    .catch(err => {
+      console.error('[SHIFT SAVE ERROR]', err);
+      alert('❌ Server error.');
     });
 }
 

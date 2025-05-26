@@ -79,24 +79,6 @@
     <option value="false">No</option>
     <option value="true">Yes</option>
   </select>
-</label>
-<div id="shiftOptions" style="display: none; margin-top: 0.5rem;">
-  <label>Assigned Shift:
-    <select>
-      <option value="">-- Select --</option>
-      <option>Weekday: 08:30–17:30</option>
-      <option>Weekday: 12:00–21:00</option>
-      <option>Weekday: 13:30–22:30</option>
-      <option>Weekday: 22:30–08:30 (Night)</option>
-      <option>Weekday: 23:50–08:50 (Night)</option>
-      <option>Weekend: 08:30–15:30</option>
-      <option>Weekend: 14:00–21:00</option>
-      <option>Weekend: 15:30–22:30</option>
-      <option>Weekend: 22:30–08:30 (Night)</option>
-      <option>Weekend: 23:50–08:50 (Night)</option>
-    </select>
-  </label>
-</div>
 
 <div id="monthlyShiftContainer" style="display: none; margin-top: 1rem;">
   <h3>Monthly Shift Pattern</h3>
@@ -243,17 +225,14 @@
     }
        }
 
-      document.getElementById('editIsPartTime').value = user.isPartTime ? "true" : "false";
-      if (user.isPartTime) {
-        document.getElementById('editWorkingDaysContainer').style.display = 'block';
-        document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
+    document.getElementById('editIsPartTime').value = user.isPartTime ? "true" : "false";
+
+    if (user.isPartTime) {
+      document.getElementById('editWorkingDaysContainer').style.display = 'block';
+      document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
     } else {
-        document.getElementById('editWorkingDaysContainer').style.display = 'none';
+      document.getElementById('editWorkingDaysContainer').style.display = 'none';
     }
-      if (user.isPartTime) {
-        document.getElementById('editWorkingDaysContainer').style.display = 'block';
-        document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
-      }
 
       document.getElementById('shiftMonth')?.addEventListener('change', () => {
         const month = document.getElementById('shiftMonth').value;

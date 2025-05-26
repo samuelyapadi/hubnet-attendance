@@ -310,13 +310,21 @@ router.patch('/sessions/:id', async (req, res) => {
 });
 
 // Update user fields
+// PATCH: Update user fields including employment and shift status
 router.patch('/users/:id', async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+  const { joinDate, isPartTime, weeklyWorkingDays, isShiftWorker } = req.body;
 
   try {
-    const user = await User.findByIdAndUpdate(id, updates);
+    const user = await User.findById(id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    if (joinDate) user.joinDate = new Date(joinDate);
+    if (typeof isPartTime !== 'undefined') user.isPartTime = isPartTime === 'true' || isPartTime === true;
+    if (typeof isShiftWorker !== 'undefined') user.isShiftWorker = isShiftWorker === 'true' || isShiftWorker === true;
+    if (!isNaN(weeklyWorkingDays)) user.weeklyWorkingDays = Number(weeklyWorkingDays);
+
+    await user.save();
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

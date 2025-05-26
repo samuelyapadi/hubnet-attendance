@@ -7,9 +7,11 @@ const path = require('path');
 
 const app = express();
 const apiRoutes = require('./routes/api');
+const shiftRoutes = require('./routes/shifts');
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
+app.use('/api/shifts', shiftRoutes);
 
 // ✅ Serve frontend static files
 app.use('/scripts', express.static(path.join(__dirname, '../frontend/scripts')));

@@ -69,16 +69,16 @@
 
   <label>Employment Type:
     <select id="editIsPartTime">
-      <option value="false">Full-Time</option>
-      <option value="true">Part-Time</option>
-    </select>
+  <option value="0">Full-Time</option>
+  <option value="1">Part-Time</option>
+</select>
   </label>
 
   <label>Shift Worker:
   <select id="editIsShiftWorker">
-    <option value="false">No</option>
-    <option value="true">Yes</option>
-  </select>
+  <option value="0">No</option>
+  <option value="1">Yes</option>
+</select>
 
 <div id="monthlyShiftContainer" style="display: none; margin-top: 1rem;">
   <h3>Monthly Shift Pattern</h3>
@@ -208,64 +208,51 @@
 
     let employeeId = null;
 
-    fetch('/api/users')
-      .then(res => res.json())
-      .then(users => {
-        const user = users.find(u => u.name === employeeName);
-        if (!user) return;
+fetch('/api/users')
+  .then(res => res.json())
+  .then(users => {
+    const user = users.find(u => u.name === employeeName);
+    if (!user) return;
 
-        employeeId = user._id;
-        employeeId = user._id;
+    employeeId = user._id;
 
-        if (user.joinDate) {
-          document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);
-        }
+    if (user.joinDate) {
+      document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);
+    }
 
-          const partTimeEl = document.getElementById('editIsPartTime');
-partTimeEl.value = String(user.isPartTime);
-if (partTimeEl.value !== String(user.isPartTime)) {
-  [...partTimeEl.options].forEach(opt => {
-    opt.selected = opt.value === String(user.isPartTime);
-  });
-}
+    const partTimeEl = document.getElementById('editIsPartTime');
+    partTimeEl.value = user.isPartTime ? "1" : "0";
 
-        if (user.isPartTime) {
-          document.getElementById('editWorkingDaysContainer').style.display = 'block';
-          document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
-        } else {
-          document.getElementById('editWorkingDaysContainer').style.display = 'none';
-        }
+    if (user.isPartTime) {
+      document.getElementById('editWorkingDaysContainer').style.display = 'block';
+      document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
+    } else {
+      document.getElementById('editWorkingDaysContainer').style.display = 'none';
+    }
 
-          const shiftWorkerEl = document.getElementById('editIsShiftWorker');
-shiftWorkerEl.value = String(user.isShiftWorker);
-if (shiftWorkerEl.value !== String(user.isShiftWorker)) {
-  [...shiftWorkerEl.options].forEach(opt => {
-    opt.selected = opt.value === String(user.isShiftWorker);
-  });
-}
-        
-          document.getElementById('monthlyShiftContainer').style.display = user.isShiftWorker ? 'block' : 'none';
+    const shiftWorkerEl = document.getElementById('editIsShiftWorker');
+    shiftWorkerEl.value = user.isShiftWorker ? "1" : "0";
+    document.getElementById('monthlyShiftContainer').style.display = user.isShiftWorker ? 'block' : 'none';
 
-      document.getElementById('shiftMonth')?.addEventListener('change', () => {
-        const month = document.getElementById('shiftMonth').value;
-        if (!month || !employeeId) return;
+    document.getElementById('shiftMonth')?.addEventListener('change', () => {
+      const month = document.getElementById('shiftMonth').value;
+      if (!month || !employeeId) return;
 
       fetch(`/api/shifts/${employeeId}/${month}`)
         .then(res => res.json())
         .then(data => {
-      if (!data || !data.shifts) return;
+          if (!data || !data.shifts) return;
 
-      document.getElementById('shiftMon').value = data.shifts.Mon || '';
-      document.getElementById('shiftTue').value = data.shifts.Tue || '';
-      document.getElementById('shiftWed').value = data.shifts.Wed || '';
-      document.getElementById('shiftThu').value = data.shifts.Thu || '';
-      document.getElementById('shiftFri').value = data.shifts.Fri || '';
-      document.getElementById('shiftSat').value = data.shifts.Sat || '';
-      document.getElementById('shiftSun').value = data.shifts.Sun || '';
+          document.getElementById('shiftMon').value = data.shifts.Mon || '';
+          document.getElementById('shiftTue').value = data.shifts.Tue || '';
+          document.getElementById('shiftWed').value = data.shifts.Wed || '';
+          document.getElementById('shiftThu').value = data.shifts.Thu || '';
+          document.getElementById('shiftFri').value = data.shifts.Fri || '';
+          document.getElementById('shiftSat').value = data.shifts.Sat || '';
+          document.getElementById('shiftSun').value = data.shifts.Sun || '';
+        });
     });
-});
-
-    });
+  });
 
     let allRecords = [];
 
@@ -503,8 +490,8 @@ function saveEmployeeInfo() {
   if (!employeeId) return alert('❌ Employee ID not loaded.');
 
   const joinDate = document.getElementById('editJoinDate').value;
-  const isPartTime = document.getElementById('editIsPartTime').value === 'true';
-  const isShiftWorker = document.getElementById('editIsShiftWorker').value === 'true';
+  const isPartTime = document.getElementById('editIsPartTime').value === '1';
+  const isShiftWorker = document.getElementById('editIsShiftWorker').value === '1';
   const weeklyWorkingDays = isPartTime ? Number(document.getElementById('editWeeklyWorkingDays').value) : 5;
 
   fetch(`/api/users/${employeeId}`, {
@@ -535,7 +522,7 @@ function saveEmployeeInfo() {
 }
 
 document.getElementById('editIsShiftWorker').addEventListener('change', () => {
-  const isShift = document.getElementById('editIsShiftWorker').value === 'true';
+  const isShift = document.getElementById('editIsShiftWorker').value === '1';
   document.getElementById('monthlyShiftContainer').style.display = isShift ? 'block' : 'none';
 });
 

@@ -313,20 +313,37 @@ router.patch('/sessions/:id', async (req, res) => {
 // PATCH: Update user fields including employment and shift status
 router.patch('/users/:id', async (req, res) => {
   const { id } = req.params;
-  const { joinDate, isPartTime, weeklyWorkingDays, isShiftWorker } = req.body;
+  const {
+    joinDate,
+    isPartTime,
+    weeklyWorkingDays,
+    isShiftWorker
+  } = req.body;
 
   try {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    if (joinDate) user.joinDate = new Date(joinDate);
-    if (typeof isPartTime !== 'undefined') user.isPartTime = isPartTime === 'true' || isPartTime === true;
-    if (typeof isShiftWorker !== 'undefined') user.isShiftWorker = isShiftWorker === 'true' || isShiftWorker === true;
-    if (!isNaN(weeklyWorkingDays)) user.weeklyWorkingDays = Number(weeklyWorkingDays);
+    if (joinDate && !isNaN(Date.parse(joinDate))) {
+      user.joinDate = new Date(joinDate);
+    }
+
+    if (typeof isPartTime !== 'undefined') {
+      user.isPartTime = isPartTime === true || isPartTime === 'true';
+    }
+
+    if (typeof weeklyWorkingDays !== 'undefined' && !isNaN(Number(weeklyWorkingDays))) {
+      user.weeklyWorkingDays = Number(weeklyWorkingDays);
+    }
+
+    if (typeof isShiftWorker !== 'undefined') {
+      user.isShiftWorker = isShiftWorker === true || isShiftWorker === 'true';
+    }
 
     await user.save();
     res.json({ success: true });
   } catch (err) {
+    console.error('[UPDATE USER ERROR]', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });

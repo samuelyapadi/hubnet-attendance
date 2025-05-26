@@ -527,9 +527,32 @@ function saveEmployeeInfo() {
       if (result.success) {
         alert('✅ Employment info updated.');
 
-        // 🔁 Update displays
-        document.getElementById('employmentTypeDisplay').textContent = isPartTime ? 'Part-Time' : 'Full-Time';
-        document.getElementById('shiftWorkerDisplay').textContent = isShiftWorker ? 'Yes' : 'No';
+    // ✅ Fetch updated user from backend to reflect actual stored values
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(users => {
+        const updatedUser = users.find(u => u.name === employeeName);
+        if (!updatedUser) return;
+
+        document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
+        document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
+
+        if (updatedUser.isPartTime) {
+          document.getElementById('editWorkingDaysContainer').style.display = 'block';
+          document.getElementById('editWeeklyWorkingDays').value = updatedUser.weeklyWorkingDays || "1";
+        } else {
+          document.getElementById('editWorkingDaysContainer').style.display = 'none';
+        }
+
+        return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
+      })
+      .then(res => res?.json?.())
+      .then(data => {
+        if (data) {
+          document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
+        }
+      });
+
 
         fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`)
           .then(res => res.json())

@@ -74,6 +74,13 @@
     </select>
   </label>
 
+  <label>Shift Worker:
+    <select id="editIsShiftWorker">
+      <option value="false">No</option>
+      <option value="true">Yes</option>
+    </select>
+  </label>
+
   <div id="editWorkingDaysContainer" style="display: none;">
     <label>Weekly Working Days:
       <select id="editWeeklyWorkingDays">
@@ -370,6 +377,7 @@ function saveEmployeeInfo() {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ joinDate, isPartTime, weeklyWorkingDays, isShiftWorker })
+  })
     .then(res => res.json())
     .then(result => {
       if (result.success) {

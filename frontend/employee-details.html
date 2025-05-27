@@ -397,20 +397,19 @@ async function renderLogTable(records) {
     let isLate = false;
     let nightWorkMinutes = 0;
     try {
-      const shiftRes = await fetch(`/api/shifts/${employeeId}/${yearMonth}`);
-      const shiftData = await shiftRes.json();
-      const shiftCode = shiftData?.shifts?.[shiftDay];
-      const shiftStart = shiftTimes[shiftCode];
-
-      if (!shiftData?.shifts || !shiftCode) {
-        isLate = false; // ✅ Prevent lateness if no shift is assigned or pattern cleared
-      }
-
-      if (shiftStart) {
-        const [h, m] = shiftStart.split(':').map(Number);
-        const expected = new Date(checkIn);
-        expected.setHours(h, m, 0, 0);
-        isLate = checkIn > expected;
+      const userRes = await fetch(`/api/users/${employeeId}`);
+      const user = await userRes.json();
+      if (user.isShiftWorker) {
+        const shiftRes = await fetch(`/api/shifts/${employeeId}/${yearMonth}`);
+        const shiftData = await shiftRes.json();
+        const shiftCode = shiftData?.shifts?.[shiftDay];
+        const shiftStart = shiftTimes[shiftCode];
+        if (shiftStart) {
+          const [h, m] = shiftStart.split(':').map(Number);
+          const expected = new Date(checkIn);
+          expected.setHours(h, m, 0, 0);
+          isLate = checkIn > expected;
+        }
       }
 
       const ci = checkIn.getHours() + checkIn.getMinutes() / 60;

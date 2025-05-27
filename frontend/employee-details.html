@@ -517,6 +517,8 @@ function saveEmployeeInfo() {
   const isShiftWorker = document.getElementById('editIsShiftWorker').value === '1';
   const weeklyWorkingDays = isPartTime ? Number(document.getElementById('editWeeklyWorkingDays').value) : 5;
 
+  console.log('[PATCH PAYLOAD]', { joinDate, isPartTime, weeklyWorkingDays, isShiftWorker });
+
   fetch(`/api/users/${employeeId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -527,39 +529,32 @@ function saveEmployeeInfo() {
       if (result.success) {
         alert('✅ Employment info updated.');
 
-    // ✅ Fetch updated user from backend to reflect actual stored values
-    fetch('/api/users')
-      .then(res => res.json())
-      .then(users => {
-        const updatedUser = users.find(u => u.name === employeeName);
-        if (!updatedUser) return;
+        fetch('/api/users')
+          .then(res => res.json())
+          .then(users => {
+            const updatedUser = users.find(u => u.name === employeeName);
+            console.log('[UPDATED USER]', updatedUser);
+            if (!updatedUser) return;
 
-        document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
-        document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
+            // Update UI from true backend value
+            document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
+            document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
 
-        if (updatedUser.isPartTime) {
-          document.getElementById('editWorkingDaysContainer').style.display = 'block';
-          document.getElementById('editWeeklyWorkingDays').value = updatedUser.weeklyWorkingDays || "1";
-        } else {
-          document.getElementById('editWorkingDaysContainer').style.display = 'none';
-        }
+            if (updatedUser.isPartTime) {
+              document.getElementById('editWorkingDaysContainer').style.display = 'block';
+              document.getElementById('editWeeklyWorkingDays').value = updatedUser.weeklyWorkingDays || "1";
+            } else {
+              document.getElementById('editWorkingDaysContainer').style.display = 'none';
+            }
 
-        return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
-      })
-      .then(res => res?.json?.())
-      .then(data => {
-        if (data) {
-          document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
-        }
-      });
-
-
-        fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`)
+            return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
+          })
           .then(res => res.json())
           .then(data => {
-            document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
+            if (data) {
+              document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
+            }
           });
-
       } else {
         alert('❌ Failed to update.');
       }

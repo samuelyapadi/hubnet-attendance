@@ -529,26 +529,22 @@ function saveEmployeeInfo() {
       if (result.success) {
         alert('✅ Employment info updated.');
 
-        fetch('/api/users')
-          .then(res => res.json())
-          .then(users => {
-            const updatedUser = users.find(u => u.name === employeeName);
-            console.log('[UPDATED USER]', updatedUser);
-            if (!updatedUser) return;
+  fetch(`/api/users/${employeeId}`)
+    .then(res => res.json())
+    .then(updatedUser => {
+      document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
+      document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
 
-            // Update UI from true backend value
-            document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
-            document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
+      if (updatedUser.isPartTime) {
+        document.getElementById('editWorkingDaysContainer').style.display = 'block';
+        document.getElementById('editWeeklyWorkingDays').value = updatedUser.weeklyWorkingDays || "1";
+      } else {
+        document.getElementById('editWorkingDaysContainer').style.display = 'none';
+      }
 
-            if (updatedUser.isPartTime) {
-              document.getElementById('editWorkingDaysContainer').style.display = 'block';
-              document.getElementById('editWeeklyWorkingDays').value = updatedUser.weeklyWorkingDays || "1";
-            } else {
-              document.getElementById('editWorkingDaysContainer').style.display = 'none';
-            }
+      return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
+    })
 
-            return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
-          })
           .then(res => res.json())
           .then(data => {
             if (data) {

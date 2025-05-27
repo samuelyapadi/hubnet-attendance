@@ -401,6 +401,11 @@ async function renderLogTable(records) {
       const shiftData = await shiftRes.json();
       const shiftCode = shiftData?.shifts?.[shiftDay];
       const shiftStart = shiftTimes[shiftCode];
+
+      if (!shiftData?.shifts || !shiftCode) {
+        isLate = false; // ✅ Prevent lateness if no shift is assigned or pattern cleared
+      }
+
       if (shiftStart) {
         const [h, m] = shiftStart.split(':').map(Number);
         const expected = new Date(checkIn);
@@ -412,6 +417,7 @@ async function renderLogTable(records) {
       const co = checkOut.getHours() + checkOut.getMinutes() / 60;
       if (ci < 5) nightWorkMinutes += Math.min(5, co) * 60;
       if (co > 22) nightWorkMinutes += (co - Math.max(ci, 22)) * 60;
+
     } catch (err) {
       console.warn('[Shift check failed]', err);
     }
@@ -428,18 +434,24 @@ async function renderLogTable(records) {
 
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${toLocalDatetimeString(entry.checkIn)}</td>
-      <td>${toLocalDatetimeString(entry.checkOut)}</td>
+      <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkIn)}" data-id="${entry._id}" data-type="checkIn" disabled></td>
+      <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkOut)}" data-id="${entry._id}" data-type="checkOut" disabled></td>
       <td>${workedTime}</td>
       <td>${overtime}</td>
-      <td>${entry.type}</td>
+      <td>
+        <select data-id="${entry._id}" data-type="type" disabled>
+          <option value="work" ${entry.type === 'work' ? 'selected' : ''}>work</option>
+          <option value="leave" ${entry.type === 'leave' ? 'selected' : ''}>leave</option>
+          <option value="unpaid" ${entry.type === 'unpaid' ? 'selected' : ''}>unpaid</option>
+        </select>
+      </td>
       <td>${nightWork}</td>
       <td>
         <button class="btn edit-btn" onclick="enableEdit('${entry._id}', this)">✏️ Edit</button>
         <button class="btn save-btn" onclick="saveSession('${entry._id}')" style="display:none;">📂 Save</button>
         <button class="btn delete-btn" onclick="deleteSession('${entry._id}')">🗑️ Delete</button>
       </td>
-    `;
+`   ;
 
     tbody.appendChild(row);
   }

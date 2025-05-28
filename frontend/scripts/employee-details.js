@@ -5,7 +5,7 @@ import { toLocalDatetimeString } from './utils-datetime.js';
 let userDefaultStartTime = null;
 let userIsShiftWorker = false;
 
-export function renderLogTable(records) {
+export async function renderLogTable(records) {
   const tbody = document.getElementById('logTable');
   tbody.innerHTML = '';
   document.getElementById('sessionCount').textContent = records.length;
@@ -19,7 +19,9 @@ export function renderLogTable(records) {
     '5': '23:50'
   };
 
-  records.forEach(async entry => {
+  const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const rowPromises = records.map(async entry => {
     const checkIn = new Date(entry.checkIn);
     const checkOut = new Date(entry.checkOut);
     const workedMs = checkOut - checkIn;
@@ -29,7 +31,6 @@ export function renderLogTable(records) {
     const sessionDate = new Date(entry.checkIn);
     const yearMonth = sessionDate.toISOString().slice(0, 7);
     const weekDayIndex = sessionDate.getDay();
-    const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const shiftDay = dayMap[weekDayIndex];
 
     let isLate = false;
@@ -96,6 +97,8 @@ export function renderLogTable(records) {
     tbody.appendChild(row);
   });
 
+  await Promise.all(rowPromises);
+
   const totalOvertime = `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`;
   document.getElementById('overtimeCount').textContent = totalOvertime;
 }
@@ -111,6 +114,7 @@ export async function saveSession(sessionId) {
   const checkInInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkIn']`);
   const checkOutInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkOut']`);
   const typeSelect = document.querySelector(`select[data-id='${sessionId}'][data-type='type']`);
+  const row = checkInInput.closest('tr');
 
   const checkInDate = new Date(checkInInput.value);
   const checkOutDate = new Date(checkOutInput.value);
@@ -129,11 +133,23 @@ export async function saveSession(sessionId) {
     const result = await res.json();
     if (result.success) {
       alert('✅ Session updated!');
-      const refreshed = await fetch('/api/sessions/all').then(res => res.json());
-      window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
-      if (typeof window.applyFilterAndRender === 'function') {
-        window.applyFilterAndRender(window.allRecords);
-      }
+      // Update the display values directly without full re-render
+      const durationMs = checkOutDate - checkInDate;
+      const minutes = Math.max(0, Math.round(durationMs / 60000));
+      const adjusted = minutes > 360 ? minutes - 60 : minutes;
+
+      const workedText = body.type === 'work' ? `${Math.floor(adjusted / 60)}h ${adjusted % 60}m` : '-';
+      const overtimeMinutes = body.type === 'work' ? Math.max(0, adjusted - 480) : 0;
+      const overtimeText = overtimeMinutes > 0 ? `${Math.floor(overtimeMinutes / 60)}h ${overtimeMinutes % 60}m` : '-';
+
+      row.querySelector('.worked-cell').textContent = workedText;
+      row.querySelector('.overtime-cell').textContent = overtimeText;
+
+      checkInInput.disabled = true;
+      checkOutInput.disabled = true;
+      typeSelect.disabled = true;
+      row.querySelector('.save-btn').style.display = 'none';
+      row.querySelector('.edit-btn').style.display = 'inline-flex';
     } else {
       alert('❌ Failed to update session.');
     }

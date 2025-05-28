@@ -53,7 +53,7 @@ fetch('/api/users')
   .then(data => {
     const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
     populateYearMonthFilters(allRecords);
-    renderLogTable(allRecords);
+    renderLogTable(allRecords, toLocalDatetimeString); // ✅ Pass the datetime formatter
 
     // ✅ Register button and shift listeners
     setupMetaListeners(employeeId, employeeName);
@@ -117,5 +117,5 @@ function applyFilterAndRender(records) {
     return matchYear && matchMonth && matchStart && matchEnd;
   });
 
-  renderLogTable(filtered);
+  renderLogTable(filtered, toLocalDatetimeString); // ✅ Pass again for filtered view
 }

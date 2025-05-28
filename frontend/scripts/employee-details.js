@@ -128,8 +128,10 @@ export async function saveSession(sessionId) {
     if (result.success) {
       alert('✅ Session updated!');
       const refreshed = await fetch('/api/sessions/all').then(res => res.json());
-      allRecords = refreshed.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-      applyFilterAndRender();
+      window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
+      if (typeof window.applyFilterAndRender === 'function') {
+        window.applyFilterAndRender();
+      }
     } else {
       alert('❌ Failed to update session.');
     }

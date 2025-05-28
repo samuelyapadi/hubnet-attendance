@@ -58,6 +58,11 @@ fetch('/api/users')
     // ✅ Register button and shift listeners
     setupMetaListeners(employeeId, employeeName);
 
+    // ✅ Make accessible for inline handlers in employee-details.js
+    window.allRecords = allRecords;
+    window.employeeName = employeeName;
+    window.applyFilterAndRender = () => applyFilterAndRender(allRecords);
+
     return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
   })
   .then(res => res.json())

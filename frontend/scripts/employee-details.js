@@ -130,7 +130,7 @@ export async function saveSession(sessionId) {
       const refreshed = await fetch('/api/sessions/all').then(res => res.json());
       window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
       if (typeof window.applyFilterAndRender === 'function') {
-        window.applyFilterAndRender();
+        window.applyFilterAndRender(window.allRecords);
       }
     } else {
       alert('❌ Failed to update session.');
@@ -151,7 +151,7 @@ export async function deleteSession(sessionId) {
       const refreshed = await fetch('/api/sessions/all').then(res => res.json());
       window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
       if (typeof window.applyFilterAndRender === 'function') {
-        window.applyFilterAndRender();
+        window.applyFilterAndRender(window.allRecords);
       }
     } else {
       alert('❌ Failed to delete session.');

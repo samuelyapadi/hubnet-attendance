@@ -77,8 +77,8 @@ export function renderLogTable(records) {
     row.innerHTML = `
       <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkIn)}" data-id="${entry._id}" data-type="checkIn" disabled></td>
       <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkOut)}" data-id="${entry._id}" data-type="checkOut" disabled></td>
-      <td>${workedTime}</td>
-      <td>${overtime}</td>
+      <td class="worked-cell">${workedTime}</td>
+      <td class="overtime-cell">${overtime}</td>
       <td>
         <select data-id="${entry._id}" data-type="type" disabled>
           <option value="work" ${entry.type === 'work' ? 'selected' : ''}>work</option>
@@ -111,10 +111,14 @@ export async function saveSession(sessionId) {
   const checkInInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkIn']`);
   const checkOutInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkOut']`);
   const typeSelect = document.querySelector(`select[data-id='${sessionId}'][data-type='type']`);
+  const workedCell = checkInInput.closest('tr').querySelector('.worked-cell');
+  const overtimeCell = checkOutInput.closest('tr').querySelector('.overtime-cell');
 
+  const checkInDate = new Date(checkInInput.value);
+  const checkOutDate = new Date(checkOutInput.value);
   const body = {
-    checkIn: new Date(checkInInput.value).toISOString(),
-    checkOut: new Date(checkOutInput.value).toISOString(),
+    checkIn: checkInDate.toISOString(),
+    checkOut: checkOutDate.toISOString(),
     type: typeSelect.value
   };
 
@@ -127,6 +131,20 @@ export async function saveSession(sessionId) {
     const result = await res.json();
     if (result.success) {
       alert('✅ Session updated!');
+
+      // Recalculate on the spot
+      const totalMinutes = Math.max(0, Math.round((checkOutDate - checkInDate) / 60000));
+      const adjustedWorked = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
+      const workedTime = body.type === 'work'
+        ? `${Math.floor(adjustedWorked / 60)}h ${adjustedWorked % 60}m`
+        : '-';
+      const overtimeMinutes = body.type === 'work' ? Math.max(0, adjustedWorked - 480) : 0;
+      const overtime = overtimeMinutes > 0 ? `${Math.floor(overtimeMinutes / 60)}h ${overtimeMinutes % 60}m` : '-';
+
+      workedCell.textContent = workedTime;
+      overtimeCell.textContent = overtime;
+
+      // Also update allRecords and refresh filter display if needed
       const refreshed = await fetch('/api/sessions/all').then(res => res.json());
       window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
       if (typeof window.applyFilterAndRender === 'function') {

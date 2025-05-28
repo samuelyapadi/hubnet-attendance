@@ -317,7 +317,8 @@ router.patch('/users/:id', async (req, res) => {
     joinDate,
     isPartTime,
     weeklyWorkingDays,
-    isShiftWorker
+    isShiftWorker,
+    defaultStartTime
   } = req.body;
 
   try {
@@ -338,6 +339,10 @@ router.patch('/users/:id', async (req, res) => {
 
     if (typeof isShiftWorker !== 'undefined') {
       user.isShiftWorker = isShiftWorker === true || isShiftWorker === 'true';
+    }
+
+    if (typeof defaultStartTime === 'string') {
+      user.defaultStartTime = defaultStartTime;
     }
 
     await user.save();

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Check-In Records</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/styles.css" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employee Check-In Records</title>
   <style>
-    select, input[type="number"] {
+    select, input[type="number"], input[type="date"], input[type="time"], input[type="month"] {
       font-size: 14px;
       padding: 4px 8px;
       height: 32px;
@@ -27,6 +27,16 @@
     .summary p {
       margin: 0.25rem 0;
     }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -39,582 +49,102 @@
   <div style="height: 24px;"></div>
   <h1 id="employeeName">Employee Logs</h1>
 
-  <div class="summary" style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;">
-    <label style="display: inline-block; max-width: 160px; margin-right: 1rem;">
-      Start Date:
-      <input type="date" id="startDate" style="font-size: 14px; padding: 4px 8px; height: 32px; width: 100%;" />
-    </label>
-    <label style="display: inline-block; max-width: 160px; margin-right: 1rem;">
-      End Date:
-      <input type="date" id="endDate" style="font-size: 14px; padding: 4px 8px; height: 32px; width: 100%;" />
-    </label>
-    <select id="yearFilter"></select>
-    <select id="monthFilter"></select>
-    <button class="btn" onclick="resetFilters()">Clear All</button>
-  </div>
-
+  <!-- 🔍 Filter Summary -->
   <div class="summary">
-    <p>Total Sessions: 
-   <strong id="sessionCount">0</strong></p>
-    <p>Total Overtime: <span id="overtimeCount">0h 0m</span></p>
-    <p>Paid Leave Remaining: <strong id="leaveBalance">-</strong></p>
+    <div>
+      <label for="yearFilter">Year:</label>
+      <select id="yearFilter"></select>
+
+      <label for="monthFilter">Month:</label>
+      <select id="monthFilter"></select>
+
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate">
+
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate">
+    </div>
+    <p>Total sessions: <span id="sessionCount">0</span></p>
+    <p>Total overtime: <span id="overtimeCount">0h 0m</span></p>
   </div>
 
-  <div class="summary">
-  <h2>Edit Employment Info</h2>
-
-  <label>Join Date:
-    <input type="date" id="editJoinDate" />
-  </label>
-
-  <label>Employment Type:
-  <select id="editIsPartTime">
-    <option value="0">Full-Time</option>
-    <option value="1">Part-Time</option>
-  </select>
-  <span style="margin-left: 1rem; font-weight: bold;" id="employmentTypeDisplay"></span>
-</label>
-  </label>
-
-  <label>Shift Worker:
-  <select id="editIsShiftWorker">
-    <option value="0">No</option>
-    <option value="1">Yes</option>
-  </select>
-  <span style="margin-left: 1rem; font-weight: bold;" id="shiftWorkerDisplay"></span>
-</label>
-
-<div id="monthlyShiftContainer" style="display: none; margin-top: 1rem;">
-  <h3>Monthly Shift Pattern</h3>
-  <label for="shiftMonth">Select Month:</label>
-  <input type="month" id="shiftMonth" />
-
-  <div id="shiftPatternGrid" style="margin-top: 0.5rem;">
-    <label>Monday:
-      <select id="shiftMon">
-        <option value="">--</option>
-        <option value="1">① 08:30–17:30</option>
-        <option value="2">② 12:00–21:00</option>
-        <option value="3">③ 13:30–22:30</option>
-        <option value="4">④ 22:30–08:30</option>
-        <option value="5">⑤ 23:50–08:50</option>
-      </select>
-    </label><br/>
-
-    <label>Tuesday:
-      <select id="shiftTue">
-        <option value="">--</option>
-        <option value="1">① 08:30–17:30</option>
-        <option value="2">② 12:00–21:00</option>
-        <option value="3">③ 13:30–22:30</option>
-        <option value="4">④ 22:30–08:30</option>
-        <option value="5">⑤ 23:50–08:50</option>
-      </select>
-    </label><br/>
-
-    <label>Wednesday:
-      <select id="shiftWed">
-        <option value="">--</option>
-        <option value="1">① 08:30–17:30</option>
-        <option value="2">② 12:00–21:00</option>
-        <option value="3">③ 13:30–22:30</option>
-        <option value="4">④ 22:30–08:30</option>
-        <option value="5">⑤ 23:50–08:50</option>
-      </select>
-    </label><br/>
-
-    <label>Thursday:
-      <select id="shiftThu">
-        <option value="">--</option>
-        <option value="1">① 08:30–17:30</option>
-        <option value="2">② 12:00–21:00</option>
-        <option value="3">③ 13:30–22:30</option>
-        <option value="4">④ 22:30–08:30</option>
-        <option value="5">⑤ 23:50–08:50</option>
-      </select>
-    </label><br/>
-
-    <label>Friday:
-      <select id="shiftFri">
-        <option value="">--</option>
-        <option value="1">① 08:30–17:30</option>
-        <option value="2">② 12:00–21:00</option>
-        <option value="3">③ 13:30–22:30</option>
-        <option value="4">④ 22:30–08:30</option>
-        <option value="5">⑤ 23:50–08:50</option>
-      </select>
-    </label><br/>
-
-    <label>Saturday:
-      <select id="shiftSat">
-        <option value="">--</option>
-        <option value="1">① 08:30–17:30</option>
-        <option value="2">② 12:00–21:00</option>
-        <option value="3">③ 13:30–22:30</option>
-        <option value="4">④ 22:30–08:30</option>
-        <option value="5">⑤ 23:50–08:50</option>
-      </select>
-    </label><br/>
-
-    <label>Sunday:
-      <select id="shiftSun">
-        <option value="">--</option>
-        <option value="1">① 08:30–17:30</option>
-        <option value="2">② 12:00–21:00</option>
-        <option value="3">③ 13:30–22:30</option>
-        <option value="4">④ 22:30–08:30</option>
-        <option value="5">⑤ 23:50–08:50</option>
-      </select>
-    </label><br/>
-  </div>
-
-  <button class="btn" onclick="saveMonthlyShift()">💾 Save Monthly Shift</button>
-</div>
-
-
-  <div id="editWorkingDaysContainer" style="display: none;">
-    <label>Weekly Working Days:
-      <select id="editWeeklyWorkingDays">
-        <option value="1">1 day/week</option>
-        <option value="2">2 days/week</option>
-        <option value="3">3 days/week</option>
-        <option value="4">4 days/week</option>
-      </select>
-    </label>
-  </div>
-
-  <button class="btn" onclick="saveEmployeeInfo()">💾 Save Info</button>
-</div>
-
-
-  <a href="employees.html" class="btn">← Back to Employee List</a>
-  <a href="admin.html" class="btn">Back to Admin Dashboard</a>
-
+  <!-- 📊 Session Table -->
   <table>
     <thead>
       <tr>
-        <th>Check-In</th>
-        <th>Check-Out</th>
-        <th>Worked Time</th>
+        <th>Check In</th>
+        <th>Check Out</th>
+        <th>Worked</th>
         <th>Overtime</th>
         <th>Type</th>
-        <th>Hours Used</th>
+        <th>Night Work</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody id="logTable"></tbody>
   </table>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const employeeName = params.get('name');
-    document.getElementById('employeeName').textContent = `Logs for: ${employeeName}`;
+  <!-- 🧑‍💼 Employment Info -->
+  <section>
+    <h2>Employment Info</h2>
+    <label>Join Date:
+      <input type="date" id="editJoinDate" />
+    </label><br/>
 
-    let employeeId = null;
+    <label>Employment Type:
+      <select id="editIsPartTime">
+        <option value="0">Full-Time</option>
+        <option value="1">Part-Time</option>
+      </select>
+    </label><br/>
 
-fetch('/api/users')
-  .then(res => res.json())
-  .then(users => {
-    const match = users.find(u => decodeURIComponent(u.name.trim()) === decodeURIComponent(employeeName.trim()));
-    if (!match) return;
-    employeeId = match._id;
+    <div id="editWorkingDaysContainer" style="display:none;">
+      <label>Weekly Working Days:
+        <input type="number" id="editWeeklyWorkingDays" min="1" max="6" />
+      </label><br/>
+    </div>
 
-    return fetch(`/api/users/${employeeId}`);
-  })
-  .then(res => res.json())
-  .then(user => {
-    if (!user) return;
+    <label>Default Start Time:
+      <input type="time" id="defaultStartTime" />
+    </label><br/>
 
-    if (user.joinDate) {
-      document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);
-    }
+    <label>Shift Worker:
+      <select id="editIsShiftWorker">
+        <option value="0">No</option>
+        <option value="1">Yes</option>
+      </select>
+    </label><br/>
 
-    document.getElementById('employmentTypeDisplay').textContent = user.isPartTime ? 'Part-Time' : 'Full-Time';
-    document.getElementById('editIsPartTime').value = user.isPartTime ? "1" : "0";
+    <p>Employment Type: <span id="employmentTypeDisplay">-</span></p>
+    <p>Shift Worker: <span id="shiftWorkerDisplay">-</span></p>
+    <p>Leave Balance: <span id="leaveBalance">-</span></p>
 
-    if (user.isPartTime) {
-      document.getElementById('editWorkingDaysContainer').style.display = 'block';
-      document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
-    } else {
-      document.getElementById('editWorkingDaysContainer').style.display = 'none';
-    }
+    <button id="saveEmployeeBtn" class="btn">💾 Save Info</button>
+  </section>
 
-    document.getElementById('shiftWorkerDisplay').textContent = user.isShiftWorker ? 'Yes' : 'No';
-    document.getElementById('editIsShiftWorker').value = user.isShiftWorker ? "1" : "0";
-    document.getElementById('monthlyShiftContainer').style.display = user.isShiftWorker ? 'block' : 'none';
+  <!-- 📅 Monthly Shift Setup -->
+  <section id="monthlyShiftContainer" style="display:none;">
+    <h2>Monthly Shift Assignment</h2>
+    <label for="shiftMonth">Month:</label>
+    <input type="month" id="shiftMonth"><br/><br/>
 
-    return fetch('/api/sessions/all');
-  })
-  .then(res => res.json())
-  .then(data => {
-    allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-    populateYearMonthFilters(allRecords);
-    applyFilterAndRender();
+    <label>Mon: <input type="text" id="shiftMon"></label>
+    <label>Tue: <input type="text" id="shiftTue"></label>
+    <label>Wed: <input type="text" id="shiftWed"></label>
+    <label>Thu: <input type="text" id="shiftThu"></label>
+    <label>Fri: <input type="text" id="shiftFri"></label>
+    <label>Sat: <input type="text" id="shiftSat"></label>
+    <label>Sun: <input type="text" id="shiftSun"></label><br/><br/>
 
-    return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
-  })
-  .catch(err => {
-    console.error('[Employee Load Error]', err);
-    document.getElementById('leaveBalance').textContent = '-';
-  });
+    <button id="saveShiftBtn" class="btn">💾 Save Shift</button>
+  </section>
 
-        document.getElementById('shiftMonth')?.addEventListener('change', () => {
-          if (!employeeId) return;
-          const month = document.getElementById('shiftMonth').value;
-          if (!month) return;
-
-          fetch(`/api/shifts/${employeeId}/${month}`)
-            .then(res => res.json())
-            .then(data => {
-              if (!data || !data.shifts) return;
-              document.getElementById('shiftMon').value = data.shifts.Mon || '';
-              document.getElementById('shiftTue').value = data.shifts.Tue || '';
-              document.getElementById('shiftWed').value = data.shifts.Wed || '';
-              document.getElementById('shiftThu').value = data.shifts.Thu || '';
-              document.getElementById('shiftFri').value = data.shifts.Fri || '';
-              document.getElementById('shiftSat').value = data.shifts.Sat || '';
-              document.getElementById('shiftSun').value = data.shifts.Sun || '';
-            });
-
-fetch('/api/sessions/all')
-  .then(res => res.json())
-  .then(data => {
-    allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-    populateYearMonthFilters(allRecords);
-    applyFilterAndRender();
-
-    return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
-  })
-  .catch(err => {
-    console.error('[Leave Balance Fetch Error]', err);
-    document.getElementById('leaveBalance').textContent = '-';
-  });
-
-      
-});
-
-    function toLocalDatetimeString(dateStr) {
-      const date = new Date(dateStr);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      const seconds = String(date.getSeconds()).padStart(2, '0');
-      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-    }
-
-    function toISOStringLocal(datetimeStr) {
-      return new Date(datetimeStr).toISOString();
-    }
-
-    function populateYearMonthFilters(records) {
-      const yearSet = new Set();
-      const monthSet = new Set();
-
-      records.forEach(r => {
-        const date = new Date(r.checkIn);
-        yearSet.add(date.getFullYear());
-        monthSet.add(date.getMonth());
-      });
-
-      const yearSelect = document.getElementById('yearFilter');
-      const monthSelect = document.getElementById('monthFilter');
-      const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-      ];
-
-      yearSelect.innerHTML = `<option value="">All Years</option>` +
-        [...yearSet].sort((a, b) => b - a).map(y => `<option value="${y}">${y}</option>`).join('');
-
-      monthSelect.innerHTML = `<option value="">All Months</option>` +
-        [...monthSet].sort((a, b) => a - b)
-          .map(m => `<option value="${m}">${monthNames[m]}</option>`)
-          .join('');
-
-      yearSelect.addEventListener('change', applyFilterAndRender);
-      monthSelect.addEventListener('change', applyFilterAndRender);
-      document.getElementById('startDate')?.addEventListener('change', applyFilterAndRender);
-      document.getElementById('endDate')?.addEventListener('change', applyFilterAndRender);
-    }
-
-    function applyFilterAndRender() {
-      const year = document.getElementById('yearFilter').value;
-      const month = document.getElementById('monthFilter').value;
-      const startDateVal = document.getElementById('startDate')?.value;
-      const endDateVal = document.getElementById('endDate')?.value;
-      const startDate = startDateVal ? new Date(startDateVal) : null;
-      const endDate = endDateVal ? new Date(new Date(endDateVal).setHours(23, 59, 59, 999)) : null;
-
-      const filtered = allRecords.filter(entry => {
-        const d = new Date(entry.checkIn);
-        const matchYear = !year || d.getFullYear().toString() === year;
-        const matchMonth = month === '' || d.getMonth().toString() === month;
-        const matchStart = !startDate || d >= startDate;
-        const matchEnd = !endDate || d <= endDate;
-        return matchYear && matchMonth && matchStart && matchEnd;
-      });
-
-      renderLogTable(filtered);
-    }
-
-async function renderLogTable(records) {
-  const tbody = document.getElementById('logTable');
-  tbody.innerHTML = '';
-  document.getElementById('sessionCount').textContent = records.length;
-
-  let totalOvertimeMinutes = 0;
-  const shiftTimes = {
-    '1': '08:30',
-    '2': '12:00',
-    '3': '13:30',
-    '4': '22:30',
-    '5': '23:50'
-  };
-
-  for (const entry of records) {
-    const checkIn = new Date(entry.checkIn);
-    const checkOut = new Date(entry.checkOut);
-    const workedMs = checkOut - checkIn;
-    const totalMinutes = Math.max(0, Math.round(workedMs / 60000));
-    const adjustedWorked = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
-
-    const sessionDate = new Date(entry.checkIn);
-    const yearMonth = sessionDate.toISOString().slice(0, 7);
-    const weekDayIndex = sessionDate.getDay();
-    const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const shiftDay = dayMap[weekDayIndex];
-
-    let isLate = false;
-    let nightWorkMinutes = 0;
-    try {
-      const userRes = await fetch(`/api/users/${employeeId}`);
-      const user = await userRes.json();
-      if (user.isShiftWorker) {
-        const shiftRes = await fetch(`/api/shifts/${employeeId}/${yearMonth}`);
-        const shiftData = await shiftRes.json();
-        const shiftCode = shiftData?.shifts?.[shiftDay];
-        const shiftStart = shiftTimes[shiftCode];
-        if (shiftStart) {
-          const [h, m] = shiftStart.split(':').map(Number);
-          const expected = new Date(checkIn);
-          expected.setHours(h, m, 0, 0);
-          isLate = checkIn > expected;
-        }
-      }
-
-      const ci = checkIn.getHours() + checkIn.getMinutes() / 60;
-      const co = checkOut.getHours() + checkOut.getMinutes() / 60;
-      if (ci < 5) nightWorkMinutes += Math.min(5, co) * 60;
-      if (co > 22) nightWorkMinutes += (co - Math.max(ci, 22)) * 60;
-
-    } catch (err) {
-      console.warn('[Shift check failed]', err);
-    }
-
-    const workedTime = entry.type === 'work'
-      ? `${Math.floor(adjustedWorked / 60)}h ${adjustedWorked % 60}m${isLate ? ' 🚨 Late' : ''}`
-      : '-';
-
-    const overtimeMinutes = entry.type === 'work' ? Math.max(0, adjustedWorked - 480) : 0;
-    const overtime = overtimeMinutes > 0 ? `${Math.floor(overtimeMinutes / 60)}h ${overtimeMinutes % 60}m` : '-';
-    if (overtimeMinutes > 0) totalOvertimeMinutes += overtimeMinutes;
-
-    const nightWork = nightWorkMinutes > 0 ? `${Math.floor(nightWorkMinutes / 60)}h ${nightWorkMinutes % 60}m` : '';
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkIn)}" data-id="${entry._id}" data-type="checkIn" disabled></td>
-      <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkOut)}" data-id="${entry._id}" data-type="checkOut" disabled></td>
-      <td>${workedTime}</td>
-      <td>${overtime}</td>
-      <td>
-        <select data-id="${entry._id}" data-type="type" disabled>
-          <option value="work" ${entry.type === 'work' ? 'selected' : ''}>work</option>
-          <option value="leave" ${entry.type === 'leave' ? 'selected' : ''}>leave</option>
-          <option value="unpaid" ${entry.type === 'unpaid' ? 'selected' : ''}>unpaid</option>
-        </select>
-      </td>
-      <td>${nightWork}</td>
-      <td>
-        <button class="btn edit-btn" onclick="enableEdit('${entry._id}', this)">✏️ Edit</button>
-        <button class="btn save-btn" onclick="saveSession('${entry._id}')" style="display:none;">📂 Save</button>
-        <button class="btn delete-btn" onclick="deleteSession('${entry._id}')">🗑️ Delete</button>
-      </td>
-`   ;
-
-    tbody.appendChild(row);
-  }
-
-  const totalOvertime = `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`;
-  document.getElementById('overtimeCount').textContent = totalOvertime;
-}
-
-    window.enableEdit = function (sessionId, button) {
-      const row = button.closest('tr');
-      row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-      row.querySelector('.save-btn').style.display = 'inline-flex';
-      button.style.display = 'none';
-    }
-
-    window.saveSession = async function (sessionId) {
-      const checkInInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkIn']`);
-      const checkOutInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkOut']`);
-      const typeSelect = document.querySelector(`select[data-id='${sessionId}'][data-type='type']`);
-
-      const body = {
-        checkIn: toISOStringLocal(checkInInput.value),
-        checkOut: toISOStringLocal(checkOutInput.value),
-        type: typeSelect.value,
-        
-      };
-
-      try {
-        const res = await fetch(`/api/sessions/${sessionId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        const result = await res.json();
-        if (result.success) {
-          alert('✅ Session updated!');
-          const refreshed = await fetch('/api/sessions/all').then(res => res.json());
-          allRecords = refreshed.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-          applyFilterAndRender();
-        } else {
-          alert('❌ Failed to update session.');
-        }
-      } catch (err) {
-        console.error('Session update error:', err);
-        alert('❌ Request failed.');
-      }
-    };
-  window.deleteSession = async function (sessionId) {
-  if (!confirm('Are you sure you want to delete this session?')) return;
-  try {
-    const res = await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
-    const result = await res.json();
-    if (result.success) {
-      alert('🗑️ Session deleted.');
-      const refreshed = await fetch('/api/sessions/all').then(res => res.json());
-      allRecords = refreshed.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-      applyFilterAndRender();
-    } else {
-      alert('❌ Failed to delete session.');
-    }
-  } catch (err) {
-    console.error('Session delete error:', err);
-    alert('❌ Request failed.');
-  }
-};
-function resetFilters() {
-  document.getElementById('yearFilter').value = '';
-  document.getElementById('monthFilter').value = '';
-  document.getElementById('startDate').value = '';
-  document.getElementById('endDate').value = '';
-  applyFilterAndRender();
-}
-
-function saveEmployeeInfo() {
-  if (!employeeId) return alert('❌ Employee ID not loaded.');
-
-  const joinDate = document.getElementById('editJoinDate').value;
-  const isPartTime = document.getElementById('editIsPartTime').value === '1';
-  const isShiftWorker = document.getElementById('editIsShiftWorker').value === '1';
-  const weeklyWorkingDays = isPartTime ? Number(document.getElementById('editWeeklyWorkingDays').value) : 5;
-
-  console.log('[PATCH PAYLOAD]', { joinDate, isPartTime, weeklyWorkingDays, isShiftWorker });
-
-  fetch(`/api/users/${employeeId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ joinDate, isPartTime, weeklyWorkingDays, isShiftWorker })
-  })
-    .then(res => res.json())
-    .then(result => {
-      if (result.success) {
-        alert('✅ Employment info updated.');
-
-  fetch(`/api/users/${employeeId}`)
-    .then(res => res.json())
-    .then(updatedUser => {
-      document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
-      document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
-
-      if (updatedUser.isPartTime) {
-        document.getElementById('editWorkingDaysContainer').style.display = 'block';
-        document.getElementById('editWeeklyWorkingDays').value = updatedUser.weeklyWorkingDays || "1";
-      } else {
-        document.getElementById('editWorkingDaysContainer').style.display = 'none';
-      }
-
-      return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
-    })
-
-          .then(res => res.json())
-          .then(data => {
-            if (data) {
-              document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
-            }
-          });
-      } else {
-        alert('❌ Failed to update.');
-      }
-    })
-    .catch(err => {
-      console.error('[Update Error]', err);
-      alert('❌ Update request failed.');
-    });
-}
-
-document.getElementById('editIsShiftWorker').addEventListener('change', () => {
-  const isShift = document.getElementById('editIsShiftWorker').value === '1';
-  document.getElementById('monthlyShiftContainer').style.display = isShift ? 'block' : 'none';
-});
-
-function saveMonthlyShift() {
-  if (!employeeId) return alert('❌ User ID missing');
-  const month = document.getElementById('shiftMonth').value;
-  if (!month) return alert('❌ Please select a month');
-
-  const shifts = {
-    Mon: document.getElementById('shiftMon').value,
-    Tue: document.getElementById('shiftTue').value,
-    Wed: document.getElementById('shiftWed').value,
-    Thu: document.getElementById('shiftThu').value,
-    Fri: document.getElementById('shiftFri').value,
-    Sat: document.getElementById('shiftSat').value,
-    Sun: document.getElementById('shiftSun').value
-  };
-
-  fetch(`/api/shifts/${employeeId}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ month, shifts })
-  })
-    .then(res => res.json())
-    .then(result => {
-      if (result.success) {
-        alert('✅ Shift pattern saved!');
-      } else {
-        alert('❌ Failed to save shift pattern.');
-      }
-    })
-    .catch(err => {
-      console.error('[SHIFT SAVE ERROR]', err);
-      alert('❌ Server error.');
-    });
-}
-
-</script>
+  <!-- 📦 Modular Scripts -->
+  <script type="module" src="scripts/employee-details.js"></script>
+  <script type="module" src="scripts/employee-info.js"></script>
+  <script type="module" src="scripts/employee-filters.js"></script>
+  <script type="module" src="scripts/employee-loader.js"></script>
+  <script type="module" src="scripts/employee-meta.js"></script>
+  <script type="module" src="scripts/employee-ui.js"></script>
 </body>
 </html>

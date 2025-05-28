@@ -1,5 +1,5 @@
 // employee-info.js
-import { toISOStringLocal } from './utils-datetime.js';
+import { toLocalDatetimeString, toISOStringLocal } from './utils-datetime.js';
 
 export function saveEmployeeInfo() {
   if (!employeeId) return alert('❌ Employee ID not loaded.');

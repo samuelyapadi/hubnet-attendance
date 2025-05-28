@@ -1,6 +1,6 @@
 // employee-details.js
 
-import { toLocalDatetimeString, toISOStringLocal } from './utils-datetime.js';
+import { toLocalDatetimeString } from './utils-datetime.js';
 
 let userDefaultStartTime = null;
 let userIsShiftWorker = false;
@@ -113,8 +113,8 @@ export async function saveSession(sessionId) {
   const typeSelect = document.querySelector(`select[data-id='${sessionId}'][data-type='type']`);
 
   const body = {
-    checkIn: toISOStringLocal(checkInInput.value),
-    checkOut: toISOStringLocal(checkOutInput.value),
+    checkIn: new Date(checkInInput.value).toISOString(),
+    checkOut: new Date(checkOutInput.value).toISOString(),
     type: typeSelect.value
   };
 
@@ -149,8 +149,10 @@ export async function deleteSession(sessionId) {
     if (result.success) {
       alert('🗑️ Session deleted.');
       const refreshed = await fetch('/api/sessions/all').then(res => res.json());
-      allRecords = refreshed.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-      applyFilterAndRender();
+      window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
+      if (typeof window.applyFilterAndRender === 'function') {
+        window.applyFilterAndRender();
+      }
     } else {
       alert('❌ Failed to delete session.');
     }

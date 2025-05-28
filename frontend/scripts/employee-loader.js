@@ -2,6 +2,7 @@
 
 import { renderLogTable } from './employee-details.js';
 import { setupMetaListeners } from './employee-meta.js';
+import { toLocalDatetimeString } from './utils-datetime.js'; // ✅ Ensure datetime function is available
 
 let employeeId = null;
 let userDefaultStartTime = null;

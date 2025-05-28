@@ -1,5 +1,4 @@
 // employee-details.js
-import { toLocalDatetimeString, toISOStringLocal } from './utils-datetime.js';
 
 let userDefaultStartTime = null;
 let userIsShiftWorker = false;
@@ -156,3 +155,8 @@ export async function deleteSession(sessionId) {
     alert('❌ Request failed.');
   }
 }
+
+// Expose for inline HTML handlers
+window.enableEdit = enableEdit;
+window.saveSession = saveSession;
+window.deleteSession = deleteSession;

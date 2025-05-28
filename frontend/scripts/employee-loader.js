@@ -1,6 +1,7 @@
 // employee-loader.js
 
 import { renderLogTable } from './employee-details.js';
+import { setupMetaListeners } from './employee-meta.js';
 
 let employeeId = null;
 let userDefaultStartTime = null;
@@ -52,6 +53,9 @@ fetch('/api/users')
     const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
     populateYearMonthFilters(allRecords);
     renderLogTable(allRecords);
+
+    // ✅ Register button and shift listeners
+    setupMetaListeners(employeeId, employeeName);
 
     return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
   })

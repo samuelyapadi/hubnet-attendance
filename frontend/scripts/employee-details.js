@@ -161,17 +161,35 @@ export async function saveSession(sessionId) {
 
 export async function deleteSession(sessionId) {
   if (!confirm('Are you sure you want to delete this session?')) return;
-  try {
-    const res = await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
-    const result = await res.json();
-    if (result.success) {
-      alert('🗑️ Session deleted.');
-      const refreshed = await fetch('/api/sessions/all').then(res => res.json());
-      window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
-      if (typeof window.applyFilterAndRender === 'function') {
-        window.applyFilterAndRender(window.allRecords);
-      }
-    } else {
+    try {
+      const res = await fetch(`/api/sessions/${sessionId}`, { method: 'DELETE' });
+      const result = await res.json();
+  if (result.success) {
+    alert('🗑️ Session deleted.');
+
+    const refreshed = await fetch('/api/sessions/all').then(res => res.json());
+    window.allRecords = refreshed.filter(
+    e => e.name === window.employeeName && e.checkIn && e.checkOut
+  );
+
+    const year = document.getElementById('yearFilter').value;
+    const month = document.getElementById('monthFilter').value;
+    const startDateVal = document.getElementById('startDate')?.value;
+    const endDateVal = document.getElementById('endDate')?.value;
+    const startDate = startDateVal ? new Date(startDateVal) : null;
+    const endDate = endDateVal ? new Date(new Date(endDateVal).setHours(23, 59, 59, 999)) : null;
+
+    const filtered = window.allRecords.filter(entry => {
+    const d = new Date(entry.checkIn);
+    const matchYear = !year || d.getFullYear().toString() === year;
+    const matchMonth = month === '' || d.getMonth().toString() === month;
+    const matchStart = !startDate || d >= startDate;
+    const matchEnd = !endDate || d <= endDate;
+    return matchYear && matchMonth && matchStart && matchEnd;
+  });
+  renderLogTable(filtered);
+}
+ else {
       alert('❌ Failed to delete session.');
     }
   } catch (err) {

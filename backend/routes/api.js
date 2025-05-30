@@ -266,7 +266,7 @@ router.put('/users/:id', async (req, res) => {
 // Update session details (final timezone fix + leave support)
 router.patch('/sessions/:id', async (req, res) => {
   const { id } = req.params;
-  const { checkIn, checkOut, isOvertime, department, type, hoursUsed } = req.body;
+  const { checkIn, checkOut, isOvertime, department, type, hoursUsed, lateMinutes } = req.body;
 
   try {
     const session = await Attendance.findById(id);
@@ -290,6 +290,9 @@ router.patch('/sessions/:id', async (req, res) => {
     if (type) session.type = type;
     if (!isNaN(hoursUsed)) {
       session.hoursUsed = Number(hoursUsed);
+    if (!isNaN(lateMinutes)){
+      session.lateMinutes = Number(lateMinutes);
+    }
     } else if (type !== 'work' && parsedCheckIn && parsedCheckOut) {
       const ms = parsedCheckOut - parsedCheckIn;
       session.hoursUsed = Math.round((ms / 3600000) * 2) / 2;

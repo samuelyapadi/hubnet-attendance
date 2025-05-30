@@ -10,3 +10,8 @@ export function toISOStringLocal(localStr) {
   const date = new Date(localStr);
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
 }
+
+export function parseTimeString(timeStr) {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return hours * 60 + minutes;
+}

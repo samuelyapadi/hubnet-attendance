@@ -1,6 +1,6 @@
 // employee-details.js
 
-import { toLocalDatetimeString } from './utils-datetime.js';
+import { toLocalDatetimeString, parseTimeString } from './utils-datetime.js';
 
 let userDefaultStartTime = null;
 let userIsShiftWorker = false;
@@ -49,10 +49,9 @@ export async function renderLogTable(records) {
           isLate = checkIn > expected;
         }
       } else if (userDefaultStartTime) {
-        const [h, m] = userDefaultStartTime.split(':').map(Number);
-        const expected = new Date(checkIn);
-        expected.setHours(h, m, 0, 0);
-        isLate = checkIn > expected;
+        const defaultStartMinutes = parseTimeString(userDefaultStartTime);
+        const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
+        isLate = checkInMinutes > defaultStartMinutes;
       }
 
       const ci = checkIn.getHours() + checkIn.getMinutes() / 60;
@@ -64,8 +63,16 @@ export async function renderLogTable(records) {
       console.warn('[Lateness or Night Work check failed]', err);
     }
 
+    let lateNote = '';
+    if (isLate) {
+      const defaultStartMinutes = parseTimeString(userDefaultStartTime);
+      const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
+      const lateMinutes = checkInMinutes - defaultStartMinutes;
+      lateNote = ` 🚨 Late by ${lateMinutes}m`;
+  }
+
     const workedTime = entry.type === 'work'
-      ? `${Math.floor(adjustedWorked / 60)}h ${adjustedWorked % 60}m${isLate ? ' 🚨 Late' : ''}`
+      ? `${Math.floor(adjustedWorked / 60)}h ${adjustedWorked % 60}m${lateNote}`
       : '-';
 
     const overtimeMinutes = entry.type === 'work' ? Math.max(0, adjustedWorked - 480) : 0;
@@ -75,6 +82,9 @@ export async function renderLogTable(records) {
     const nightWork = nightWorkMinutes > 0 ? `${Math.floor(nightWorkMinutes / 60)}h ${nightWorkMinutes % 60}m` : '';
 
     const row = document.createElement('tr');
+    if (isLate) {
+    row.style.backgroundColor = '#ffe5e5'; // Light red background
+    }
     row.innerHTML = `
       <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkIn)}" data-id="${entry._id}" data-type="checkIn" disabled></td>
       <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkOut)}" data-id="${entry._id}" data-type="checkOut" disabled></td>
@@ -118,10 +128,18 @@ export async function saveSession(sessionId) {
 
   const checkInDate = new Date(checkInInput.value);
   const checkOutDate = new Date(checkOutInput.value);
+  let lateMinutes = 0;
+  if (!userIsShiftWorker && userDefaultStartTime) {
+  const defaultStartMinutes = parseTimeString(userDefaultStartTime);
+  const checkInMinutes = checkInDate.getHours() * 60 + checkInDate.getMinutes();
+  lateMinutes = Math.max(0, checkInMinutes - defaultStartMinutes);
+  }
+
   const body = {
     checkIn: checkInDate.toISOString(),
     checkOut: checkOutDate.toISOString(),
-    type: typeSelect.value
+    type: typeSelect.value,
+    lateMinutes
   };
 
   try {

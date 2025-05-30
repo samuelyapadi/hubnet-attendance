@@ -5,8 +5,8 @@ import { setupMetaListeners } from './employee-meta.js';
 import { toLocalDatetimeString } from './utils-datetime.js'; // ✅ Ensure datetime function is available
 
 let employeeId = null;
-let userDefaultStartTime = null;
-let userIsShiftWorker = false;
+let userDefaultStartTime = window.userDefaultStartTime || null;
+let userIsShiftWorker = window.userIsShiftWorker || false;
 
 const params = new URLSearchParams(window.location.search);
 const employeeName = params.get('name');
@@ -49,16 +49,20 @@ fetch('/api/users')
 
     return fetch('/api/sessions/all');
   })
-  .then(res => res.json())
-  .then(data => {
-    const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-    populateYearMonthFilters(allRecords);
-    renderLogTable(allRecords, toLocalDatetimeString); // ✅ Pass the datetime formatter
+    .then(res => res.json())
+    .then(data => {
+      const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
+      populateYearMonthFilters(allRecords);
 
-    // ✅ Register button and shift listeners
+      window.userDefaultStartTime = userDefaultStartTime;
+      window.userIsShiftWorker = userIsShiftWorker;
+
+      renderLogTable(allRecords);
+
+    //Register button and shift listeners
     setupMetaListeners(employeeId, employeeName);
 
-    // ✅ Make accessible for inline handlers in employee-details.js
+    //Make accessible for inline handlers in employee-details.js
     window.allRecords = allRecords;
     window.employeeName = employeeName;
     window.applyFilterAndRender = () => applyFilterAndRender(allRecords);

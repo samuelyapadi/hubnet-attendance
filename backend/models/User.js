@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   isPartTime: { type: Boolean, default: false },
   weeklyWorkingDays: { type: Number, default: 5 },
-  isShiftWorker: { type: Boolean, default: false } // 👈 new field
+  isShiftWorker: { type: Boolean, default: false },
+  defaultStartTime: { type: String, default: null } // 👈 ADD THIS
 });
 
 module.exports = mongoose.model('User', userSchema);

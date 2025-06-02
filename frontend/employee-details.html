@@ -74,7 +74,24 @@
   </div>
 
   <!-- 📊 Session Table -->
-  <button id="createSessionBtn" class="btn" style="margin-bottom: 1rem;">➕ Create Session</button>
+  <div style="margin: 12px 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+    <label for="sessionType">Type:</label>
+    <select id="sessionType" style="font-size: 14px; padding: 4px 8px; height: 32px;">
+      <option value="work">work</option>
+      <option value="leave">leave</option>
+      <option value="unpaid">unpaid</option>
+    </select>
+
+    <label for="manualCheckIn">Check-in:</label>
+    <input type="datetime-local" id="manualCheckIn" style="font-size: 14px; padding: 4px 8px; height: 32px;">
+
+    <label for="manualCheckOut">Check-out:</label>
+    <input type="datetime-local" id="manualCheckOut" style="font-size: 14px; padding: 4px 8px; height: 32px;">
+
+    <button id="createSessionBtn" style="font-size: 14px; padding: 6px 12px; height: 34px; background: black; color: white; border: 1px solid #000;">
+      ➕ Create Session
+    </button>
+  </div>
   <table>
     <thead>
       <tr>

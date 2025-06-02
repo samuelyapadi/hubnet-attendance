@@ -282,30 +282,59 @@ window.saveSession = saveSession;
 window.deleteSession = deleteSession;
 
 document.getElementById('createSessionBtn')?.addEventListener('click', async () => {
-  const name = window.employeeName;
-  const checkIn = prompt('Enter check-in time (YYYY-MM-DDTHH:MM):');
-  const checkOut = prompt('Enter check-out time (YYYY-MM-DDTHH:MM):');
+  const type = document.getElementById('sessionType').value;
+  const checkInStr = document.getElementById('manualCheckIn').value;
+  const checkOutStr = document.getElementById('manualCheckOut').value;
 
-  if (!checkIn || !checkOut) {
-    alert('❌ Both check-in and check-out are required.');
+  if (!checkInStr || !checkOutStr) {
+    alert('⛔ Please fill in both check-in and check-out times.');
     return;
   }
 
+  const checkIn = new Date(checkInStr);
+  const checkOut = new Date(checkOutStr);
+
+  if (isNaN(checkIn) || isNaN(checkOut)) {
+    alert('❌ Invalid date input.');
+    return;
+  }
+
+  if (checkOut <= checkIn) {
+    alert('⚠️ Check-out must be after check-in.');
+    return;
+  }
+
+  const durationMs = checkOut - checkIn;
+  const hoursUsed = type !== 'work' ? Math.round((durationMs / 3600000) * 2) / 2 : 0;
+
+  const body = {
+    name: window.employeeName,
+    employeeId: window.employeeId,
+    checkIn: checkIn.toISOString(),
+    checkOut: checkOut.toISOString(),
+    type,
+    hoursUsed
+  };
+
   try {
-    const res = await fetch('/api/sessions/manual', {
+    const res = await fetch('/api/sessions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, checkIn, checkOut })
+      body: JSON.stringify(body)
     });
-
     const result = await res.json();
 
-    if (result.success) {
-      alert('✅ Session created.');
-      const refreshed = await fetch('/api/sessions/all').then(res => res.json());
-      window.allRecords = refreshed.filter(e => e.name === name && e.checkIn && e.checkOut);
-      renderLogTable(window.allRecords);
-    } else {
+  if (result.success) {
+    alert('✅ Session created.');
+    const refreshed = await fetch('/api/sessions/all').then(res => res.json());
+    window.allRecords = refreshed.filter(e => e.name === window.employeeName && e.checkIn && e.checkOut);
+    renderLogTable(window.allRecords);
+
+    // auto-clear form fields
+    document.getElementById('manualCheckIn').value = '';
+    document.getElementById('manualCheckOut').value = '';
+    document.getElementById('sessionType').value = 'work';
+  } else {
       alert('❌ Failed to create session.');
     }
   } catch (err) {

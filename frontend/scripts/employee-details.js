@@ -50,13 +50,17 @@ export async function renderLogTable(records) {
           isLate = checkIn > expected;
         }
       } else if (userDefaultStartTime) {
-        const defaultStartMinutes = parseTimeString(userDefaultStartTime);
-        const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
-        isLate = checkInMinutes > defaultStartMinutes;
-        console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);
-        console.log('Check-in:', checkIn.toTimeString(), '→', checkInMinutes);
-        console.log('Late?', isLate);
-      }
+    const defaultStartMinutes = parseTimeString(userDefaultStartTime);
+      if (defaultStartMinutes !== null && !isNaN(defaultStartMinutes)) {
+      const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
+      isLate = checkInMinutes > defaultStartMinutes;
+      console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);
+      console.log('Check-in:', checkIn.toTimeString(), '→', checkInMinutes);
+      console.log('Late?', isLate);
+    } else {
+        console.warn('⚠️ Failed to parse default start time:', userDefaultStartTime);
+    }
+  }
 
       const ci = checkIn.getHours() + checkIn.getMinutes() / 60;
       const co = checkOut.getHours() + checkOut.getMinutes() / 60;
@@ -68,12 +72,14 @@ export async function renderLogTable(records) {
     }
 
     let lateNote = '';
-    if (isLate) {
+    if (isLate && userDefaultStartTime) {
       const defaultStartMinutes = parseTimeString(userDefaultStartTime);
-      const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
-      const lateMinutes = checkInMinutes - defaultStartMinutes;
-      lateNote = ` 🚨 Late by ${lateMinutes}m`;
-  }
+      if (defaultStartMinutes !== null) {
+        const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
+        const lateMinutes = checkInMinutes - defaultStartMinutes;
+        lateNote = ` 🚨 Late by ${lateMinutes}m`;
+      }
+    }
 
     const workedTime = entry.type === 'work'
       ? `${Math.floor(adjustedWorked / 60)}h ${adjustedWorked % 60}m${lateNote}`

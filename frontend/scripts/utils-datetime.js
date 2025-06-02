@@ -12,6 +12,9 @@ export function toISOStringLocal(localStr) {
 }
 
 export function parseTimeString(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string' || !timeStr.includes(':')) {
+    return null;
+  }
   const [hours, minutes] = timeStr.split(':').map(Number);
   return hours * 60 + minutes;
 }

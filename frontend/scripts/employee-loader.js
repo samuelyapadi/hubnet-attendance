@@ -2,11 +2,9 @@
 
 import { renderLogTable } from './employee-details.js';
 import { setupMetaListeners } from './employee-meta.js';
-import { toLocalDatetimeString } from './utils-datetime.js'; // ✅ Ensure datetime function is available
+import { toLocalDatetimeString } from './utils-datetime.js';
 
 let employeeId = null;
-//let userDefaultStartTime = window.userDefaultStartTime || null;
-//let userIsShiftWorker = window.userIsShiftWorker || false;
 
 const params = new URLSearchParams(window.location.search);
 const employeeName = params.get('name');
@@ -18,6 +16,7 @@ fetch('/api/users')
     const match = users.find(u => decodeURIComponent(u.name.trim()) === decodeURIComponent(employeeName.trim()));
     if (!match) return;
     employeeId = match._id;
+    window.employeeId = employeeId; // ✅ Make employeeId globally accessible
     return fetch(`/api/users/${employeeId}`);
   })
   .then(res => res.json())
@@ -52,20 +51,17 @@ fetch('/api/users')
 
     return fetch('/api/sessions/all');
   })
-    .then(res => res.json())
-    .then(data => {
-      const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-      populateYearMonthFilters(allRecords);
+  .then(res => res.json())
+  .then(data => {
+    const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
+    populateYearMonthFilters(allRecords);
 
-      window.userDefaultStartTime = userDefaultStartTime;
-      window.userIsShiftWorker = userIsShiftWorker;
+    renderLogTable(allRecords);
 
-      renderLogTable(allRecords);
-
-    //Register button and shift listeners
+    // Register button and shift listeners
     setupMetaListeners(employeeId, employeeName);
 
-    //Make accessible for inline handlers in employee-details.js
+    // Make accessible for inline handlers in employee-details.js
     window.allRecords = allRecords;
     window.employeeName = employeeName;
     window.applyFilterAndRender = () => applyFilterAndRender(allRecords);
@@ -129,5 +125,5 @@ function applyFilterAndRender(records) {
     return matchYear && matchMonth && matchStart && matchEnd;
   });
 
-  renderLogTable(filtered, toLocalDatetimeString); // ✅ Pass again for filtered view
+  renderLogTable(filtered, toLocalDatetimeString);
 }

@@ -48,6 +48,13 @@ export async function renderLogTable(records) {
           const expected = new Date(checkIn);
           expected.setHours(h, m, 0, 0);
           isLate = checkIn > expected;
+
+          if (isLate) {
+            const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
+            const shiftStartMinutes = h * 60 + m;
+            const lateMinutes = checkInMinutes - shiftStartMinutes;
+            lateNote = `Late by ${lateMinutes}m`;
+          }
         }
       } else if (userDefaultStartTime) {
     const defaultStartMinutes = parseTimeString(userDefaultStartTime);

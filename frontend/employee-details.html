@@ -74,24 +74,30 @@
   </div>
 
   <!-- 📊 Session Table -->
-  <div style="margin: 12px 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-    <label for="sessionType">Type:</label>
-    <select id="sessionType" style="font-size: 14px; padding: 4px 8px; height: 32px;">
-      <option value="work">work</option>
-      <option value="leave">leave</option>
-      <option value="unpaid">unpaid</option>
+   <!-- ➕ Toggle Create Session -->
+<div style="margin-top: 1rem;">
+  <button id="openCreateSessionModal" class="btn">＋ Create Session</button>
+</div>
+
+<!-- 📝 Modal for Session Creation -->
+<div id="createSessionModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
+  <h3>Create Manual Session</h3>
+  <label>Type:
+    <select id="sessionType">
+      <option value="work">Work</option>
+      <option value="leave">Paid Leave</option>
+      <option value="unpaid">Unpaid Leave</option>
     </select>
-
-    <label for="manualCheckIn">Check-in:</label>
-    <input type="datetime-local" id="manualCheckIn" style="font-size: 14px; padding: 4px 8px; height: 32px;">
-
-    <label for="manualCheckOut">Check-out:</label>
-    <input type="datetime-local" id="manualCheckOut" style="font-size: 14px; padding: 4px 8px; height: 32px;">
-
-    <button id="createSessionBtn" style="font-size: 14px; padding: 6px 12px; height: 34px; background: black; color: white; border: 1px solid #000;">
-      ➕ Create Session
-    </button>
-  </div>
+  </label><br><br>
+  <label>Check-in:
+    <input type="datetime-local" id="manualCheckIn">
+  </label><br><br>
+  <label>Check-out:
+    <input type="datetime-local" id="manualCheckOut">
+  </label><br><br>
+  <button id="createSessionBtn" class="btn">Submit</button>
+  <button type="button" class="btn" onclick="document.getElementById('createSessionModal').style.display='none'">Cancel</button>
+</div>
   <table>
     <thead>
       <tr>

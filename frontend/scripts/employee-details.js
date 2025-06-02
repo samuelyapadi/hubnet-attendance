@@ -343,3 +343,8 @@ document.getElementById('createSessionBtn')?.addEventListener('click', async () 
   }
 });
 
+document.getElementById('openCreateSessionModal')?.addEventListener('click', () => {
+  document.getElementById('createSessionModal').style.display = 'block';
+});
+
+

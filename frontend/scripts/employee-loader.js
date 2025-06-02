@@ -5,8 +5,8 @@ import { setupMetaListeners } from './employee-meta.js';
 import { toLocalDatetimeString } from './utils-datetime.js'; // ✅ Ensure datetime function is available
 
 let employeeId = null;
-let userDefaultStartTime = window.userDefaultStartTime || null;
-let userIsShiftWorker = window.userIsShiftWorker || false;
+//let userDefaultStartTime = window.userDefaultStartTime || null;
+//let userIsShiftWorker = window.userIsShiftWorker || false;
 
 const params = new URLSearchParams(window.location.search);
 const employeeName = params.get('name');
@@ -26,6 +26,9 @@ fetch('/api/users')
 
     userDefaultStartTime = user.defaultStartTime || null;
     userIsShiftWorker = user.isShiftWorker || false;
+
+    window.userDefaultStartTime = userDefaultStartTime;
+    window.userIsShiftWorker = userIsShiftWorker;
 
     if (user.joinDate) {
       document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);

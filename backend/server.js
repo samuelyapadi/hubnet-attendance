@@ -17,20 +17,20 @@ app.use('/api/shifts', shiftRoutes);
 app.use('/api', apiRoutes);
 
 // ✅ Serve static frontend files
-app.use('/scripts', express.static(path.join(__dirname, 'frontend/scripts')));
-app.use(express.static(path.join(__dirname, 'frontend')));
+app.use('/scripts', express.static(path.join(__dirname, '../frontend/scripts')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-// ✅ Serve HTML files directly (like /employee-details.html)
+// ✅ Serve HTML files directly (e.g. /admin.html, /employee-details.html)
 app.get('/*.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', req.path));
+  res.sendFile(path.join(__dirname, '../frontend', req.path));
 });
 
-// ✅ Fallback to index.html for non-file routes (e.g., /dashboard)
+// ✅ Fallback to index.html for unknown routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-// ✅ Connect to MongoDB and start server
+// ✅ Start server after DB connects
 const PORT = process.env.PORT || 3000;
 console.log('📦 MONGO_URI from env:', process.env.MONGO_URI);
 

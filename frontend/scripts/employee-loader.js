@@ -24,8 +24,8 @@ fetch('/api/users')
   .then(user => {
     if (!user) return;
 
-    userDefaultStartTime = user.defaultStartTime || null;
-    userIsShiftWorker = user.isShiftWorker || false;
+    const userDefaultStartTime = user.defaultStartTime || null;
+    const userIsShiftWorker = user.isShiftWorker || false;
 
     window.userDefaultStartTime = userDefaultStartTime;
     window.userIsShiftWorker = userIsShiftWorker;

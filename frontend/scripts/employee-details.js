@@ -280,3 +280,36 @@ export async function deleteSession(sessionId) {
 window.enableEdit = enableEdit;
 window.saveSession = saveSession;
 window.deleteSession = deleteSession;
+
+document.getElementById('createSessionBtn')?.addEventListener('click', async () => {
+  const name = window.employeeName;
+  const checkIn = prompt('Enter check-in time (YYYY-MM-DDTHH:MM):');
+  const checkOut = prompt('Enter check-out time (YYYY-MM-DDTHH:MM):');
+
+  if (!checkIn || !checkOut) {
+    alert('❌ Both check-in and check-out are required.');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/sessions/manual', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, checkIn, checkOut })
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      alert('✅ Session created.');
+      const refreshed = await fetch('/api/sessions/all').then(res => res.json());
+      window.allRecords = refreshed.filter(e => e.name === name && e.checkIn && e.checkOut);
+      renderLogTable(window.allRecords);
+    } else {
+      alert('❌ Failed to create session.');
+    }
+  } catch (err) {
+    console.error('Create session error:', err);
+    alert('❌ Request failed.');
+  }
+});

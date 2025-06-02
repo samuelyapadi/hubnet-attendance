@@ -2,10 +2,11 @@
 
 import { toLocalDatetimeString, parseTimeString } from './utils-datetime.js';
 
-let userDefaultStartTime = window.userDefaultStartTime || null;
-let userIsShiftWorker = window.userIsShiftWorker || false;
-
 export async function renderLogTable(records) {
+  const userDefaultStartTime = window.userDefaultStartTime || null;
+  const userIsShiftWorker = window.userIsShiftWorker || false;
+  console.log('[Render] userDefaultStartTime =', userDefaultStartTime);
+
   const tbody = document.getElementById('logTable');
   tbody.innerHTML = '';
   document.getElementById('sessionCount').textContent = records.length;

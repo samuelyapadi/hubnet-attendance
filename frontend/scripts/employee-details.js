@@ -39,7 +39,7 @@ export async function renderLogTable(records) {
 
     try {
       if (userIsShiftWorker) {
-        const shiftRes = await fetch(`/api/shifts/${employeeId}/${yearMonth}`);
+        const shiftRes = await fetch(`/api/shifts/${window.employeeId}/${yearMonth}`);
         const shiftData = await shiftRes.json();
         const shiftCode = shiftData?.shifts?.[shiftDay];
         const shiftStart = shiftTimes[shiftCode];

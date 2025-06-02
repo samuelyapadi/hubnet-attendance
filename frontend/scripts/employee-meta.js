@@ -71,6 +71,11 @@ function saveEmployeeInfo(employeeId, employeeName) {
         document.getElementById('defaultStartTime').value = updatedUser.defaultStartTime;
       }
 
+      // ✅ Live re-render of sessions with new employment/shift status
+      window.userIsShiftWorker = updatedUser.isShiftWorker;
+      window.userDefaultStartTime = updatedUser.defaultStartTime;
+      window.analyzeAndRenderSessions(window.allRecordsRaw);
+
       return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
     })
     .then(res => res.json())

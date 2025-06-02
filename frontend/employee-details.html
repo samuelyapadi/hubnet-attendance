@@ -122,22 +122,84 @@
     <button id="saveEmployeeBtn" class="btn">💾 Save Info</button>
   </section>
 
-  <!-- 📅 Monthly Shift Setup -->
-  <section id="monthlyShiftContainer" style="display:none;">
-    <h2>Monthly Shift Assignment</h2>
-    <label for="shiftMonth">Month:</label>
-    <input type="month" id="shiftMonth"><br/><br/>
+<!-- 📅 Monthly Shift Setup -->
+<section id="monthlyShiftContainer" style="display:none;">
+  <h2>Monthly Shift Assignment</h2>
+  <label for="shiftMonth">Month:</label>
+  <input type="month" id="shiftMonth"><br/><br/>
 
-    <label>Mon: <input type="text" id="shiftMon"></label>
-    <label>Tue: <input type="text" id="shiftTue"></label>
-    <label>Wed: <input type="text" id="shiftWed"></label>
-    <label>Thu: <input type="text" id="shiftThu"></label>
-    <label>Fri: <input type="text" id="shiftFri"></label>
-    <label>Sat: <input type="text" id="shiftSat"></label>
-    <label>Sun: <input type="text" id="shiftSun"></label><br/><br/>
+  <label for="shiftMon">Monday:</label>
+  <select id="shiftMon">
+    <option value="">--</option>
+    <option value="1">1 - 08:30</option>
+    <option value="2">2 - 12:00</option>
+    <option value="3">3 - 13:30</option>
+    <option value="4">4 - 22:30</option>
+    <option value="5">5 - 23:50</option>
+  </select><br>
 
-    <button id="saveShiftBtn" class="btn">💾 Save Shift</button>
-  </section>
+  <label for="shiftTue">Tuesday:</label>
+  <select id="shiftTue">
+    <option value="">--</option>
+    <option value="1">1 - 08:30</option>
+    <option value="2">2 - 12:00</option>
+    <option value="3">3 - 13:30</option>
+    <option value="4">4 - 22:30</option>
+    <option value="5">5 - 23:50</option>
+  </select><br>
+
+  <label for="shiftWed">Wednesday:</label>
+  <select id="shiftWed">
+    <option value="">--</option>
+    <option value="1">1 - 08:30</option>
+    <option value="2">2 - 12:00</option>
+    <option value="3">3 - 13:30</option>
+    <option value="4">4 - 22:30</option>
+    <option value="5">5 - 23:50</option>
+  </select><br>
+
+  <label for="shiftThu">Thursday:</label>
+  <select id="shiftThu">
+    <option value="">--</option>
+    <option value="1">1 - 08:30</option>
+    <option value="2">2 - 12:00</option>
+    <option value="3">3 - 13:30</option>
+    <option value="4">4 - 22:30</option>
+    <option value="5">5 - 23:50</option>
+  </select><br>
+
+  <label for="shiftFri">Friday:</label>
+  <select id="shiftFri">
+    <option value="">--</option>
+    <option value="1">1 - 08:30</option>
+    <option value="2">2 - 12:00</option>
+    <option value="3">3 - 13:30</option>
+    <option value="4">4 - 22:30</option>
+    <option value="5">5 - 23:50</option>
+  </select><br>
+
+  <label for="shiftSat">Saturday:</label>
+  <select id="shiftSat">
+    <option value="">--</option>
+    <option value="1">1 - 08:30</option>
+    <option value="2">2 - 12:00</option>
+    <option value="3">3 - 13:30</option>
+    <option value="4">4 - 22:30</option>
+    <option value="5">5 - 23:50</option>
+  </select><br>
+
+  <label for="shiftSun">Sunday:</label>
+  <select id="shiftSun">
+    <option value="">--</option>
+    <option value="1">1 - 08:30</option>
+    <option value="2">2 - 12:00</option>
+    <option value="3">3 - 13:30</option>
+    <option value="4">4 - 22:30</option>
+    <option value="5">5 - 23:50</option>
+  </select><br><br>
+
+  <button id="saveShiftBtn" class="btn">💾 Save Shift</button>
+</section>
 
   <!-- 📦 Modular Scripts -->
   <script type="module" src="scripts/employee-loader.js"></script>

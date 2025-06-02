@@ -54,7 +54,7 @@ export async function renderLogTable(records) {
             const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
             const shiftStartMinutes = h * 60 + m;
             const lateMinutes = checkInMinutes - shiftStartMinutes;
-            lateNote = `Late by ${lateMinutes}m`;
+            lateNote = ` 🚨 Late by ${lateMinutes}m`;
           }
         }
       } else if (userDefaultStartTime) {
@@ -70,10 +70,21 @@ export async function renderLogTable(records) {
     }
   }
 
-      const ci = checkIn.getHours() + checkIn.getMinutes() / 60;
-      const co = checkOut.getHours() + checkOut.getMinutes() / 60;
-      if (ci < 5) nightWorkMinutes += Math.min(5, co) * 60;
-      if (co > 22) nightWorkMinutes += (co - Math.max(ci, 22)) * 60;
+    function calculateNightWorkMinutes(start, end) {
+      let total = 0;
+      const step = 1000 * 60; // 1 minute
+
+      for (let t = new Date(start); t < end; t = new Date(t.getTime() + step)) {
+        const hour = t.getHours();
+        if (hour >= 22 || hour < 5) {
+          total++;
+        }
+      }
+      return total;
+    }
+
+nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
+
 
     } catch (err) {
       console.warn('[Lateness or Night Work check failed]', err);

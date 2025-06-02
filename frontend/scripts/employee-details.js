@@ -342,3 +342,4 @@ document.getElementById('createSessionBtn')?.addEventListener('click', async () 
     alert('❌ Request failed.');
   }
 });
+

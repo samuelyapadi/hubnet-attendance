@@ -39,36 +39,63 @@ export async function renderLogTable(records) {
     let lateNote = '';
 
     try {
-      if (userIsShiftWorker) {
-        const shiftRes = await fetch(`/api/shifts/${window.employeeId}/${yearMonth}`);
-        const shiftData = await shiftRes.json();
-        const shiftCode = shiftData?.shifts?.[shiftDay];
-        const shiftStart = shiftTimes[shiftCode];
-        if (shiftStart) {
-          const [h, m] = shiftStart.split(':').map(Number);
-          const expected = new Date(checkIn);
-          expected.setHours(h, m, 0, 0);
-          isLate = checkIn > expected;
+if (userIsShiftWorker) {
+  const shiftRes = await fetch(`/api/shifts/${window.employeeId}/${yearMonth}`);
+  const shiftData = await shiftRes.json();
 
-          if (isLate) {
-            const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
-            const shiftStartMinutes = h * 60 + m;
-            const lateMinutes = checkInMinutes - shiftStartMinutes;
-            lateNote = ` 🚨 Late by ${lateMinutes}m`;
-          }
-        }
-      } else if (userDefaultStartTime) {
-    const defaultStartMinutes = parseTimeString(userDefaultStartTime);
-      if (defaultStartMinutes !== null && !isNaN(defaultStartMinutes)) {
+  // Map current and possibly previous day if check-in is early morning
+  const checkInHour = checkIn.getHours();
+  let shiftDayKey = shiftDay;
+  let shiftCode = shiftData?.shifts?.[shiftDayKey];
+
+  if (!shiftCode && checkInHour < 5) {
+    // Try previous day
+    const prevDayIndex = (weekDayIndex + 6) % 7; // wrap around
+    const prevDay = dayMap[prevDayIndex];
+    shiftDayKey = prevDay;
+    shiftCode = shiftData?.shifts?.[shiftDayKey];
+  }
+
+  const shiftStart = shiftTimes[shiftCode];
+  if (shiftStart) {
+    const [h, m] = shiftStart.split(':').map(Number);
+    const expected = new Date(checkIn);
+    expected.setHours(h, m, 0, 0);
+
+    // If shift is late-night (22:00 or later) and check-in hour is past midnight
+    if (h >= 22 && checkInHour < 5) {
+      expected.setDate(expected.getDate() - 1); // Roll back expected to previous day
+    }
+
+    isLate = checkIn > expected;
+
+    if (isLate) {
       const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
-      isLate = checkInMinutes > defaultStartMinutes;
-      console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);
-      console.log('Check-in:', checkIn.toTimeString(), '→', checkInMinutes);
-      console.log('Late?', isLate);
-    } else {
-        console.warn('⚠️ Failed to parse default start time:', userDefaultStartTime);
+      const shiftStartMinutes = h * 60 + m;
+      let lateMinutes = checkInMinutes - shiftStartMinutes;
+
+      // If late past midnight, add 1440 mins (1 day) to shift time for proper diff
+      if (lateMinutes < 0) lateMinutes += 1440;
+
+      lateNote = ` 🚨 Late by ${lateMinutes}m`;
     }
   }
+} else if (userDefaultStartTime) {
+  const defaultStartMinutes = parseTimeString(userDefaultStartTime);
+  if (defaultStartMinutes !== null && !isNaN(defaultStartMinutes)) {
+    const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
+    isLate = checkInMinutes > defaultStartMinutes;
+    if (isLate) {
+      const lateMinutes = checkInMinutes - defaultStartMinutes;
+      lateNote = ` 🚨 Late by ${lateMinutes}m`;
+    }
+    console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);
+    console.log('Check-in:', checkIn.toTimeString(), '→', checkInMinutes);
+    console.log('Late?', isLate);
+  } else {
+    console.warn('⚠️ Failed to parse default start time:', userDefaultStartTime);
+  }
+}
 
     function calculateNightWorkMinutes(start, end) {
       let total = 0;

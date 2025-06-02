@@ -137,9 +137,14 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
     const nightWork = nightWorkMinutes > 0 ? `${Math.floor(nightWorkMinutes / 60)}h ${nightWorkMinutes % 60}m` : '';
 
     const row = document.createElement('tr');
-    if (isLate) {
-    row.style.backgroundColor = '#ffe5e5'; // Light red background
+    if (isLate && nightWorkMinutes > 0) {
+      row.style.backgroundColor = '#f0e5ff'; // Light purple = both late + night
+    } else if (isLate) {
+      row.style.backgroundColor = '#ffe5e5'; // Light red = late only
+    } else if (nightWorkMinutes > 0) {
+      row.style.backgroundColor = '#e5f0ff'; // Light blue = night work only
     }
+
     row.innerHTML = `
       <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkIn)}" data-id="${entry._id}" data-type="checkIn" disabled></td>
       <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkOut)}" data-id="${entry._id}" data-type="checkOut" disabled></td>

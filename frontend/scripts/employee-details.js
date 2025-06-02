@@ -52,6 +52,9 @@ export async function renderLogTable(records) {
         const defaultStartMinutes = parseTimeString(userDefaultStartTime);
         const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
         isLate = checkInMinutes > defaultStartMinutes;
+        console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);
+        console.log('Check-in:', checkIn.toTimeString(), '→', checkInMinutes);
+        console.log('Late?', isLate);
       }
 
       const ci = checkIn.getHours() + checkIn.getMinutes() / 60;

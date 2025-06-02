@@ -36,6 +36,7 @@ export async function renderLogTable(records) {
 
     let isLate = false;
     let nightWorkMinutes = 0;
+    let lateNote = '';
 
     try {
       if (userIsShiftWorker) {
@@ -78,7 +79,6 @@ export async function renderLogTable(records) {
       console.warn('[Lateness or Night Work check failed]', err);
     }
 
-    let lateNote = '';
     if (isLate && userDefaultStartTime) {
       const defaultStartMinutes = parseTimeString(userDefaultStartTime);
       if (defaultStartMinutes !== null) {

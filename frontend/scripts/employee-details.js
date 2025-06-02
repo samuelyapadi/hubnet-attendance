@@ -347,4 +347,4 @@ document.getElementById('openCreateSessionModal')?.addEventListener('click', () 
   document.getElementById('createSessionModal').style.display = 'block';
 });
 
-
+window.analyzeAndRenderSessions = analyzeAndRenderSessions;

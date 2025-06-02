@@ -71,17 +71,16 @@ function saveEmployeeInfo(employeeId, employeeName) {
         document.getElementById('defaultStartTime').value = updatedUser.defaultStartTime;
       }
 
-      // ✅ Live re-render of sessions with new employment/shift status
-      window.userIsShiftWorker = updatedUser.isShiftWorker;
-      window.userDefaultStartTime = updatedUser.defaultStartTime;
-      window.analyzeAndRenderSessions(window.allRecordsRaw);
-
       return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
     })
     .then(res => res.json())
     .then(data => {
       if (data) {
         document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
+      }
+      // 🔁 Re-analyze sessions to reflect new shift rules or start time
+      if (typeof window.analyzeAndRenderSessions === 'function') {
+        window.analyzeAndRenderSessions(window.allRecordsRaw || []);
       }
     })
     .catch(err => {
@@ -113,6 +112,10 @@ function saveMonthlyShift(employeeId) {
     .then(result => {
       if (result.success) {
         alert('✅ Shift pattern saved!');
+        // 🔁 Immediately re-run analysis
+        if (typeof window.analyzeAndRenderSessions === 'function') {
+          window.analyzeAndRenderSessions(window.allRecordsRaw || []);
+        }
       } else {
         alert('❌ Failed to save shift pattern.');
       }

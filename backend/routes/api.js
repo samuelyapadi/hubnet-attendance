@@ -356,6 +356,32 @@ router.patch('/users/:id', async (req, res) => {
   }
 });
 
+// ✅ Create session (employee-details page)
+router.post('/sessions', async (req, res) => {
+  const { name, checkIn, checkOut, type = 'work' } = req.body;
+
+  if (!name || !checkIn || !checkOut) {
+    return res.status(400).json({ success: false, error: 'Missing fields' });
+  }
+
+  try {
+    const newSession = new Attendance({
+      name,
+      checkIn: new Date(checkIn),
+      checkOut: new Date(checkOut),
+      type,
+      sessionCompleted: true,
+      hoursUsed: type !== 'work' ? Math.round(((new Date(checkOut) - new Date(checkIn)) / 3600000) * 2) / 2 : 0
+    });
+
+    await newSession.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[CREATE SESSION ERROR]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ✅ Manual session input (admin panel)
 router.post('/sessions/manual', async (req, res) => {
   const { name, checkIn, checkOut, type = 'work', hoursUsed = 0 } = req.body;

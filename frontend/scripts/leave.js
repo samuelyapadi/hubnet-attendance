@@ -106,6 +106,12 @@ window.addEventListener('DOMContentLoaded', () => {
     nameInputForm.style.display = 'none';
   }
 
+  // Set back-to-logs link
+  const backBtn = document.getElementById('backToLogsBtn');
+  if (backBtn && currentEmployeeId && currentEmployeeName) {
+    backBtn.href = `employee-details.html?id=${currentEmployeeId}&name=${encodeURIComponent(currentEmployeeName)}`;
+  }
+
   if (!currentEmployeeId) {
     alert('No employee ID provided');
     return;

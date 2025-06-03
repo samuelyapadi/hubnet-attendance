@@ -28,7 +28,18 @@ function renderLeaveTable(leaves) {
 
 function loadLeaveRecords() {
   if (!currentEmployeeId) return;
-  fetch(`/api/leaves/${currentEmployeeId}`)
+  const typeFilter = document.getElementById('leaveTypeFilter')?.value;
+  const monthFilter = document.getElementById('leaveFilterMonth')?.value;
+
+  let url = `/api/leaves/${currentEmployeeId}`;
+  if (monthFilter || typeFilter) {
+    const query = new URLSearchParams();
+    if (monthFilter) query.append('month', monthFilter);
+    if (typeFilter) query.append('type', typeFilter);
+    url += '?' + query.toString();
+  }
+
+  fetch(url)
     .then(res => res.json())
     .then(data => renderLeaveTable(data));
 }
@@ -51,7 +62,13 @@ function createLeaveRecord() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
-  }).then(() => loadLeaveRecords());
+  }).then(() => {
+    // If paid leave, update employee balance
+    if (type === 'paid') {
+      fetch(`/api/leaves/balance/${currentEmployeeId}`, { method: 'PATCH' });
+    }
+    loadLeaveRecords();
+  });
 }
 
 function updateLeaveRecord(id) {
@@ -77,6 +94,7 @@ function deleteLeaveRecord(id) {
 
 // 🟢 Event Listeners
 document.getElementById('addLeaveBtn').addEventListener('click', createLeaveRecord);
+document.getElementById('filterLeaveBtn')?.addEventListener('click', loadLeaveRecords);
 
 document.querySelector('#leaveTable tbody').addEventListener('click', (e) => {
   if (e.target.classList.contains('save-leave')) {
@@ -92,21 +110,23 @@ window.addEventListener('DOMContentLoaded', () => {
   currentEmployeeId = params.get('id') || localStorage.getItem('currentEmployeeId');
   currentEmployeeName = params.get('name') || localStorage.getItem('currentEmployeeName');
 
-  // Fill filter name and disable
   const nameInput = document.getElementById('leaveFilterName');
   if (nameInput && currentEmployeeName) {
     nameInput.value = currentEmployeeName;
     nameInput.disabled = true;
   }
 
-  // Fill leave form name or hide it
+  const nameHeader = document.getElementById('employeeLeaveHeader');
+  if (nameHeader && currentEmployeeName) {
+    nameHeader.textContent = `${currentEmployeeName}'s Leave Records`;
+  }
+
   const nameInputForm = document.getElementById('newLeaveName');
   if (nameInputForm && currentEmployeeName) {
     nameInputForm.value = currentEmployeeName;
     nameInputForm.style.display = 'none';
   }
 
-  // Set back-to-logs link
   const backBtn = document.getElementById('backToLogsBtn');
   if (backBtn && currentEmployeeId && currentEmployeeName) {
     backBtn.href = `employee-details.html?id=${currentEmployeeId}&name=${encodeURIComponent(currentEmployeeName)}`;

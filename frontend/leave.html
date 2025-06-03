@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leave Management</title>
+  <div style="margin-bottom: 1rem;">
+  <a href="employees.html" class="btn">👥 Employee List</a>
+  <a href="admin.html" class="btn">← Admin</a>
+  <a href="employee-details.html" class="btn">📄 Employee Logs</a>
+</div>
+  <link rel="stylesheet" href="styles/styles.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1, h2 {
+      font-size: 20px;
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    select, input[type="number"], input[type="date"], input[type="text"] {
+      font-size: 14px;
+      padding: 6px 8px;
+      height: 34px;
+      margin-right: 1rem;
+    }
+    .btn {
+      font-size: 14px;
+      padding: 6px 12px;
+      height: 34px;
+      background: black;
+      color: white;
+      border: 1px solid #000;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #333;
+    }
+    .top-nav {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background-color: white;
+      border-bottom: 1px solid #ccc;
+    }
+    .top-nav .logo {
+      height: 36px;
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-nav">
+    <img src="images/hubnetblack.jpg" alt="Logo" class="logo" />
+    <h1>HUBNET Attendance</h1>
+  </header>
+
+  <div style="margin: 1rem 0;">
+    <a href="admin.html" class="btn">← Back to Admin</a>
+    <a href="employees.html" class="btn">👥 Employee List</a>
+  </div>
+
+  <h2>📆 Leave Records</h2>
+
+  <div style="margin-bottom: 1rem;">
+    <label for="leaveFilterName">Employee:</label>
+    <input type="text" id="leaveFilterName" placeholder="Name">
+
+    <label for="leaveFilterMonth">Month:</label>
+    <input type="month" id="leaveFilterMonth">
+
+    <button class="btn" id="filterLeaveBtn">🔍 Filter</button>
+  </div>
+
+  <table id="leaveTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Hours</th>
+        <th>Notes</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>➕ Add Leave</h2>
+  <div style="margin-bottom: 2rem;">
+    <input type="text" id="newLeaveName" placeholder="Employee Name">
+    <input type="date" id="newLeaveDate">
+    <select id="newLeaveType">
+      <option value="paid">Paid Leave</option>
+      <option value="unpaid">Unpaid Leave</option>
+      <option value="substitute">Substitute</option>
+      <option value="childcare">Childcare</option>
+      <option value="maternity">Maternity</option>
+      <option value="bereavement">Bereavement</option>
+      <option value="summer">Summer</option>
+      <option value="care">Care</option>
+      <option value="injury">Injury</option>
+      <option value="other">Other</option>
+    </select>
+    <input type="number" id="newLeaveHours" placeholder="Hours" style="width: 80px;">
+    <input type="text" id="newLeaveNotes" placeholder="Notes" style="width: 200px;">
+    <button class="btn" id="addLeaveBtn">➕ Add Leave</button>
+  </div>
+
+  <script type="module" src="scripts/leave.js"></script>
+</body>
+</html>

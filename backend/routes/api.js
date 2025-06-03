@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
+const Leave = require('../models/Leave');
 
 function calculateLeaveEntitlement(user) {
   if (!user.joinDate || isNaN(new Date(user.joinDate))) return 0;
@@ -483,6 +484,65 @@ router.get('/users/:id', async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all leave records for a user
+router.get('/leaves/:userId', async (req, res) => {
+  try {
+    const records = await Leave.find({ userId: req.params.userId }).sort({ date: -1 });
+    res.json(records);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add a new leave record
+router.post('/leaves/:userId', async (req, res) => {
+  const { type, hours, notes, date } = req.body;
+  if (!type || !hours || !date) return res.status(400).json({ error: 'Missing fields' });
+
+  try {
+    const record = new Leave({
+      userId: req.params.userId,
+      type,
+      hours,
+      notes,
+      date: new Date(date)
+    });
+    await record.save();
+    res.json({ success: true, record });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Edit an existing leave
+router.patch('/leaves/:leaveId', async (req, res) => {
+  const { type, hours, notes, date } = req.body;
+  try {
+    const record = await Leave.findById(req.params.leaveId);
+    if (!record) return res.status(404).json({ error: 'Leave not found' });
+
+    if (type) record.type = type;
+    if (!isNaN(hours)) record.hours = hours;
+    if (notes) record.notes = notes;
+    if (date) record.date = new Date(date);
+
+    await record.save();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete a leave record
+router.delete('/leaves/:leaveId', async (req, res) => {
+  try {
+    await Leave.findByIdAndDelete(req.params.leaveId);
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -52,7 +52,7 @@
   <div style="margin-bottom: 1rem;">
   <a href="admin.html" class="btn">← Back to Admin</a>
   <a href="employees.html" class="btn">👥 Employee List</a>
-  <a href="leave.html" class="btn">📆 Manage Leave</a>
+  <a id="manageLeaveBtn" class="btn">📆 Manage Leave</a>
   </div>
 
   <!-- 🔍 Filter Summary -->
@@ -238,5 +238,23 @@
   <script type="module" src="scripts/employee-filters.js"></script>
   <script type="module" src="scripts/employee-meta.js"></script>
   <script type="module" src="scripts/employee-ui.js"></script>
+
+<script>
+  document.getElementById('manageLeaveBtn')?.addEventListener('click', () => {
+    // Try to get from global variable first, then fall back to DOM or localStorage
+    const empId = window.employeeId || localStorage.getItem('currentEmployeeId');
+    const empName = window.employeeName || document.getElementById('employeeName')?.textContent.trim();
+
+    if (empId && empName) {
+      localStorage.setItem('currentEmployeeId', empId);
+      localStorage.setItem('currentEmployeeName', empName);
+      const target = `leave.html?id=${empId}&name=${encodeURIComponent(empName)}`;
+      window.location.href = target;
+    } else {
+      alert('Employee ID or name not available');
+    }
+  });
+</script>
+
 </body>
 </html>

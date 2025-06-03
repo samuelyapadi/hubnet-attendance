@@ -73,12 +73,8 @@
   <h2>📆 Leave Records</h2>
 
   <div style="margin-bottom: 1rem;">
-    <label for="leaveFilterName">Employee:</label>
-    <input type="text" id="leaveFilterName" placeholder="Name">
-
     <label for="leaveFilterMonth">Month:</label>
     <input type="month" id="leaveFilterMonth">
-
     <button class="btn" id="filterLeaveBtn">🔍 Filter</button>
   </div>
 
@@ -98,7 +94,6 @@
 
   <h2>➕ Add Leave</h2>
   <div style="margin-bottom: 2rem;">
-    <input type="text" id="newLeaveName" placeholder="Employee Name">
     <input type="date" id="newLeaveDate">
     <select id="newLeaveType">
       <option value="paid">Paid Leave</option>
@@ -118,5 +113,16 @@
   </div>
 
   <script type="module" src="scripts/leave.js"></script>
+
+  <script>
+    const empName = localStorage.getItem('currentEmployeeName');
+    const empId = localStorage.getItem('currentEmployeeId');
+    if (empName && empId) {
+      const logsBtn = document.getElementById('backToLogsBtn');
+      logsBtn.href = `employee-details.html?id=${empId}&name=${encodeURIComponent(empName)}`;
+    } else {
+      document.getElementById('backToLogsBtn').style.display = 'none';
+    }
+  </script>
 </body>
 </html>

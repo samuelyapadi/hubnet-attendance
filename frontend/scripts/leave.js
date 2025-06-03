@@ -1,6 +1,5 @@
-// leave.js
-
 let currentEmployeeId = null;
+let currentEmployeeName = null;
 
 function renderLeaveTable(leaves) {
   const tbody = document.querySelector('#leaveTable tbody');
@@ -9,6 +8,7 @@ function renderLeaveTable(leaves) {
   leaves.forEach(leave => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
+      <td>${leave.name}</td>
       <td><input type="date" value="${leave.date.split('T')[0]}" data-id="${leave._id}" class="leave-date"></td>
       <td>
         <select data-id="${leave._id}" class="leave-type">
@@ -34,20 +34,23 @@ function loadLeaveRecords() {
 }
 
 function createLeaveRecord() {
-  const date = document.getElementById('leaveDate').value;
-  const type = document.getElementById('leaveType').value;
-  const hours = parseFloat(document.getElementById('leaveHours').value || '0');
-  const notes = document.getElementById('leaveNotes').value;
+  const date = document.getElementById('newLeaveDate').value;
+  const type = document.getElementById('newLeaveType').value;
+  const hours = parseFloat(document.getElementById('newLeaveHours').value || '0');
+  const notes = document.getElementById('newLeaveNotes').value;
 
   if (!date || hours <= 0) {
     alert('Please provide a valid date and hours.');
     return;
   }
 
+  const payload = { date, type, hours, notes };
+  if (currentEmployeeName) payload.name = currentEmployeeName;
+
   fetch(`/api/leaves/${currentEmployeeId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date, type, hours, notes })
+    body: JSON.stringify(payload)
   }).then(() => loadLeaveRecords());
 }
 
@@ -83,13 +86,30 @@ document.querySelector('#leaveTable tbody').addEventListener('click', (e) => {
   }
 });
 
-// 🔁 On Load (assuming employeeId is passed via query param like ?id=xxxxx)
+// 🔁 On Load
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
-  currentEmployeeId = params.get('id');
+  currentEmployeeId = params.get('id') || localStorage.getItem('currentEmployeeId');
+  currentEmployeeName = params.get('name') || localStorage.getItem('currentEmployeeName');
+
+  // Fill filter name and disable
+  const nameInput = document.getElementById('leaveFilterName');
+  if (nameInput && currentEmployeeName) {
+    nameInput.value = currentEmployeeName;
+    nameInput.disabled = true;
+  }
+
+  // Fill leave form name or hide it
+  const nameInputForm = document.getElementById('newLeaveName');
+  if (nameInputForm && currentEmployeeName) {
+    nameInputForm.value = currentEmployeeName;
+    nameInputForm.style.display = 'none';
+  }
+
   if (!currentEmployeeId) {
     alert('No employee ID provided');
     return;
   }
+
   loadLeaveRecords();
 });

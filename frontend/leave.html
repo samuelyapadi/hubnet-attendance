@@ -4,11 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Leave Management</title>
-  <div style="margin-bottom: 1rem;">
-  <a href="employees.html" class="btn">👥 Employee List</a>
-  <a href="admin.html" class="btn">← Admin</a>
-  <a href="employee-details.html" class="btn">📄 Employee Logs</a>
-</div>
+
   <link rel="stylesheet" href="styles/styles.css" />
   <style>
     body {
@@ -71,6 +67,7 @@
   <div style="margin: 1rem 0;">
     <a href="admin.html" class="btn">← Back to Admin</a>
     <a href="employees.html" class="btn">👥 Employee List</a>
+      <a id="backToLogsBtn" class="btn">← Back to Logs</a>
   </div>
 
   <h2>📆 Leave Records</h2>
@@ -121,5 +118,15 @@
   </div>
 
   <script type="module" src="scripts/leave.js"></script>
+
+  <script>
+  const empName = localStorage.getItem('currentEmployeeName');
+  const empId = localStorage.getItem('currentEmployeeId');
+  if (empName && empId) {
+    const logsBtn = document.getElementById('backToLogsBtn');
+    logsBtn.href = `employee-details.html?id=${empId}&name=${encodeURIComponent(empName)}`;
+  }
+</script>
+
 </body>
 </html>

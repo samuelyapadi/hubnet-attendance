@@ -113,41 +113,6 @@
     <tbody id="logTable"></tbody>
   </table>
 
-  <!-- 📆 Leave Records -->
-<h2>📆 Leave Records</h2>
-<table id="leaveTable" border="1" style="width:100%; margin-bottom:10px;">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Type</th>
-      <th>Hours</th>
-      <th>Notes</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-
-<h3>Add Leave</h3>
-<div style="display:flex; gap:10px; margin-bottom:20px;">
-  <input type="date" id="leaveDate">
-  <select id="leaveType">
-    <option value="paid">Paid Leave</option>
-    <option value="unpaid">Unpaid Leave</option>
-    <option value="substitute">Substitute</option>
-    <option value="childcare">Childcare</option>
-    <option value="maternity">Maternity</option>
-    <option value="bereavement">Bereavement</option>
-    <option value="summer">Summer</option>
-    <option value="care">Care</option>
-    <option value="injury">Injury</option>
-    <option value="other">Other</option>
-  </select>
-  <input type="number" id="leaveHours" placeholder="Hours" style="width:60px;">
-  <input type="text" id="leaveNotes" placeholder="Notes" style="flex:1;">
-  <button class="btn" id="addLeaveBtn">➕ Add</button>
-</div>
-
   <!-- 🧑‍💼 Employment Info -->
   <section>
     <h2>Employment Info</h2>
@@ -274,4 +239,3 @@
   <script type="module" src="scripts/employee-ui.js"></script>
 </body>
 </html>
-

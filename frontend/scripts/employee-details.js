@@ -211,7 +211,6 @@ export async function saveSession(sessionId) {
     const result = await res.json();
     if (result.success) {
       alert('✅ Session updated!');
-      location.reload();
       // Update the display values directly without full re-render
       const durationMs = checkOutDate - checkInDate;
       const minutes = Math.max(0, Math.round(durationMs / 60000));
@@ -350,63 +349,4 @@ document.getElementById('openCreateSessionModal')?.addEventListener('click', () 
 
 window.analyzeAndRenderSessions = () => {
   renderLogTable(window.allRecords);
-
-async function fetchLeaveEntries() {
-  const res = await fetch(`/api/leave/${window.employeeId}`);
-  const leaves = await res.json();
-  const tbody = document.querySelector('#leaveTable tbody');
-  tbody.innerHTML = '';
-
-  leaves.forEach(entry => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${entry.date?.slice(0, 10) || ''}</td>
-      <td>${entry.type}</td>
-      <td>${entry.hours}</td>
-      <td>${entry.notes || ''}</td>
-      <td><button onclick="deleteLeave('${entry._id}')">🗑️</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-window.deleteLeave = async (id) => {
-  if (!confirm('Delete this leave entry?')) return;
-  await fetch(`/api/leave/${id}`, { method: 'DELETE' });
-  fetchLeaveEntries();
-};
-
-document.getElementById('addLeaveBtn')?.addEventListener('click', async () => {
-  const date = document.getElementById('leaveDate').value;
-  const type = document.getElementById('leaveType').value;
-  const hours = parseFloat(document.getElementById('leaveHours').value);
-  const notes = document.getElementById('leaveNotes').value;
-
-  if (!date || isNaN(hours)) {
-    alert('Date and hours are required.');
-    return;
-  }
-
-  const body = {
-    userId: window.employeeId,
-    date,
-    type,
-    hours,
-    notes
-  };
-
-  await fetch('/api/leave', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  document.getElementById('leaveDate').value = '';
-  document.getElementById('leaveHours').value = '';
-  document.getElementById('leaveNotes').value = '';
-  fetchLeaveEntries();
-});
-
-// 🚀 Run on page load
-fetchLeaveEntries();
 };

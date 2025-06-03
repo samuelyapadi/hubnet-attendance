@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
-const Leave = require('../models/Leave');
 
 function calculateLeaveEntitlement(user) {
   if (!user.joinDate || isNaN(new Date(user.joinDate))) return 0;
@@ -488,52 +487,5 @@ router.get('/users/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// Get leave records for a specific user
-router.get('/api/leave/:userId', async (req, res) => {
-  try {
-    const leaveEntries = await Leave.find({ userId: req.params.userId }).sort({ date: -1 });
-    res.json(leaveEntries);
-  } catch (err) {
-    console.error('Failed to fetch leave records:', err);
-    res.status(500).json({ success: false, error: 'Failed to fetch leave records' });
-  }
-});
-
-// Create new leave record
-router.post('/api/leave', async (req, res) => {
-  try {
-    const { userId, type, date, hours, notes } = req.body;
-    const newLeave = new Leave({ userId, type, date, hours, notes });
-    await newLeave.save();
-    res.json({ success: true, leave: newLeave });
-  } catch (err) {
-    console.error('Failed to create leave:', err);
-    res.status(500).json({ success: false, error: 'Failed to create leave' });
-  }
-});
-
-// Update existing leave record
-router.patch('/api/leave/:leaveId', async (req, res) => {
-  try {
-    const updated = await Leave.findByIdAndUpdate(req.params.leaveId, req.body, { new: true });
-    res.json({ success: true, leave: updated });
-  } catch (err) {
-    console.error('Failed to update leave:', err);
-    res.status(500).json({ success: false, error: 'Failed to update leave' });
-  }
-});
-
-// Delete leave record
-router.delete('/api/leave/:leaveId', async (req, res) => {
-  try {
-    await Leave.findByIdAndDelete(req.params.leaveId);
-    res.json({ success: true });
-  } catch (err) {
-    console.error('Failed to delete leave:', err);
-    res.status(500).json({ success: false, error: 'Failed to delete leave' });
-  }
-});
-
 
 module.exports = router;

@@ -58,6 +58,33 @@ function createLeaveRecord() {
     return;
   }
 
+  const leaveDate = new Date(date);
+  const month = leaveDate.getMonth();
+  const year = leaveDate.getFullYear();
+  const now = new Date();
+
+  if (type === 'summer') {
+    if (month < 6 || month > 8) {
+      alert('Summer vacation can only be taken from July to September.');
+      return;
+    }
+
+    fetch(`/api/leaves/${currentEmployeeId}?type=summer&year=${year}`)
+      .then(res => res.json())
+      .then(records => {
+        const totalSummerHours = records.reduce((sum, l) => sum + (l.hours || 0), 0);
+        if (totalSummerHours + hours > 24) {
+          alert('Limit exceeded: only 3 days (24h) of summer vacation allowed per year.');
+          return;
+        }
+        postLeave(date, type, hours, notes);
+      });
+  } else {
+    postLeave(date, type, hours, notes);
+  }
+}
+
+function postLeave(date, type, hours, notes) {
   const payload = { date, type, hours, notes };
   if (currentEmployeeName) payload.name = currentEmployeeName;
 
@@ -79,6 +106,14 @@ function updateLeaveRecord(id) {
   const rawHours = document.querySelector(`.leave-hours[data-id="${id}"]`).value;
   const hours = rawHours.includes('h') ? parseFloat(rawHours) : parseFloat(rawHours) * 8;
   const notes = document.querySelector(`.leave-notes[data-id="${id}"]`).value;
+
+  const leaveDate = new Date(date);
+  const month = leaveDate.getMonth();
+
+  if (type === 'summer' && (month < 6 || month > 8)) {
+    alert('Summer vacation can only be taken from July to September.');
+    return;
+  }
 
   fetch(`/api/leaves/${id}`, {
     method: 'PATCH',

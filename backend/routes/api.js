@@ -181,6 +181,10 @@ router.get('/users/:name/leave-balance', async (req, res) => {
       checkOut: { $exists: true }
     });
 
+    // Include manual Leave records
+    const manualLeaves = await Leave.find({ userId: user._id, type: 'paid' });
+    const manualHours = manualLeaves.reduce((sum, l) => sum + (l.hours || 0), 0);
+
     const hoursUsedRaw = paidLeaveSessions.reduce((sum, s) => {
       const start = new Date(s.checkIn);
       const end = new Date(s.checkOut);
@@ -193,7 +197,7 @@ router.get('/users/:name/leave-balance', async (req, res) => {
       return sum + (fullDays * 8) + Math.min(leftoverHours, 8);
     }, 0);
 
-    const hoursUsed = Math.round((hoursUsedRaw + Number.EPSILON) * 2) / 2;
+    const hoursUsed = Math.round((hoursUsedRaw + manualHours + Number.EPSILON) * 2) / 2;
 
     const hoursRemaining = Math.max(0, totalEntitledHours - hoursUsed);
     const days = Math.floor(hoursRemaining / 8);
@@ -492,7 +496,18 @@ router.get('/users/:id', async (req, res) => {
 // Get all leave records for a user
 router.get('/leaves/:userId', async (req, res) => {
   try {
-    const records = await Leave.find({ userId: req.params.userId }).sort({ date: -1 });
+    const { month, type } = req.query;
+    const query = { userId: req.params.userId };
+
+    if (type) query.type = type;
+    if (month) {
+      const [year, m] = month.split('-').map(Number);
+      const start = new Date(year, m - 1, 1);
+      const end = new Date(year, m, 1);
+      query.date = { $gte: start, $lt: end };
+    }
+
+    const records = await Leave.find(query).sort({ date: -1 });
     res.json(records);
   } catch (err) {
     res.status(500).json({ error: err.message });

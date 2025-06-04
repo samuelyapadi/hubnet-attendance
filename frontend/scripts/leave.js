@@ -6,8 +6,7 @@ function renderLeaveTable(leaves) {
   tbody.innerHTML = '';
 
   leaves.forEach(leave => {
-    const isHourly = leave.hours % 1 !== 0;
-    const displayValue = isHourly ? `${leave.hours}h` : `${leave.hours / 8}d`;
+    const displayValue = leave.hours % 1 === 0 ? `${leave.hours / 8}d` : `${leave.hours}h`;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -50,7 +49,7 @@ function createLeaveRecord() {
   const date = document.getElementById('newLeaveDate').value;
   const type = document.getElementById('newLeaveType').value;
   const notes = document.getElementById('newLeaveNotes').value;
-  const isHourly = document.getElementById('isHourly').checked;
+  const isHourly = document.getElementById('isHourly')?.checked;
   const inputValue = parseFloat(document.getElementById('newLeaveDuration').value || '0');
   const hours = isHourly ? inputValue : inputValue * 8;
 

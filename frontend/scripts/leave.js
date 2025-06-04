@@ -6,17 +6,19 @@ function renderLeaveTable(leaves) {
   tbody.innerHTML = '';
 
   leaves.forEach(leave => {
+    const isHourly = leave.hours % 1 !== 0;
+    const displayValue = isHourly ? `${leave.hours}h` : `${leave.hours / 8}d`;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${leave.name}</td>
       <td><input type="date" value="${leave.date.split('T')[0]}" data-id="${leave._id}" class="leave-date"></td>
       <td>
         <select data-id="${leave._id}" class="leave-type">
           ${["paid","unpaid","substitute","childcare","maternity","bereavement","summer","care","injury","other"].map(t => `<option value="${t}" ${leave.type === t ? 'selected' : ''}>${t}</option>`).join('')}
         </select>
       </td>
-      <td><input type="number" value="${leave.hours}" data-id="${leave._id}" class="leave-hours" style="width:60px;"></td>
-      <td><input type="text" value="${leave.notes || ''}" data-id="${leave._id}" class="leave-notes"></td>
+      <td><input type="text" value="${displayValue}" data-id="${leave._id}" class="leave-hours" style="width:60px;"></td>
+      <td><input type="text" value="${leave.notes || ''}" data-id="${leave._id}" class="leave-notes" style="width: 100%;"></td>
       <td>
         <button class="btn save-leave" data-id="${leave._id}">💾</button>
         <button class="btn delete-leave" data-id="${leave._id}">🗑️</button>
@@ -47,11 +49,13 @@ function loadLeaveRecords() {
 function createLeaveRecord() {
   const date = document.getElementById('newLeaveDate').value;
   const type = document.getElementById('newLeaveType').value;
-  const hours = parseFloat(document.getElementById('newLeaveHours').value || '0');
   const notes = document.getElementById('newLeaveNotes').value;
+  const isHourly = document.getElementById('isHourly').checked;
+  const inputValue = parseFloat(document.getElementById('newLeaveDuration').value || '0');
+  const hours = isHourly ? inputValue : inputValue * 8;
 
   if (!date || hours <= 0) {
-    alert('Please provide a valid date and hours.');
+    alert('Please provide a valid date and duration.');
     return;
   }
 
@@ -63,7 +67,6 @@ function createLeaveRecord() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   }).then(() => {
-    // If paid leave, update employee balance
     if (type === 'paid') {
       fetch(`/api/leaves/balance/${currentEmployeeId}`, { method: 'PATCH' });
     }
@@ -74,7 +77,8 @@ function createLeaveRecord() {
 function updateLeaveRecord(id) {
   const date = document.querySelector(`.leave-date[data-id="${id}"]`).value;
   const type = document.querySelector(`.leave-type[data-id="${id}"]`).value;
-  const hours = parseFloat(document.querySelector(`.leave-hours[data-id="${id}"]`).value || '0');
+  const rawHours = document.querySelector(`.leave-hours[data-id="${id}"]`).value;
+  const hours = rawHours.includes('h') ? parseFloat(rawHours) : parseFloat(rawHours) * 8;
   const notes = document.querySelector(`.leave-notes[data-id="${id}"]`).value;
 
   fetch(`/api/leaves/${id}`, {
@@ -86,10 +90,7 @@ function updateLeaveRecord(id) {
 
 function deleteLeaveRecord(id) {
   if (!confirm('Delete this leave record?')) return;
-
-  fetch(`/api/leaves/${id}`, {
-    method: 'DELETE'
-  }).then(() => loadLeaveRecords());
+  fetch(`/api/leaves/${id}`, { method: 'DELETE' }).then(() => loadLeaveRecords());
 }
 
 // 🟢 Event Listeners

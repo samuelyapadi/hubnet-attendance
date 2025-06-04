@@ -79,39 +79,45 @@
     <button class="btn" id="filterLeaveBtn">🔍 Filter</button>
   </div>
 
-  <table id="leaveTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Date</th>
-        <th>Type</th>
-        <th>Hours</th>
-        <th>Notes</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<table id="leaveTable">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Type</th>
+      <th>Duration</th>
+      <th>Notes</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <h2>➕ Add Leave</h2>
-  <div style="margin-bottom: 2rem;">
-    <input type="date" id="newLeaveDate">
-    <select id="newLeaveType">
-      <option value="paid">Paid Leave</option>
-      <option value="unpaid">Unpaid Leave</option>
-      <option value="substitute">Substitute</option>
-      <option value="childcare">Childcare</option>
-      <option value="maternity">Maternity</option>
-      <option value="bereavement">Bereavement</option>
-      <option value="summer">Summer</option>
-      <option value="care">Care</option>
-      <option value="injury">Injury</option>
-      <option value="other">Other</option>
-    </select>
-    <input type="number" id="newLeaveHours" placeholder="Hours (e.g. 8 = 1 day)" style="width: 80px;">
-    <input type="text" id="newLeaveNotes" placeholder="Notes" style="width: 200px;">
-    <button class="btn" id="addLeaveBtn">➕ Add Leave</button>
-  </div>
+<!-- 🔁 Replace the Add Leave section -->
+<h2>➕ Add Leave</h2>
+<div style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;">
+  <input type="date" id="newLeaveDate">
+  
+  <select id="newLeaveType">
+    <option value="paid">Paid Leave</option>
+    <option value="unpaid">Unpaid Leave</option>
+    <option value="substitute">Substitute</option>
+    <option value="childcare">Childcare</option>
+    <option value="maternity">Maternity</option>
+    <option value="bereavement">Bereavement</option>
+    <option value="summer">Summer</option>
+    <option value="care">Care</option>
+    <option value="injury">Injury</option>
+    <option value="other">Other</option>
+  </select>
+
+  <label>
+    <input type="checkbox" id="isHourly"> Hourly?
+  </label>
+
+  <input type="number" id="newLeaveDuration" placeholder="Days" style="width: 80px;">
+  <input type="text" id="newLeaveNotes" placeholder="Notes" style="width: 200px;">
+  <button class="btn" id="addLeaveBtn">➕ Add Leave</button>
+</div>
 
   <script type="module" src="scripts/leave.js"></script>
 

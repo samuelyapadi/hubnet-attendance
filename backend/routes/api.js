@@ -457,14 +457,13 @@ router.get('/leave-balance/all', async (req, res) => {
       }
 
       const joinDate = new Date(user.joinDate);
-      const totalYears = Math.floor((now - joinDate) / (365.25 * 24 * 3600 * 1000)) + 1;
-
-      for (let i = 0; i < totalYears; i++) {
-        const grantDate = new Date(joinDate.getFullYear() + i, joinDate.getMonth(), joinDate.getDate());
+      for (let i = 0; i < 2; i++) {
+        const grantYear = now.getFullYear() - i;
+        const grantDate = new Date(grantYear, joinDate.getMonth(), joinDate.getDate());
         const expiryDate = new Date(grantDate);
         expiryDate.setFullYear(expiryDate.getFullYear() + 2);
 
-        if (now < expiryDate) {
+        if (grantDate <= now && now < expiryDate) {
           const workingDays = user.isPartTime ? user.weeklyWorkingDays : 5;
           const entitlement = calculateLeaveEntitlement({ ...user, weeklyWorkingDays: workingDays });
           grantedLeave.push(entitlement * 8);

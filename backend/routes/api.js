@@ -439,11 +439,39 @@ router.delete('/sessions/:id', async (req, res) => {
 router.get('/leave-balance/all', async (req, res) => {
   try {
     const users = await User.find({});
+    const now = new Date();
     const results = [];
 
     for (const user of users) {
-      const entitlementDays = Math.min(calculateLeaveEntitlement(user) * 2, 40);
-      const totalEntitledHours = entitlementDays * 8;
+      const grantedLeave = [];
+
+      if (!user.joinDate) {
+        results.push({
+          name: user.name,
+          hoursRemaining: 0,
+          hoursUsed: 0,
+          entitlementDays: 0,
+          formatted: '0d 0h'
+        });
+        continue;
+      }
+
+      const joinDate = new Date(user.joinDate);
+      const totalYears = Math.floor((now - joinDate) / (365.25 * 24 * 3600 * 1000)) + 1;
+
+      for (let i = 0; i < totalYears; i++) {
+        const grantDate = new Date(joinDate.getFullYear() + i, joinDate.getMonth(), joinDate.getDate());
+        const expiryDate = new Date(grantDate);
+        expiryDate.setFullYear(expiryDate.getFullYear() + 2);
+
+        if (now < expiryDate) {
+          const workingDays = user.isPartTime ? user.weeklyWorkingDays : 5;
+          const entitlement = calculateLeaveEntitlement({ ...user, weeklyWorkingDays: workingDays });
+          grantedLeave.push(entitlement * 8);
+        }
+      }
+
+      const totalEntitledHours = Math.min(grantedLeave.reduce((sum, h) => sum + h, 0), 320); // Max 40d = 320h
 
       const paidLeaveSessions = await Attendance.find({
         name: user.name,
@@ -452,34 +480,24 @@ router.get('/leave-balance/all', async (req, res) => {
         checkOut: { $exists: true }
       });
 
+      const manualLeaves = await Leave.find({ userId: user._id, type: 'paid' });
+      const manualHours = manualLeaves.reduce((sum, l) => sum + (l.hours || 0), 0);
+
       const hoursUsedRaw = paidLeaveSessions.reduce((sum, s) => {
-        const start = new Date(s.checkIn);
-        const end = new Date(s.checkOut);
-        const msDiff = end - start;
-        const fullDays = Math.floor(msDiff / (1000 * 60 * 60 * 24));
-        const leftoverMs = msDiff % (1000 * 60 * 60 * 24);
-        const leftoverHours = leftoverMs / (1000 * 60 * 60);
-        return sum + (fullDays * 8) + Math.min(leftoverHours, 8);
+        const ms = new Date(s.checkOut) - new Date(s.checkIn);
+        return sum + Math.min(ms / 3600000, 8);
       }, 0);
 
-      const hoursUsed = Math.round((hoursUsedRaw + Number.EPSILON) * 2) / 2;
+      const hoursUsed = Math.round((hoursUsedRaw + manualHours + Number.EPSILON) * 2) / 2;
       const hoursRemaining = Math.max(0, totalEntitledHours - hoursUsed);
       const days = Math.floor(hoursRemaining / 8);
       const hours = Math.round((hoursRemaining % 8 + Number.EPSILON) * 2) / 2;
-
-      console.log('[LEAVE DEBUG]', {
-        name: user.name,
-        joinDate: user.joinDate,
-        isPartTime: user.isPartTime,
-        weeklyWorkingDays: user.weeklyWorkingDays,
-        entitlementDays
-      });
 
       results.push({
         name: user.name,
         hoursRemaining: Math.round(hoursRemaining * 10) / 10,
         hoursUsed: Math.round(hoursUsed * 10) / 10,
-        entitlementDays,
+        entitlementDays: Math.floor(totalEntitledHours / 8),
         formatted: `${days}d ${hours}h`
       });
     }

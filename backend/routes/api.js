@@ -166,13 +166,31 @@ router.get('/users', async (req, res) => {
 });
 
 // Get remaining paid leave
+// Get remaining paid leave with 2-year expiry logic
 router.get('/users/:name/leave-balance', async (req, res) => {
   try {
     const user = await User.findOne({ name: req.params.name });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const entitlementDays = calculateLeaveEntitlement(user);
-    const totalEntitledHours = entitlementDays * 8;
+    const now = new Date();
+    const grantedLeave = [];
+
+    const joinDate = new Date(user.joinDate);
+    const totalYears = Math.floor((now - joinDate) / (365.25 * 24 * 3600 * 1000)) + 1;
+
+    for (let i = 0; i < totalYears; i++) {
+      const grantDate = new Date(joinDate.getFullYear() + i, joinDate.getMonth(), joinDate.getDate());
+      const expiryDate = new Date(grantDate);
+      expiryDate.setFullYear(expiryDate.getFullYear() + 2);
+
+      if (now < expiryDate) {
+        const workingDays = user.isPartTime ? user.weeklyWorkingDays : 5;
+        const entitlement = calculateLeaveEntitlement({ ...user, weeklyWorkingDays: workingDays });
+        grantedLeave.push(entitlement * 8);
+      }
+    }
+
+    const totalEntitledHours = grantedLeave.reduce((sum, h) => sum + h, 0);
 
     const paidLeaveSessions = await Attendance.find({
       name: user.name,
@@ -181,34 +199,25 @@ router.get('/users/:name/leave-balance', async (req, res) => {
       checkOut: { $exists: true }
     });
 
-    // Include manual Leave records
     const manualLeaves = await Leave.find({ userId: user._id, type: 'paid' });
     const manualHours = manualLeaves.reduce((sum, l) => sum + (l.hours || 0), 0);
 
     const hoursUsedRaw = paidLeaveSessions.reduce((sum, s) => {
-      const start = new Date(s.checkIn);
-      const end = new Date(s.checkOut);
-      const msDiff = end - start;
-
-      const fullDays = Math.floor(msDiff / (1000 * 60 * 60 * 24));
-      const leftoverMs = msDiff % (1000 * 60 * 60 * 24);
-      const leftoverHours = leftoverMs / (1000 * 60 * 60);
-
-      return sum + (fullDays * 8) + Math.min(leftoverHours, 8);
+      const ms = new Date(s.checkOut) - new Date(s.checkIn);
+      return sum + Math.min(ms / 3600000, 8);
     }, 0);
 
     const hoursUsed = Math.round((hoursUsedRaw + manualHours + Number.EPSILON) * 2) / 2;
-
     const hoursRemaining = Math.max(0, totalEntitledHours - hoursUsed);
     const days = Math.floor(hoursRemaining / 8);
     const hours = Math.round((hoursRemaining % 8 + Number.EPSILON) * 2) / 2;
 
     res.json({
-  hoursRemaining: Math.round(hoursRemaining * 10) / 10,
-  hoursUsed: Math.round(hoursUsed * 10) / 10,
-  entitlementDays,
-  formatted: `${days}d ${hours}h`
-});
+      hoursRemaining: Math.round(hoursRemaining * 10) / 10,
+      hoursUsed: Math.round(hoursUsed * 10) / 10,
+      entitlementDays: Math.floor(totalEntitledHours / 8),
+      formatted: `${days}d ${hours}h`
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

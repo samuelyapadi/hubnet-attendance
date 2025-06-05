@@ -173,19 +173,18 @@ router.get('/users/:name/leave-balance', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const now = new Date();
-    const grantedLeave = [];
-
     const joinDate = new Date(user.joinDate);
-    const totalYears = Math.floor((now - joinDate) / (365.25 * 24 * 3600 * 1000)) + 1;
 
-    for (let i = 0; i < totalYears; i++) {
-      const grantDate = new Date(joinDate.getFullYear() + i, joinDate.getMonth(), joinDate.getDate());
+    const entitlement = calculateLeaveEntitlement(user); // call ONCE
+
+    let grantedLeave = [];
+
+    for (let i = 0; i < 2; i++) {
+      const grantDate = new Date(joinDate.getFullYear() + (now.getFullYear() - joinDate.getFullYear()) - i, joinDate.getMonth(), joinDate.getDate());
       const expiryDate = new Date(grantDate);
       expiryDate.setFullYear(expiryDate.getFullYear() + 2);
 
-      if (now < expiryDate) {
-        const workingDays = user.isPartTime ? user.weeklyWorkingDays : 5;
-        const entitlement = calculateLeaveEntitlement({ ...user, weeklyWorkingDays: workingDays });
+      if (grantDate <= now && now < expiryDate) {
         grantedLeave.push(entitlement * 8);
       }
     }
@@ -443,7 +442,7 @@ router.get('/leave-balance/all', async (req, res) => {
     const results = [];
 
     for (const user of users) {
-      const entitlementDays = calculateLeaveEntitlement(user);
+      const entitlementDays = Math.min(calculateLeaveEntitlement(user) * 2, 40);
       const totalEntitledHours = entitlementDays * 8;
 
       const paidLeaveSessions = await Attendance.find({

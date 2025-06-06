@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles/styles.css" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title data-i18n="title">Employees List</title>
+  <title data-i18n="pageTitle">HUBNET Attendance System</title>
 </head>
 <body>
   <!-- 🔝 Sticky Navigation Bar -->
@@ -53,7 +53,7 @@
     window.resetEmployeeFilters = resetEmployeeFilters;
 
     document.addEventListener('DOMContentLoaded', async () => {
-      applyTranslations('employees');
+      applyTranslations();
       await fetchAndRenderEmployees();
     });
   </script>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title data-i18n="pageTitle">HUBNET Attendance System</title>
+  <title data-i18n="title">HUBNET Attendance</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -57,11 +57,11 @@
 <body>
   <div class="container">
     <img src="images/hubnetblack.jpg" alt="Hubnet Logo" class="logo" />
-    <h1 data-i18n="welcome">HUBNET Attendance System</h1>
+    <h1 data-i18n="title">HUBNET Attendance</h1>
 
-    <a class="button" href="login.html" data-i18n="clockInOut">👤 Clock In / Out</a>
-    <a class="button" href="register.html" data-i18n="registerBtn">📝 Register</a>
-    <a class="button" href="admin.html" data-i18n="adminBtn">🛠 Admin Dashboard</a>
+    <a class="button" href="login.html" data-i18n="login">👤 Clock In/Out</a>
+    <a class="button" href="register.html" data-i18n="register">📝 Register</a>
+    <a class="button" href="admin.html" data-i18n="admin">🛠 Admin Dashboard</a>
 
     <div style="margin-top: 1rem;">
       <button onclick="setLanguageUI('en')">English</button>
@@ -74,10 +74,10 @@
 
     window.setLanguageUI = (lang) => {
       setLanguage(lang);
-      location.reload(); // Full reload to apply changes cleanly
+      location.reload();
     };
 
-    applyTranslations();
+    applyTranslations('index');
   </script>
 </body>
 </html>

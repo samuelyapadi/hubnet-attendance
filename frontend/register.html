@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register Face</title>
+  <title data-i18n="title">Register New Employee</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -99,12 +99,18 @@
   <div class="container">
     <img src="images/hubnetblack.jpg" alt="Hubnet Logo" class="logo" />
 
-    <h1>Register New Employee</h1>
+  <div>
+    <button onclick="setLanguageUI('en')">English</button>
+    <button onclick="setLanguageUI('ja')">日本語</button>
+    <span id="langLoading" style="margin-left: 8px; display: none;">⏳</span>
+  </div>
 
-    <label for="username">Name:</label>
+    <h1 data-i18n="registerTitle">Register New Employee</h1>
+
+    <label for="username" data-i18n="name">Name:</label>
     <input type="text" id="username" />
 
-    <label for="department">Department:</label>
+    <label for="department" data-i18n="department">Department:</label>
     <select id="department">
       <option value="">-- Select Department --</option>
       <option value="THERMAL">THERMAL</option>
@@ -121,17 +127,17 @@
       <option value="HR">人事部</option>
     </select>
 
-    <label for="joinDate">Join Date:</label>
+    <label for="joinDate" data-i18n="joinDate">Join Date:</label>
     <input type="date" id="joinDate" />
 
-    <label for="isPartTime">Employment Type:</label>
+    <label for="isPartTime" data-i18n="employmentType">Employment Type:</label>
     <select id="isPartTime" name="isPartTime">
       <option value="false">Full-Time</option>
       <option value="true">Part-Time</option>
     </select>
 
     <div id="workingDaysContainer" style="display: none;">
-      <label for="weeklyWorkingDays">Weekly Working Days:</label>
+      <label for="weeklyWorkingDays" data-i18n="weeklyWorkingDays">Weekly Working Days:</label>
       <select id="weeklyWorkingDays" name="weeklyWorkingDays">
         <option value="1">1 day/week</option>
         <option value="2">2 days/week</option>
@@ -142,19 +148,31 @@
 
     <video id="video" autoplay playsinline></video>
 
-    <button id="capturePhotoBtn">
+    <button id="capturePhotoBtn" data-i18n="capturePhoto">
       Capture Photo (<span id="photoCount">0</span>/3)
     </button>
-    <button id="saveUserBtn" disabled>Save Registered Face</button>
+    <button id="saveUserBtn" disabled data-i18n="saveFace">Save Registered Face</button>
 
     <div class="status" id="status"></div>
     <canvas id="canvas" style="display:none;"></canvas>
 
-    <a href="index.html" class="back-link">← Back to Home</a>
+    <a href="index.html" class="back-link" data-i18n="backToHome">← Back to Home</a>
   </div>
 
   <!-- ✅ Sound elements -->
   <audio id="sound-success" src="sounds/success.mp3" preload="auto"></audio>
   <audio id="sound-fail" src="sounds/fail.mp3" preload="auto"></audio>
+
+  <script type="module">
+  import { setLanguage, applyTranslations } from './scripts/lang.js';
+  window.setLanguageUI = async (lang) => {
+    document.getElementById('langLoading').style.display = 'inline';
+    setLanguage(lang);
+    applyTranslations('register');
+    document.getElementById('langLoading').style.display = 'none';
+  };
+  window.addEventListener('DOMContentLoaded', () => applyTranslations('register'));
+</script>
+
 </body>
 </html>

@@ -42,7 +42,7 @@
 
   window.setLanguageUI = (lang) => {
     setLanguage(lang);
-    location.reload(); // optional: reload to refresh the whole UI
+    applyTranslations(); //update text without refresh
 };
 
   window.viewEmployeeLog = viewEmployeeLog;

@@ -435,6 +435,26 @@ router.delete('/sessions/:id', async (req, res) => {
   }
 });
 
+function calculateEntitlementDays(user, yearIndex) {
+  if (!user.joinDate || isNaN(new Date(user.joinDate))) return 0;
+
+  if (!user.isPartTime || user.weeklyWorkingDays >= 5) {
+    const fullTimeTable = [10, 11, 12, 14, 16, 18, 20];
+    const index = Math.max(0, Math.min(fullTimeTable.length - 1, yearIndex));
+    return fullTimeTable[index];
+  }
+
+  const partTimeTable = {
+    4: [7, 8, 9, 10, 12, 13, 15],
+    3: [5, 6, 6, 8, 9, 10, 11],
+    2: [3, 4, 4, 5, 6, 6, 7],
+    1: [1, 2, 2, 2, 3, 3, 3]
+  };
+  const row = partTimeTable[user.weeklyWorkingDays] || [];
+  const index = Math.max(0, Math.min(row.length - 1, yearIndex));
+  return row[index] || 0;
+}
+
 // ✅ Batch fetch leave balances for all users
 router.get('/leave-balance/all', async (req, res) => {
   try {
@@ -465,7 +485,7 @@ router.get('/leave-balance/all', async (req, res) => {
 
         if (grantDate <= now && now < expiryDate) {
           const workingDays = user.isPartTime ? user.weeklyWorkingDays : 5;
-          const entitlement = calculateLeaveEntitlement({ ...user, weeklyWorkingDays: workingDays });
+          const entitlement = calculateEntitlementDays(user, i);
           grantedLeave.push(entitlement * 8);
         }
       }

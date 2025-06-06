@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="clockInOut">Clock In / Clock Out - HUBNET Attendance</title>
+  <title data-i18n="title">Clock In / Clock Out - HUBNET Attendance</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,7 +81,7 @@
     window.setLanguageUI = async (lang) => {
       document.getElementById('langLoading').style.display = 'inline';
       setLanguage(lang);
-      applyTranslations();
+      applyTranslations('login');
       document.getElementById('langLoading').style.display = 'none';
     };
     window.addEventListener('DOMContentLoaded', () => applyTranslations('login'));
@@ -90,7 +90,7 @@
 <body class="register-page">
   <div class="container">
     <img src="images/hubnetblack.jpg" alt="Hubnet Logo" class="logo" />
-    
+
     <div class="lang-switch">
       <button onclick="setLanguageUI('en')">English</button>
       <button onclick="setLanguageUI('ja')">日本語</button>

@@ -1,4 +1,3 @@
-<!--employees.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +8,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Employees List</title>
-  
 </head>
 <body>
   <!-- 🔝 Sticky Navigation Bar -->
@@ -18,9 +16,11 @@
     <h1>HUBNET Attendance</h1>
   </header>
 
-  <div class="language-switcher" style="margin: 12px;">
-    <button onclick="window.setLanguageUI('en')">English</button>
-    <button onclick="window.setLanguageUI('ja')">日本語</button>
+  <!-- 🌐 Language Switch -->
+  <div>
+    <button onclick="setLanguageUI('en')">English</button>
+    <button onclick="setLanguageUI('ja')">日本語</button>
+    <span id="langLoading" style="margin-left: 8px; display: none;">⏳</span>
   </div>
 
   <div style="height: 24px;"></div>
@@ -28,33 +28,37 @@
   <div id="app"></div>
 
   <script type="module">
-  import {
-    fetchAndRenderEmployees,
-    viewEmployeeLog,
-    enableEdit,
-    saveUserEdits,
-    deleteUser,
-    updateNameFilterOptions,
-    resetEmployeeFilters  
-  } from './employees.js';
+    import {
+      fetchAndRenderEmployees,
+      viewEmployeeLog,
+      enableEdit,
+      saveUserEdits,
+      deleteUser,
+      updateNameFilterOptions,
+      resetEmployeeFilters
+    } from './employees.js';
 
-  import { setLanguage, applyTranslations } from './scripts/lang.js';
+    import { setLanguage, applyTranslations } from './scripts/lang.js';
 
-  window.setLanguageUI = async (lang) => {
-    setLanguage(lang);
-    await fetchAndRenderEmployees();  // Regenerates the filters + table
-    applyTranslations();              // Translates static labels (like headers/buttons)
-  };
+    window.setLanguageUI = async (lang) => {
+      document.getElementById('langLoading').style.display = 'inline';
+      await setLanguage(lang);
+      await fetchAndRenderEmployees(); // dynamically re-renders content
+      applyTranslations();             // re-applies static translations
+      document.getElementById('langLoading').style.display = 'none';
+    };
 
-  window.viewEmployeeLog = viewEmployeeLog;
-  window.enableEdit = enableEdit;
-  window.saveUserEdits = saveUserEdits;
-  window.deleteUser = deleteUser;
-  window.updateNameFilterOptions = updateNameFilterOptions;
-  window.resetEmployeeFilters = resetEmployeeFilters;
+    window.viewEmployeeLog = viewEmployeeLog;
+    window.enableEdit = enableEdit;
+    window.saveUserEdits = saveUserEdits;
+    window.deleteUser = deleteUser;
+    window.updateNameFilterOptions = updateNameFilterOptions;
+    window.resetEmployeeFilters = resetEmployeeFilters;
 
-  applyTranslations();
-  fetchAndRenderEmployees();
+    document.addEventListener('DOMContentLoaded', async () => {
+      applyTranslations();
+      await fetchAndRenderEmployees();
+    });
   </script>
 </body>
 </html>

@@ -20,9 +20,10 @@ const translations = {
     delete: "Delete",
     pageTitle: "HUBNET Attendance System",
     welcome: "HUBNET Attendance System",
-    loginBtn: "👤 Login",
+    loginBtn: "👤 Clock In",
     registerBtn: "📝 Register",
-    adminBtn: "🛠 Admin Dashboard"
+    adminBtn: "🛠 Admin Dashboard",
+    clockInOut: '👤 Clock In / Out'
   },
   ja: {
     employeesList: "社員一覧",
@@ -45,9 +46,10 @@ const translations = {
     delete: "削除",
     pageTitle: "HUBNET勤怠管理システム",
     welcome: "HUBNET勤怠管理システム",
-    loginBtn: "👤 ログイン",
+    loginBtn: "👤 出勤",
     registerBtn: "📝 登録",
-    adminBtn: "🛠 管理画面"
+    adminBtn: "🛠 管理画面",
+    clockInOut: '👤 出勤 / 退勤'
   }
 };
 

@@ -40,10 +40,11 @@
 
   import { setLanguage, applyTranslations } from './scripts/lang.js';
 
-  window.setLanguageUI = (lang) => {
+  window.setLanguageUI = async (lang) => {
     setLanguage(lang);
-    applyTranslations(); //update text without refresh
-};
+    await fetchAndRenderEmployees();  // Regenerates the filters + table
+    applyTranslations();              // Translates static labels (like headers/buttons)
+  };
 
   window.viewEmployeeLog = viewEmployeeLog;
   window.enableEdit = enableEdit;

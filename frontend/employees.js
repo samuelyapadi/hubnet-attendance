@@ -1,5 +1,7 @@
 // employees.js
 
+import { translate, applyTranslations } from './scripts/lang.js';
+
 let allUsers = [];
 let allSessions = [];
 let leaveBalanceMap = new Map();
@@ -39,7 +41,8 @@ function renderUIContainer() {
   const app = document.getElementById('app');
 
   const header = document.createElement('h1');
-  header.textContent = 'Employees List';
+  header.setAttribute('data-i18n', 'employeesList');
+  header.textContent = translate('employeesList');
   app.appendChild(header);
 
   const filterBar = document.createElement('div');
@@ -50,30 +53,29 @@ function renderUIContainer() {
   filterBar.style.marginBottom = '1rem';
   filterBar.style.alignItems = 'center';
   filterBar.innerHTML = `
-    <label>Start Date:
-      <input type="date" id="startDate" style="font-size: 13px; padding: 4px 6px; width: 150px;" />
+    <label data-i18n="startDate">${translate('startDate')}:
+      <input type="date" id="startDate" ... />
     </label>
-    <label>End Date:
-      <input type="date" id="endDate" style="font-size: 13px; padding: 4px 6px; width: 150px;" />
+    <label data-i18n="endDate">${translate('endDate')}:
+      <input type="date" id="endDate" ... />
     </label>
-
-    <label>Year:
-      <select id="yearSelect" style="font-size: 13px; padding: 4px 6px; width: 100px;"></select>
+    <label data-i18n="year">${translate('year')}:
+      <select id="yearSelect" ...></select>
     </label>
-    <label>Month:
-      <select id="monthSelect" style="font-size: 13px; padding: 4px 6px; width: 120px;"></select>
+    <label data-i18n="month">${translate('month')}:
+      <select id="monthSelect" ...></select>
     </label>
-    <label>Department:
-      <select id="employeeDeptFilter" style="font-size: 13px; padding: 4px 6px; width: 160px;">
-        <option value="">All</option>
+    <label data-i18n="department">${translate('department')}:
+      <select id="employeeDeptFilter" ...>
+        <option value="">${translate('all')}</option>
       </select>
     </label>
-    <label>Name:
-      <select id="employeeNameFilter" style="font-size: 13px; padding: 4px 6px; width: 160px;">
-        <option value="">All</option>
+    <label data-i18n="name">${translate('name')}:
+      <select id="employeeNameFilter" ...>
+        <option value="">${translate('all')}</option>
       </select>
     </label>
-    <button onclick="resetEmployeeFilters()" style="padding: 6px 10px; font-size: 13px;">Clear All</button>
+    <button onclick="resetEmployeeFilters()" data-i18n="clearAll">${translate('clearAll')}</button>
   `;
   app.appendChild(filterBar);
 
@@ -82,12 +84,12 @@ function renderUIContainer() {
   table.innerHTML = `
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Department</th>
-        <th>Work Hours</th>
-        <th>Total Overtime</th>
-        <th>Paid Leave Left</th>
-        <th>Actions</th>
+        <th data-i18n="name">Name</th>
+        <th data-i18n="department">Department</th>
+        <th data-i18n="workHours">Work Hours</th>
+        <th data-i18n="totalOvertime">Total Overtime</th>
+        <th data-i18n="paidLeaveLeft">Paid Leave Left</th>
+        <th data-i18n="actions">Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -193,14 +195,14 @@ function populateEmployeesTable(users) {
             }).join('')}
         </select>
       </td>
-      <td><button onclick="viewEmployeeLog('${user.name}')">View Logs</button></td>
+      <td><button onclick="viewEmployeeLog('${user.name}')" data-i18n="viewLogs">${translate('viewLogs')}</button></td>
       <td><input type="text" value="${user.totalOvertime || '0h 0m'}" disabled></td>
       <td><input type="text" value="${user.remainingLeave || '-'}" disabled></td>
-      <td>
-        <button onclick="enableEdit(this)">Edit</button>
-        <button onclick="saveUserEdits('${userId}', this)" style="display:none;">Save</button>
-        <button onclick="deleteUser('${userId}')">Delete</button>
-      </td>
+    <td>
+      <button onclick="enableEdit(this)" data-i18n="edit">${translate('edit')}</button>
+      <button onclick="saveUserEdits('${userId}', this)" style="display:none;" data-i18n="save">${translate('save')}</button>
+      <button onclick="deleteUser('${userId}')" data-i18n="delete">${translate('delete')}</button>
+    </td>
     `;
 
     tbody.appendChild(row);
@@ -234,6 +236,7 @@ function populateFilters(users, sessions) {
     [...monthSet].sort((a, b) => a - b).map(m => `<option value="${m}">${monthNames[m]}</option>`).join('');
 
   const depts = [...new Set(users.map(u => u.department).filter(Boolean))].sort();
+  deptFilter.innerHTML = `<option value="">${translate('all')}</option>`;
   depts.forEach(dept => {
     const opt = document.createElement('option');
     opt.value = dept;
@@ -255,7 +258,7 @@ export function updateNameFilterOptions() {
       .map(u => u.name)
   )].sort();
 
-  nameFilter.innerHTML = '<option value="">All</option>';
+  nameFilter.innerHTML = `<option value="">${translate('all')}</option>`;
   names.forEach(name => {
     const opt = document.createElement('option');
     opt.value = name;

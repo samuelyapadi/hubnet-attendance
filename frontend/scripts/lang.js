@@ -1,21 +1,43 @@
-export const translations = {
+const translations = {
   en: {
-    pageTitle: "Employees List",
+    employeesList: "Employees List",
     backToAdmin: "← Back to Admin Dashboard",
-    name: "Name",
+    startDate: "Start Date",
+    endDate: "End Date",
+    year: "Year",
+    month: "Month",
     department: "Department",
-    leaveBalance: "Leave Balance",
+    name: "Name",
+    all: "All",
+    clearAll: "Clear All",
+    workHours: "Work Hours",
+    totalOvertime: "Total Overtime",
+    paidLeaveLeft: "Paid Leave Left",
+    actions: "Actions",
+    viewLogs: "View Logs",
     edit: "Edit",
-    delete: "Delete",
+    save: "Save",
+    delete: "Delete"
   },
   ja: {
-    pageTitle: "従業員一覧",
-    backToAdmin: "← 管理画面に戻る",
-    name: "氏名",
+    employeesList: "社員一覧",
+    backToAdmin: "← 管理者ダッシュボードへ戻る",
+    startDate: "開始日",
+    endDate: "終了日",
+    year: "年",
+    month: "月",
     department: "部署",
-    leaveBalance: "有給残数",
+    name: "名前",
+    all: "すべて",
+    clearAll: "全てクリア",
+    workHours: "勤務時間",
+    totalOvertime: "残業合計",
+    paidLeaveLeft: "有給残り",
+    actions: "操作",
+    viewLogs: "ログを見る",
     edit: "編集",
-    delete: "削除",
+    save: "保存",
+    delete: "削除"
   }
 };
 
@@ -24,15 +46,20 @@ let currentLang = localStorage.getItem('lang') || 'en';
 export function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('lang', lang);
-  applyTranslations();
 }
 
-export function t(key) {
-  return translations[currentLang][key] || key;
+export function translate(key) {
+  return translations[currentLang]?.[key] || key;
 }
 
 export function applyTranslations() {
-  document.title = t('pageTitle');
-  const backBtn = document.getElementById('backToAdminBtn');
-  if (backBtn) backBtn.textContent = t('backToAdmin');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const translated = translate(key);
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.placeholder = translated;
+    } else {
+      el.textContent = translated;
+    }
+  });
 }

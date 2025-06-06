@@ -13,7 +13,7 @@
   <!-- 🔝 Sticky Navigation Bar -->
   <header class="top-nav">
     <img src="images/hubnetblack.jpg" alt="Logo" class="logo" />
-    <h1 data-i18n="title">HUBNET Attendance</h1>
+    <h1 data-i18n="branding">HUBNET Attendance</h1>
   </header>
 
   <!-- 🌐 Language Switch -->
@@ -40,10 +40,10 @@
 
     import { setLanguage, applyTranslations } from './scripts/lang.js';
 
-  window.setLanguageUI = (lang) => {
-    setLanguage(lang);
-    location.reload();  // full refresh to ensure filters and UI are fully reattached
-  };
+    window.setLanguageUI = (lang) => {
+      setLanguage(lang);
+      location.reload();  // full refresh to ensure filters and UI are fully reattached
+    };
 
     window.viewEmployeeLog = viewEmployeeLog;
     window.enableEdit = enableEdit;

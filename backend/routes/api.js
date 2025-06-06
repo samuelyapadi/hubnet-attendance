@@ -177,8 +177,6 @@ router.get('/users/:name/leave-balance', async (req, res) => {
 
     const totalEntitledHours = getValidGrantedLeaveHours(user, now);
 
-    const totalEntitledHours = grantedLeave.reduce((sum, h) => sum + h, 0);
-
     const paidLeaveSessions = await Attendance.find({
       name: user.name,
       type: 'paid_leave',

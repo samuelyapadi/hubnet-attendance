@@ -592,8 +592,7 @@ function getValidGrantedLeaveHours(user, asOfDate = new Date()) {
     expiryDate.setFullYear(expiryDate.getFullYear() + 2);
 
     if (grantDate <= asOfDate && asOfDate < expiryDate) {
-      const yearsWorked = Math.floor((grantDate - joinDate) / (365.25 * 24 * 3600 * 1000));
-      const days = calculateEntitlementDays(user, yearsWorked);
+    const days = calculateEntitlementDays(user, i);
       totalHours += days * 8;
     }
   }

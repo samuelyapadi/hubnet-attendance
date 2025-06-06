@@ -40,13 +40,14 @@
 
     import { setLanguage, applyTranslations } from './scripts/lang.js';
 
-    window.setLanguageUI = async (lang) => {
-      document.getElementById('langLoading').style.display = 'inline';
-      await setLanguage(lang);
-      await fetchAndRenderEmployees(); // dynamically re-renders content
-      applyTranslations();             // re-applies static translations
-      document.getElementById('langLoading').style.display = 'none';
-    };
+  window.setLanguageUI = async (lang) => {
+    document.getElementById('langLoading').style.display = 'inline';
+    await setLanguage(lang);
+    clearExistingContent();              // reset full DOM first
+    await fetchAndRenderEmployees();     // render DOM again
+    applyTranslations();                 // re-translate all i18n tags
+    document.getElementById('langLoading').style.display = 'none';
+  };
 
     window.viewEmployeeLog = viewEmployeeLog;
     window.enableEdit = enableEdit;

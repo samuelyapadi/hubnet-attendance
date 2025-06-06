@@ -42,10 +42,9 @@
 
   window.setLanguageUI = async (lang) => {
     document.getElementById('langLoading').style.display = 'inline';
-    await setLanguage(lang);
-    clearExistingContent();              // reset full DOM first
-    await fetchAndRenderEmployees();     // render DOM again
-    applyTranslations();                 // re-translate all i18n tags
+    setLanguage(lang);
+    await fetchAndRenderEmployees();  // rebuilds UI and reattaches filter logic
+    applyTranslations();              // applies static text translations
     document.getElementById('langLoading').style.display = 'none';
   };
 

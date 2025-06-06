@@ -18,29 +18,42 @@
     <h1>HUBNET Attendance</h1>
   </header>
 
+  <div style="margin: 12px;">
+    <button onclick="window.setLanguageUI('en')">English</button>
+    <button onclick="window.setLanguageUI('ja')">日本語</button>
+  </div>
+
   <div style="height: 24px;"></div>
-  <a href="admin.html" class="btn">← Back to Admin Dashboard</a>
+  <a id="backToAdminBtn" href="admin.html" class="btn">← Back to Admin Dashboard</a>
   <div id="app"></div>
 
   <script type="module">
-    import {
-      fetchAndRenderEmployees,
-      viewEmployeeLog,
-      enableEdit,
-      saveUserEdits,
-      deleteUser,
-      updateNameFilterOptions,
-      resetEmployeeFilters  
-    } from './employees.js';
+  import {
+    fetchAndRenderEmployees,
+    viewEmployeeLog,
+    enableEdit,
+    saveUserEdits,
+    deleteUser,
+    updateNameFilterOptions,
+    resetEmployeeFilters  
+  } from './employees.js';
 
-    window.viewEmployeeLog = viewEmployeeLog;
-    window.enableEdit = enableEdit;
-    window.saveUserEdits = saveUserEdits;
-    window.deleteUser = deleteUser;
-    window.updateNameFilterOptions = updateNameFilterOptions;
-    window.resetEmployeeFilters = resetEmployeeFilters;
+  import { setLanguage, applyTranslations } from './lang.js';
 
-    fetchAndRenderEmployees();
+  window.setLanguageUI = (lang) => {
+    setLanguage(lang);
+    location.reload(); // optional: reload to refresh the whole UI
+};
+
+  window.viewEmployeeLog = viewEmployeeLog;
+  window.enableEdit = enableEdit;
+  window.saveUserEdits = saveUserEdits;
+  window.deleteUser = deleteUser;
+  window.updateNameFilterOptions = updateNameFilterOptions;
+  window.resetEmployeeFilters = resetEmployeeFilters;
+
+  applyTranslations();
+  fetchAndRenderEmployees();
   </script>
 </body>
 </html>

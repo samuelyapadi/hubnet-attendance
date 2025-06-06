@@ -17,7 +17,12 @@ const translations = {
     viewLogs: "View Logs",
     edit: "Edit",
     save: "Save",
-    delete: "Delete"
+    delete: "Delete",
+    pageTitle: "HUBNET Attendance System",
+    welcome: "HUBNET Attendance System",
+    loginBtn: "👤 Login",
+    registerBtn: "📝 Register",
+    adminBtn: "🛠 Admin Dashboard"
   },
   ja: {
     employeesList: "社員一覧",
@@ -37,7 +42,12 @@ const translations = {
     viewLogs: "ログを見る",
     edit: "編集",
     save: "保存",
-    delete: "削除"
+    delete: "削除",
+    pageTitle: "HUBNET勤怠管理システム",
+    welcome: "HUBNET勤怠管理システム",
+    loginBtn: "👤 ログイン",
+    registerBtn: "📝 登録",
+    adminBtn: "🛠 管理画面"
   }
 };
 

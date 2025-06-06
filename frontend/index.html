@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>TimeOfQueen - Attendance System</title>
+  <title data-i18n="pageTitle">HUBNET Attendance System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/styles.css" />
   <style>
     body {
-  font-family: 'Inter', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: #f0f2f5;
       display: flex;
       align-items: center;
@@ -56,12 +56,28 @@
 </head>
 <body>
   <div class="container">
-    <!-- ✅ Logo -->
     <img src="images/hubnetblack.jpg" alt="Hubnet Logo" class="logo" />
-    <h1>HUBNET Attendance</h1>
-    <a class="button" href="login.html">👤 Login</a>
-    <a class="button" href="register.html">📝 Register</a>
-    <a class="button" href="admin.html">🛠 Admin Dashboard</a>
+    <h1 data-i18n="welcome">HUBNET Attendance System</h1>
+
+    <a class="button" href="login.html" data-i18n="loginBtn">👤 Login</a>
+    <a class="button" href="register.html" data-i18n="registerBtn">📝 Register</a>
+    <a class="button" href="admin.html" data-i18n="adminBtn">🛠 Admin Dashboard</a>
+
+    <div style="margin-top: 1rem;">
+      <button onclick="setLanguageUI('en')">English</button>
+      <button onclick="setLanguageUI('ja')">日本語</button>
+    </div>
   </div>
+
+  <script type="module">
+    import { setLanguage, applyTranslations } from './scripts/lang.js';
+
+    window.setLanguageUI = (lang) => {
+      setLanguage(lang);
+      location.reload(); // Full reload to apply changes cleanly
+    };
+
+    applyTranslations();
+  </script>
 </body>
 </html>

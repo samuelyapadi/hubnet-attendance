@@ -40,12 +40,9 @@
 
     import { setLanguage, applyTranslations } from './scripts/lang.js';
 
-  window.setLanguageUI = async (lang) => {
-    document.getElementById('langLoading').style.display = 'inline';
+  window.setLanguageUI = (lang) => {
     setLanguage(lang);
-    await fetchAndRenderEmployees();  // rebuilds UI and reattaches filter logic
-    applyTranslations();              // applies static text translations
-    document.getElementById('langLoading').style.display = 'none';
+    location.reload();  // full refresh to ensure filters and UI are fully reattached
   };
 
     window.viewEmployeeLog = viewEmployeeLog;

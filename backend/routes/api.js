@@ -175,19 +175,7 @@ router.get('/users/:name/leave-balance', async (req, res) => {
     const now = new Date();
     const joinDate = new Date(user.joinDate);
 
-    const entitlement = calculateLeaveEntitlement(user); // call ONCE
-
-    let grantedLeave = [];
-
-    for (let i = 0; i < 2; i++) {
-      const grantDate = new Date(joinDate.getFullYear() + (now.getFullYear() - joinDate.getFullYear()) - i, joinDate.getMonth(), joinDate.getDate());
-      const expiryDate = new Date(grantDate);
-      expiryDate.setFullYear(expiryDate.getFullYear() + 2);
-
-      if (grantDate <= now && now < expiryDate) {
-        grantedLeave.push(entitlement * 8);
-      }
-    }
+    const totalEntitledHours = getValidGrantedLeaveHours(user, now);
 
     const totalEntitledHours = grantedLeave.reduce((sum, h) => sum + h, 0);
 
@@ -463,35 +451,19 @@ router.get('/leave-balance/all', async (req, res) => {
     const results = [];
 
     for (const user of users) {
-      const grantedLeave = [];
 
-      if (!user.joinDate) {
-        results.push({
-          name: user.name,
-          hoursRemaining: 0,
-          hoursUsed: 0,
-          entitlementDays: 0,
-          formatted: '0d 0h'
-        });
-        continue;
-      }
+    if (!user.joinDate) {
+      results.push({
+        name: user.name,
+        hoursRemaining: 0,
+        hoursUsed: 0,
+        entitlementDays: 0,
+        formatted: '0d 0h'
+      });
+      continue;
+    }
 
-      const joinDate = new Date(user.joinDate);
-      const totalYears = now.getFullYear() - joinDate.getFullYear();
-
-      for (let i = 0; i <= totalYears; i++) {
-        const grantDate = new Date(joinDate.getFullYear() + i, joinDate.getMonth(), joinDate.getDate());
-        const expiryDate = new Date(grantDate);
-        expiryDate.setFullYear(expiryDate.getFullYear() + 2);
-
-        if (grantDate <= now && now < expiryDate) {
-          const yearsWorked = Math.floor((grantDate - joinDate) / (365.25 * 24 * 3600 * 1000));
-          const entitlement = calculateEntitlementDays(user, yearsWorked);
-          grantedLeave.push(entitlement * 8);
-        }
-      }
-
-      const totalEntitledHours = Math.min(grantedLeave.reduce((sum, h) => sum + h, 0), 320); // Max 40d = 320h
+    const totalEntitledHours = getValidGrantedLeaveHours(user, now);
 
       const paidLeaveSessions = await Attendance.find({
         name: user.name,
@@ -608,5 +580,27 @@ router.delete('/leaves/:leaveId', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+function getValidGrantedLeaveHours(user, asOfDate = new Date()) {
+  if (!user.joinDate) return 0;
+
+  const joinDate = new Date(user.joinDate);
+  const totalYears = asOfDate.getFullYear() - joinDate.getFullYear();
+  let totalHours = 0;
+
+  for (let i = 0; i <= totalYears; i++) {
+    const grantDate = new Date(joinDate.getFullYear() + i, joinDate.getMonth(), joinDate.getDate());
+    const expiryDate = new Date(grantDate);
+    expiryDate.setFullYear(expiryDate.getFullYear() + 2);
+
+    if (grantDate <= asOfDate && asOfDate < expiryDate) {
+      const yearsWorked = Math.floor((grantDate - joinDate) / (365.25 * 24 * 3600 * 1000));
+      const days = calculateEntitlementDays(user, yearsWorked);
+      totalHours += days * 8;
+    }
+  }
+
+  return Math.min(totalHours, 320); // Cap at 40 days
+}
 
 module.exports = router;

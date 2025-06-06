@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Face Attendance</title>
+  <title data-i18n="clockInOut">Clock In / Clock Out - HUBNET Attendance</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,8 +48,10 @@
       font-weight: bold;
       margin-top: 1rem;
     }
+    .lang-switch {
+      margin: 0.5rem 0;
+    }
 
-    /* 🔧 iPad/tablet optimization */
     @media (min-width: 768px) and (max-width: 1024px) {
       #loginBtn,
       #logoutBtn {
@@ -65,7 +67,7 @@
     }
   </style>
 
-  <!-- Load face-api -->
+  <!-- face-api -->
   <script type="module">
     import * as faceapi from 'https://cdn.skypack.dev/face-api.js';
     window.faceapi = faceapi;
@@ -74,22 +76,38 @@
   <script type="module" src="scripts/storage.js" defer></script>
   <script type="module" src="scripts/index.js" defer></script>
   <script type="module" src="scripts/login.js" defer></script>
+  <script type="module">
+    import { setLanguage, applyTranslations } from './scripts/lang.js';
+    window.setLanguageUI = async (lang) => {
+      document.getElementById('langLoading').style.display = 'inline';
+      setLanguage(lang);
+      applyTranslations();
+      document.getElementById('langLoading').style.display = 'none';
+    };
+    window.addEventListener('DOMContentLoaded', applyTranslations);
+  </script>
 </head>
 <body class="register-page">
   <div class="container">
     <img src="images/hubnetblack.jpg" alt="Hubnet Logo" class="logo" />
+    
+    <div class="lang-switch">
+      <button onclick="setLanguageUI('en')">English</button>
+      <button onclick="setLanguageUI('ja')">日本語</button>
+      <span id="langLoading" style="display: none;">⏳</span>
+    </div>
 
-    <h1>Login</h1>
+    <h1 data-i18n="clockInOut">Clock In / Clock Out</h1>
 
     <video id="video" autoplay playsinline></video>
-    <button id="loginBtn">Login</button>
-    <button id="logoutBtn">Logout</button>
+    <button id="loginBtn" data-i18n="clockIn">Clock In</button>
+    <button id="logoutBtn" data-i18n="clockOut">Clock Out</button>
     <div class="status" id="status"></div>
 
-    <a href="index.html" class="back-link">← Back to Home</a>
+    <a href="index.html" class="back-link" data-i18n="backToHome">← Back to Home</a>
   </div>
 
-  <!-- ✅ Sound feedback -->
+  <!-- Sound feedback -->
   <audio id="sound-success" src="sounds/success.mp3" preload="auto"></audio>
   <audio id="sound-fail" src="sounds/fail.mp3" preload="auto"></audio>
 </body>

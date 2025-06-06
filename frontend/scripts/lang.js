@@ -23,8 +23,11 @@ const translations = {
     loginBtn: "👤 Clock In",
     registerBtn: "📝 Register",
     adminBtn: "🛠 Admin Dashboard",
-    clockInOut: '👤 Clock In / Out'
-  },
+    clockInOut: "Clock In / Clock Out",
+    clockIn: "Clock In",
+    clockOut: "Clock Out",
+    backToHome: "← Back to Home"
+    },
   ja: {
     employeesList: "社員一覧",
     backToAdmin: "← 管理者ダッシュボードへ戻る",
@@ -49,8 +52,11 @@ const translations = {
     loginBtn: "👤 出勤",
     registerBtn: "📝 登録",
     adminBtn: "🛠 管理画面",
-    clockInOut: '👤 出勤 / 退勤'
-  }
+    clockInOut: "出勤 / 退勤",
+    clockIn: "出勤",
+    clockOut: "退勤",
+    backToHome: "← ホームに戻る"
+    }
 };
 
 let currentLang = localStorage.getItem('lang') || 'en';

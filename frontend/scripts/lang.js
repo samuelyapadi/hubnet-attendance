@@ -70,46 +70,48 @@ const translations = {
 
 employees: {
   en: {
-    pageTitle: "HUBNET Attendance System",
-    branding: "HUBNET Attendance",
-    backToAdmin: "← Back to Admin Dashboard",
-    startDate: "Start Date",
-    endDate: "End Date",
-    year: "Year",
-    month: "Month",
-    department: "Department",
-    name: "Name",
-    all: "All",
-    clearAll: "Clear All",
-    workHours: "Work Hours",
-    totalOvertime: "Total Overtime",
-    paidLeaveLeft: "Paid Leave Left",
-    actions: "Actions",
-    viewLogs: "View Logs",
-    edit: "Edit",
-    save: "Save",
-    delete: "Delete"
+    title: 'Employees List',
+    branding: 'HUBNET Attendance',
+    backToAdmin: '← Back to Admin Dashboard',
+    employeesList: 'Employees List',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    year: 'Year',
+    month: 'Month',
+    department: 'Department',
+    name: 'Name',
+    all: 'All',
+    clearAll: 'Clear All',
+    viewLogs: 'View Logs',
+    workHours: 'Work Hours',
+    totalOvertime: 'Total Overtime',
+    paidLeaveLeft: 'Paid Leave Left',
+    actions: 'Actions',
+    edit: 'Edit',
+    save: 'Save',
+    delete: 'Delete'
   },
   ja: {
-    pageTitle: "HUBNET勤怠管理システム",
-    branding: "HUBNET勤怠管理",
-    backToAdmin: "← 管理画面に戻る",
-    startDate: "開始日",
-    endDate: "終了日",
-    year: "年",
-    month: "月",
-    department: "部署",
-    name: "名前",
-    all: "すべて",
-    clearAll: "全てクリア",
-    workHours: "勤務時間",
-    totalOvertime: "残業合計",
-    paidLeaveLeft: "有給残り",
-    actions: "操作",
-    viewLogs: "ログを見る",
-    edit: "編集",
-    save: "保存",
-    delete: "削除"
+    title: '社員一覧',
+    branding: 'HUBNET勤怠管理',
+    backToAdmin: '← 管理画面に戻る',
+    employeesList: '社員一覧',
+    startDate: '開始日',
+    endDate: '終了日',
+    year: '年',
+    month: '月',
+    department: '部署',
+    name: '名前',
+    all: '全て',
+    clearAll: 'リセット',
+    viewLogs: '勤務記録',
+    workHours: '勤務時間',
+    totalOvertime: '残業合計',
+    paidLeaveLeft: '有給残り',
+    actions: '操作',
+    edit: '編集',
+    save: '保存',
+    delete: '削除'
   }
 }
 
@@ -124,15 +126,16 @@ export function translate(key, section = 'index') {
   return translations[section]?.[lang]?.[key] || key;
 }
 
-export function applyTranslations(section = 'index') {
+export function applyTranslations(defaultSection = 'index') {
   const lang = localStorage.getItem('lang') || 'en';
-  const sectionTranslations = translations[section]?.[lang];
-  if (!sectionTranslations) return;
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (sectionTranslations[key]) {
-      el.textContent = sectionTranslations[key];
+    const fullKey = el.getAttribute('data-i18n');
+    const [section, key] = fullKey.includes('.') ? fullKey.split('.') : [defaultSection, fullKey];
+
+    const translation = translations[section]?.[lang]?.[key];
+    if (translation) {
+      el.textContent = translation;
     }
   });
 }

@@ -41,8 +41,8 @@ function renderUIContainer() {
   const app = document.getElementById('app');
 
   const header = document.createElement('h1');
-  header.setAttribute('data-i18n', 'employeesList');
-  header.textContent = translate('employeesList');
+  header.setAttribute('data-i18n', 'employees.title');
+  header.textContent = translate('employees.title');
   app.appendChild(header);
 
   const filterBar = document.createElement('div');
@@ -53,29 +53,31 @@ function renderUIContainer() {
   filterBar.style.marginBottom = '1rem';
   filterBar.style.alignItems = 'center';
   filterBar.innerHTML = `
-    <label data-i18n="startDate">${translate('startDate')}:
-      <input type="date" id="startDate" ... />
+    <label data-i18n="employees.startDate">${translate('employees.startDate')}:
+      <input type="date" id="startDate" />
     </label>
-    <label data-i18n="endDate">${translate('endDate')}:
-      <input type="date" id="endDate" ... />
+    <label data-i18n="employees.endDate">${translate('employees.endDate')}:
+      <input type="date" id="endDate" />
     </label>
-    <label data-i18n="year">${translate('year')}:
-      <select id="yearSelect" ...></select>
+    <label data-i18n="employees.year">${translate('employees.year')}:
+      <select id="yearSelect"></select>
     </label>
-    <label data-i18n="month">${translate('month')}:
-      <select id="monthSelect" ...></select>
+    <label data-i18n="employees.month">${translate('employees.month')}:
+      <select id="monthSelect"></select>
     </label>
-    <label data-i18n="department">${translate('department')}:
-      <select id="employeeDeptFilter" ...>
-        <option value="">${translate('all')}</option>
+    <label data-i18n="employees.department">${translate('employees.department')}:
+      <select id="employeeDeptFilter">
+        <option value="">${translate('employees.all')}</option>
       </select>
     </label>
-    <label data-i18n="name">${translate('name')}:
-      <select id="employeeNameFilter" ...>
-        <option value="">${translate('all')}</option>
+    <label data-i18n="employees.name">${translate('employees.name')}:
+      <select id="employeeNameFilter">
+        <option value="">${translate('employees.all')}</option>
       </select>
     </label>
-    <button onclick="resetEmployeeFilters()" data-i18n="clearAll">${translate('clearAll')}</button>
+    <button onclick="resetEmployeeFilters()" data-i18n="employees.clearAll">
+      ${translate('employees.clearAll')}
+    </button>
   `;
   app.appendChild(filterBar);
 
@@ -84,12 +86,12 @@ function renderUIContainer() {
   table.innerHTML = `
     <thead>
       <tr>
-        <th data-i18n="name">Name</th>
-        <th data-i18n="department">Department</th>
-        <th data-i18n="workHours">Work Hours</th>
-        <th data-i18n="totalOvertime">Total Overtime</th>
-        <th data-i18n="paidLeaveLeft">Paid Leave Left</th>
-        <th data-i18n="actions">Actions</th>
+        <th data-i18n="employees.name">${translate('employees.name')}</th>
+        <th data-i18n="employees.department">${translate('employees.department')}</th>
+        <th data-i18n="employees.workHours">${translate('employees.workHours')}</th>
+        <th data-i18n="employees.totalOvertime">${translate('employees.totalOvertime')}</th>
+        <th data-i18n="employees.paidLeaveLeft">${translate('employees.paidLeaveLeft')}</th>
+        <th data-i18n="employees.actions">${translate('employees.actions')}</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -195,16 +197,16 @@ function populateEmployeesTable(users) {
             }).join('')}
         </select>
       </td>
-      <td><button onclick="viewEmployeeLog('${user.name}')" data-i18n="viewLogs">${translate('viewLogs')}</button></td>
+      <td><button onclick="viewEmployeeLog('${user.name}')" data-i18n="employees.viewLogs">${translate('employees.viewLogs')}</button></td>
       <td><input type="text" value="${user.totalOvertime || '0h 0m'}" disabled></td>
       <td><input type="text" value="${user.remainingLeave || '-'}" disabled></td>
-    <td>
-      <button onclick="enableEdit(this)" data-i18n="edit">${translate('edit')}</button>
-      <button onclick="saveUserEdits('${userId}', this)" style="display:none;" data-i18n="save">${translate('save')}</button>
-      <button onclick="deleteUser('${userId}')" data-i18n="delete">${translate('delete')}</button>
-    </td>
+      <td>
+        <button onclick="enableEdit(this)" data-i18n="employees.edit">${translate('employees.edit')}</button>
+        <button onclick="saveUserEdits('${userId}', this)" style="display:none;" data-i18n="employees.save">${translate('employees.save')}</button>
+        <button onclick="deleteUser('${userId}')" data-i18n="employees.delete">${translate('employees.delete')}</button>
+      </td>
     `;
-
+    
     tbody.appendChild(row);
   });
 }

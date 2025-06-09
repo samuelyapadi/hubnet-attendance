@@ -68,20 +68,51 @@ const translations = {
     }
   },
 
-  employees: {
-    en: {
-      title: 'Employees List',
-      backToAdmin: '← Back to Admin Dashboard',
-      branding: 'HUBNET Attendance'
-      // Add more keys as needed
-    },
-    ja: {
-      title: '社員一覧',
-      backToAdmin: '← 管理画面に戻る',
-      branding: 'HUBNET勤怠管理'
-      // Add more keys as needed
-    }
+employees: {
+  en: {
+    pageTitle: "HUBNET Attendance System",
+    branding: "HUBNET Attendance",
+    backToAdmin: "← Back to Admin Dashboard",
+    startDate: "Start Date",
+    endDate: "End Date",
+    year: "Year",
+    month: "Month",
+    department: "Department",
+    name: "Name",
+    all: "All",
+    clearAll: "Clear All",
+    workHours: "Work Hours",
+    totalOvertime: "Total Overtime",
+    paidLeaveLeft: "Paid Leave Left",
+    actions: "Actions",
+    viewLogs: "View Logs",
+    edit: "Edit",
+    save: "Save",
+    delete: "Delete"
+  },
+  ja: {
+    pageTitle: "HUBNET勤怠管理システム",
+    branding: "HUBNET勤怠管理",
+    backToAdmin: "← 管理画面に戻る",
+    startDate: "開始日",
+    endDate: "終了日",
+    year: "年",
+    month: "月",
+    department: "部署",
+    name: "名前",
+    all: "すべて",
+    clearAll: "全てクリア",
+    workHours: "勤務時間",
+    totalOvertime: "残業合計",
+    paidLeaveLeft: "有給残り",
+    actions: "操作",
+    viewLogs: "ログを見る",
+    edit: "編集",
+    save: "保存",
+    delete: "削除"
   }
+}
+
 };
 
 export function setLanguage(lang) {

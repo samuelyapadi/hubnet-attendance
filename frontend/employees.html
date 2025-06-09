@@ -53,7 +53,7 @@
     window.resetEmployeeFilters = resetEmployeeFilters;
 
     document.addEventListener('DOMContentLoaded', async () => {
-      applyTranslations();
+      applyTranslations('employees'); // scoped translation for employee page
       await fetchAndRenderEmployees();
     });
   </script>

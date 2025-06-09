@@ -24,8 +24,8 @@ router.post('/admins/grant', async (req, res) => {
 
     return res.json({ success: true, message: 'Admin granted' });
   } catch (err) {
-    console.error('Grant admin error:', err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('[GRANT ADMIN ERROR]', err.stack || err);
+    res.status(500).json({ success: false, message: 'Server error', detail: err.message });
   }
 });
 

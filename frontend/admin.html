@@ -18,7 +18,6 @@
   <!-- 🔘 Navigation -->
   <div style="margin-bottom: 2rem;">
     <a href="employees.html" class="btn" data-i18n="employeeList">Employees List</a><br><br>
-    <button id="inputWorkLeaveBtn" class="btn" data-i18n="leaveManagement">+ Input Work / Leave</button>
   </div>
 
   <!-- 📊 Attendance Tab -->
@@ -59,36 +58,6 @@
     </a>
   </div>
 
-  <!-- 📝 Modal for Input -->
-  <div id="manualInputModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
-    <h3 data-i18n="manualInputTitle">Input Work / Leave</h3>
-    <form id="manualInputForm">
-      <label style="display: flex; align-items: center; gap: 1rem;">
-        <span data-i18n="employee">Employee:</span>
-        <select id="manualName" required style="flex: 1;"></select>
-      </label><br><br>
-
-      <label><span data-i18n="checkIn">Check-In:</span>
-        <input type="datetime-local" id="manualCheckIn" required>
-      </label><br><br>
-
-      <label><span data-i18n="checkOut">Check-Out:</span>
-        <input type="datetime-local" id="manualCheckOut" required>
-      </label><br><br>
-
-      <label><span data-i18n="type">Type:</span>
-        <select id="manualType">
-          <option value="work" data-i18n="work">Work</option>
-          <option value="paid_leave" data-i18n="paidLeave">Paid Leave</option>
-          <option value="unpaid_leave" data-i18n="unpaidLeave">Unpaid Leave</option>
-        </select>
-      </label><br><br>
-
-      <button type="submit" class="btn" data-i18n="submit">Submit</button>
-      <button type="button" class="btn" onclick="document.getElementById('manualInputModal').style.display='none'" data-i18n="cancel">Cancel</button>
-    </form>
-  </div>
-
   <!-- 🧠 JS Modules -->
   <script type="module">
     import { fetchAndRenderAttendance, setupActiveTableSorting } from './attendance.js';
@@ -103,50 +72,6 @@
 
       setupActiveTableSorting();
       fetchAndRenderAttendance();
-
-      const btn = document.getElementById('inputWorkLeaveBtn');
-      const modal = document.getElementById('manualInputModal');
-      const form = document.getElementById('manualInputForm');
-      const nameSelect = document.getElementById('manualName');
-
-      btn.onclick = async () => {
-        const res = await fetch('/api/users');
-        const users = await res.json();
-        nameSelect.innerHTML = users.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-        modal.style.display = 'block';
-      };
-
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-        const checkIn = new Date(document.getElementById('manualCheckIn').value);
-        const checkOut = new Date(document.getElementById('manualCheckOut').value);
-        const type = document.getElementById('manualType').value;
-        const diffMs = checkOut - checkIn;
-        const hoursUsed = type === 'work' ? 0 : parseFloat((diffMs / 3600000).toFixed(2));
-
-        const payload = {
-          name: document.getElementById('manualName').value,
-          checkIn: checkIn.toISOString(),
-          checkOut: checkOut.toISOString(),
-          type,
-          hoursUsed,
-        };
-
-        const res = await fetch('/api/sessions/manual', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-        if (result.success) {
-          alert('✅ Entry added!');
-          modal.style.display = 'none';
-          fetchAndRenderAttendance();
-        } else {
-          alert('❌ Failed to add entry.');
-        }
-      };
     });
   </script>
 </body>

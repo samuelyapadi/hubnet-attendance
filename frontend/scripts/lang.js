@@ -68,53 +68,52 @@ const translations = {
     }
   },
 
-employees: {
-  en: {
-    title: 'Employees List',
-    branding: 'HUBNET Attendance',
-    backToAdmin: '← Back to Admin Dashboard',
-    employeesList: 'Employees List',
-    startDate: 'Start Date',
-    endDate: 'End Date',
-    year: 'Year',
-    month: 'Month',
-    department: 'Department',
-    name: 'Name',
-    all: 'All',
-    clearAll: 'Clear All',
-    viewLogs: 'View Logs',
-    workHours: 'Work Hours',
-    totalOvertime: 'Total Overtime',
-    paidLeaveLeft: 'Paid Leave Left',
-    actions: 'Actions',
-    edit: 'Edit',
-    save: 'Save',
-    delete: 'Delete'
-  },
-  ja: {
-    title: '社員一覧',
-    branding: 'HUBNET勤怠管理',
-    backToAdmin: '← 管理画面に戻る',
-    employeesList: '社員一覧',
-    startDate: '開始日',
-    endDate: '終了日',
-    year: '年',
-    month: '月',
-    department: '部署',
-    name: '名前',
-    all: '全て',
-    clearAll: 'リセット',
-    viewLogs: '勤務記録',
-    workHours: '勤務時間',
-    totalOvertime: '残業合計',
-    paidLeaveLeft: '有給残り',
-    actions: '操作',
-    edit: '編集',
-    save: '保存',
-    delete: '削除'
+  employees: {
+    en: {
+      title: 'Employees List',
+      branding: 'HUBNET Attendance',
+      backToAdmin: '← Back to Admin Dashboard',
+      employeesList: 'Employees List',
+      startDate: 'Start Date',
+      endDate: 'End Date',
+      year: 'Year',
+      month: 'Month',
+      department: 'Department',
+      name: 'Name',
+      all: 'All',
+      clearAll: 'Clear All',
+      viewLogs: 'View Logs',
+      workHours: 'Work Hours',
+      totalOvertime: 'Total Overtime',
+      paidLeaveLeft: 'Paid Leave Left',
+      actions: 'Actions',
+      edit: 'Edit',
+      save: 'Save',
+      delete: 'Delete'
+    },
+    ja: {
+      title: '社員一覧',
+      branding: 'HUBNET勤怠管理',
+      backToAdmin: '← 管理画面に戻る',
+      employeesList: '社員一覧',
+      startDate: '開始日',
+      endDate: '終了日',
+      year: '年',
+      month: '月',
+      department: '部署',
+      name: '名前',
+      all: '全て',
+      clearAll: 'リセット',
+      viewLogs: '勤務記録',
+      workHours: '勤務時間',
+      totalOvertime: '残業合計',
+      paidLeaveLeft: '有給残り',
+      actions: '操作',
+      edit: '編集',
+      save: '保存',
+      delete: '削除'
+    }
   }
-}
-
 };
 
 export function setLanguage(lang) {

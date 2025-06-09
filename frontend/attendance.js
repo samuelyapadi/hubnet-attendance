@@ -39,6 +39,10 @@ function populateActiveTable() {
 
   const selectedDept = document.getElementById('sortDepartment')?.value;
 
+  if (!selectedDept) {
+    return; // Don't render anything until department is selected
+  }
+
   const enriched = activeSessions.map(entry => {
     const user = allUsers.find(u => u.name === entry.name);
     return {
@@ -47,7 +51,7 @@ function populateActiveTable() {
     };
   });
 
-  const filtered = selectedDept ? enriched.filter(e => e.department === selectedDept) : enriched;
+  const filtered = enriched.filter(e => e.department === selectedDept);
 
   const sorted = [...filtered].sort((a, b) => {
     const aValue = sortKey === 'checkIn' ? new Date(a.checkIn) : a.name.toLowerCase();

@@ -122,8 +122,6 @@ async function applyCombinedFilters() {
   const dept = document.getElementById('employeeDeptFilter')?.value;
   const name = document.getElementById('employeeNameFilter')?.value;
 
-  const dept = document.getElementById('employeeDeptFilter')?.value;
-
   if (!dept) {
     // Stop here if department is not selected
     populateEmployeesTable([]);

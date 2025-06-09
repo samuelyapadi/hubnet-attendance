@@ -16,6 +16,9 @@ export async function fetchAndRenderEmployees() {
     fetch('/api/sessions/all'),
   ]);
 
+  const users = await usersRes.json();
+  const sessions = await sessionsRes.json();
+
   allUsers = users;
   allSessions = sessions;
   window.allUsers = users;

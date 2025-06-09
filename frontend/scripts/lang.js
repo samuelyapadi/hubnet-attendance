@@ -122,7 +122,8 @@ export function setLanguage(lang) {
 
 export function translate(key, section = 'index') {
   const lang = localStorage.getItem('lang') || 'en';
-  return translations[section]?.[lang]?.[key] || key;
+  const [maybeSection, maybeKey] = key.includes('.') ? key.split('.') : [section, key];
+  return translations[maybeSection]?.[lang]?.[maybeKey] || key;
 }
 
 export function applyTranslations(defaultSection = 'index') {

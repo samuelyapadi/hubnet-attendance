@@ -2,6 +2,11 @@
 
 import { translate, applyTranslations } from './scripts/lang.js';
 
+const lang = localStorage.getItem('lang') || 'en';
+document.addEventListener('DOMContentLoaded', () => {
+  applyTranslations('employees', lang);
+});
+
 let allUsers = [];
 let allSessions = [];
 let leaveBalanceMap = new Map();

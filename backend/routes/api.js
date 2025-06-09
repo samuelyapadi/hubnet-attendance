@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Attendance = require('../models/Attendance');
 const Leave = require('../models/Leave');
 const Admin = require('../models/Admin');
+const bcrypt = require('bcrypt');
 
 router.post('/admins/grant', async (req, res) => {
   const { userId, username, password } = req.body;

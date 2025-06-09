@@ -122,14 +122,20 @@ async function applyCombinedFilters() {
   const dept = document.getElementById('employeeDeptFilter')?.value;
   const name = document.getElementById('employeeNameFilter')?.value;
 
+  const dept = document.getElementById('employeeDeptFilter')?.value;
+
+  if (!dept) {
+    // Stop here if department is not selected
+    populateEmployeesTable([]);
+    return;
+  }
+
   let filteredUsers = allUsers.filter(u => {
     const hasResigned = allSessions.some(s => s.name === u.name && s.status === 'resigned');
-    return !hasResigned;
+    return !hasResigned && u.department === dept;
   });
 
-  if (dept) {
-    filteredUsers = filteredUsers.filter(u => u.department === dept);
-  }
+  const name = document.getElementById('employeeNameFilter')?.value;
   if (name) {
     filteredUsers = filteredUsers.filter(u => u.name === name);
   }

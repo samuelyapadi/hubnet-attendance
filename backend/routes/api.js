@@ -3,6 +3,74 @@ const router = express.Router();
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
 const Leave = require('../models/Leave');
+const Admin = require('../models/Admin');
+
+router.post('/api/admins/grant', async (req, res) => {
+  const { userId, username, password } = req.body;
+  if (!userId || !username || !password) {
+    return res.status(400).json({ success: false, message: 'Missing fields' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const hash = await bcrypt.hash(password, 10);
+    await Admin.findOneAndUpdate(
+      { userId },
+      { userId, username, password: hash },
+      { upsert: true }
+    );
+
+    return res.json({ success: true, message: 'Admin granted' });
+  } catch (err) {
+    console.error('Grant admin error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Reset admin password
+router.patch('/api/admins/reset-password', async (req, res) => {
+  const { userId, password } = req.body;
+  if (!userId || !password) {
+    return res.status(400).json({ success: false, message: 'Missing fields' });
+  }
+
+  try {
+    const hash = await bcrypt.hash(password, 10);
+    const admin = await Admin.findOneAndUpdate(
+      { userId },
+      { password: hash }
+    );
+    if (!admin) return res.status(404).json({ success: false, message: 'Admin not found' });
+
+    res.json({ success: true, message: 'Password updated' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Admin login
+router.post('/api/admins/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Missing credentials' });
+  }
+
+  try {
+    const admin = await Admin.findOne({ username });
+    if (!admin) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Admin login error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
 
 function calculateLeaveEntitlement(user) {
   if (!user.joinDate || isNaN(new Date(user.joinDate))) return 0;
@@ -165,7 +233,6 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// Get remaining paid leave
 // Get remaining paid leave with 2-year expiry logic
 router.get('/users/:name/leave-balance', async (req, res) => {
   try {

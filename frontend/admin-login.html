@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- 🔝 Branding Header -->
+  <header class="top-nav">
+    <img src="images/hubnetblack.jpg" alt="Logo" class="logo" />
+    <h1 class="logo-title">HUBNET Attendance</h1>
+  </header>
+
+  <!-- 🧾 Login Container -->
+  <div class="container">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <input type="text" id="adminUsername" placeholder="Username" required />
+      <input type="password" id="adminPassword" placeholder="Password" required />
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <hr style="margin: 2rem 0;" />
+    <button id="manageAdminsBtn" class="btn">Manage Admins</button>
+    <p id="superAuthError" class="status error" style="display: none;">❌ Incorrect super password</p>
+    <p id="adminLoginError" class="status error" style="display: none;">❌ Invalid login</p>
+  </div>
+
+  <!-- 🌐 Language Switch -->
+  <div style="text-align: center; margin-top: 3rem;">
+    <button onclick="setLanguageUI('en')" style="margin-right: 8px;">English</button>
+    <button onclick="setLanguageUI('ja')">日本語</button>
+    <span id="langLoading" style="margin-left: 8px; display: none;">⏳</span>
+  </div>
+
+<script type="module">
+  import { setLanguage } from './scripts/lang.js';
+
+  window.setLanguageUI = (lang) => {
+    setLanguage(lang);
+    location.reload();
+  };
+
+  document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value.trim();
+
+    try {
+      const res = await fetch('/api/admins/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        localStorage.setItem('role', 'admin');
+        location.href = 'admin.html';
+      } else {
+        document.getElementById('adminLoginError').style.display = 'block';
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+      document.getElementById('adminLoginError').style.display = 'block';
+    }
+  });
+
+  document.getElementById('manageAdminsBtn').addEventListener('click', () => {
+    const superPassword = prompt('Enter super-admin password:');
+    if (superPassword === 'hubnetroot') {
+      location.href = 'admin-manage.html';
+    } else {
+      document.getElementById('superAuthError').style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>

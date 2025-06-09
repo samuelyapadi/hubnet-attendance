@@ -60,6 +60,11 @@
 
   <!-- 🧠 JS Modules -->
   <script type="module">
+    // 🔒 Restrict access to admins only
+    if (localStorage.getItem('role') !== 'admin') {
+      location.href = 'admin-login.html';
+    }
+
     import { fetchAndRenderAttendance, setupActiveTableSorting } from './attendance.js';
     import { applyTranslations } from './scripts/lang.js';
 
@@ -73,6 +78,6 @@
       setupActiveTableSorting();
       fetchAndRenderAttendance();
     });
-  </script>
+</script>
 </body>
 </html>

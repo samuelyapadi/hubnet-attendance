@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Admins</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+</head>
+<body>
+
+  <!-- 🔝 Top Nav -->
+  <header class="top-nav">
+    <img src="images/hubnetblack.jpg" alt="Logo" class="logo" />
+    <h1 class="logo-title">HUBNET Attendance</h1>
+  </header>
+
+  <div class="container">
+    <h2>Manage Admins</h2>
+
+    <!-- Department Filter -->
+    <label for="deptFilter">Department</label>
+    <select id="deptFilter">
+      <option value="">All</option>
+    </select>
+
+    <!-- User Select -->
+    <label for="userSelect">Select User</label>
+    <select id="userSelect">
+      <option value="">-- Select --</option>
+    </select>
+
+    <!-- Username/Password Inputs -->
+    <label for="adminUsernameInput">New Admin Username</label>
+    <input type="text" id="adminUsernameInput" placeholder="Enter username" />
+
+    <label for="adminPasswordInput">New Admin Password</label>
+    <input type="password" id="adminPasswordInput" placeholder="Enter password" />
+
+    <!-- Buttons -->
+    <button id="grantAdminBtn" class="btn" style="margin-top: 1rem;">Grant Admin Access</button>
+    <button id="resetPasswordBtn" class="btn" style="margin-top: 0.5rem;">Reset Admin Password</button>
+
+    <p id="adminManageStatus" class="status info" style="display: none;"></p>
+  </div>
+
+  <!-- Back Link -->
+  <div style="text-align: center; margin-top: 2rem;">
+    <a href="admin-login.html" class="btn">← Back to Admin Login</a>
+  </div>
+
+  <!-- JS -->
+  <script type="module">
+    const deptSelect = document.getElementById('deptFilter');
+    const userSelect = document.getElementById('userSelect');
+    const status = document.getElementById('adminManageStatus');
+
+    let allUsers = [];
+
+    async function fetchUsers() {
+      const res = await fetch('/api/users');
+      allUsers = await res.json();
+      populateDeptOptions();
+      populateUserOptions();
+    }
+
+    function populateDeptOptions() {
+      const departments = [...new Set(allUsers.map(u => u.department).filter(Boolean))].sort();
+      departments.forEach(dept => {
+        const opt = document.createElement('option');
+        opt.value = dept;
+        opt.textContent = dept;
+        deptSelect.appendChild(opt);
+      });
+    }
+
+    function populateUserOptions() {
+      const selectedDept = deptSelect.value;
+      userSelect.innerHTML = '<option value="">-- Select --</option>';
+      allUsers
+        .filter(u => !selectedDept || u.department === selectedDept)
+        .forEach(user => {
+          const opt = document.createElement('option');
+          opt.value = user._id;
+          opt.textContent = `${user.name} (${user.department})`;
+          userSelect.appendChild(opt);
+        });
+    }
+
+    document.getElementById('grantAdminBtn').addEventListener('click', async () => {
+      const userId = userSelect.value;
+      const username = document.getElementById('adminUsernameInput').value.trim();
+      const password = document.getElementById('adminPasswordInput').value.trim();
+      if (!userId || !username || !password) return alert('All fields required.');
+
+      const res = await fetch('/api/admins/grant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, username, password })
+      });
+      const result = await res.json();
+      status.style.display = 'block';
+      status.className = result.success ? 'status success' : 'status error';
+      status.textContent = result.message || (result.success ? '✅ Admin access granted' : '❌ Failed to grant access');
+    });
+
+    document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
+      const userId = userSelect.value;
+      const password = document.getElementById('adminPasswordInput').value.trim();
+      if (!userId || !password) return alert('User and new password required.');
+
+      const res = await fetch('/api/admins/reset-password', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, password })
+      });
+      const result = await res.json();
+      status.style.display = 'block';
+      status.className = result.success ? 'status success' : 'status error';
+      status.textContent = result.message || (result.success ? '✅ Password reset' : '❌ Failed to reset password');
+    });
+
+    deptSelect.addEventListener('change', populateUserOptions);
+
+    fetchUsers();
+  </script>
+</body>
+</html>

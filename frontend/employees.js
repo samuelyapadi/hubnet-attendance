@@ -9,23 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let allUsers = [];
 let allSessions = [];
-let leaveBalanceMap = new Map();
 
 export async function fetchAndRenderEmployees() {
-  const [usersRes, sessionsRes, leaveRes] = await Promise.all([
+  const [usersRes, sessionsRes] = await Promise.all([
     fetch('/api/users'),
     fetch('/api/sessions/all'),
-    fetch('/api/leave-balance/all')
   ]);
-
-  const users = await usersRes.json();
-  const sessions = await sessionsRes.json();
-  const leaveData = await leaveRes.json();
-
-  leaveBalanceMap = new Map();
-  leaveData.forEach(entry => {
-    leaveBalanceMap.set(entry.name, entry.formatted);
-  });
 
   allUsers = users;
   allSessions = sessions;
@@ -121,58 +110,33 @@ async function applyCombinedFilters() {
   const month = document.getElementById('monthSelect')?.value;
   const dept = document.getElementById('employeeDeptFilter')?.value;
   const name = document.getElementById('employeeNameFilter')?.value;
+  const startDate = document.getElementById('startDate')?.value;
+  const endDate = document.getElementById('endDate')?.value;
 
   if (!dept) {
-    // Stop here if department is not selected
     populateEmployeesTable([]);
     return;
   }
 
-  let filteredUsers = allUsers.filter(u => {
-    const hasResigned = allSessions.some(s => s.name === u.name && s.status === 'resigned');
-    return !hasResigned && u.department === dept;
-  });
+  const params = new URLSearchParams({ dept });
+  if (year) params.append('year', year);
+  if (month) params.append('month', month);
+  if (startDate) params.append('startDate', startDate);
+  if (endDate) params.append('endDate', endDate);
 
-  if (name) {
-    filteredUsers = filteredUsers.filter(u => u.name === name);
+  try {
+    const res = await fetch(`/api/employees-summary?${params.toString()}`);
+    const summary = await res.json();
+
+    const filtered = name
+      ? summary.filter(u => u.name === name)
+      : summary;
+
+    populateEmployeesTable(filtered);
+  } catch (err) {
+    console.error('Error fetching summary:', err);
+    alert('❌ Failed to load employee summary');
   }
-
-  const startDateVal = document.getElementById('startDate')?.value;
-  const endDateVal = document.getElementById('endDate')?.value;
-  const startDate = startDateVal ? new Date(startDateVal) : null;
-  const endDate = endDateVal ? new Date(new Date(endDateVal).setHours(23, 59, 59, 999)) : null;
-
-  const filteredSessions = allSessions.filter(session => {
-    if (!session.checkIn || !session.checkOut) return false;
-
-    const checkIn = new Date(session.checkIn);
-    if (year && checkIn.getFullYear() !== Number(year)) return false;
-    if (month && checkIn.getMonth() !== Number(month)) return false;
-
-    if (startDate && checkIn < startDate) return false;
-    if (endDate && checkIn > endDate) return false;
-    return true;
-  });
-
-  await Promise.all(filteredUsers.map(async user => {
-    const sessions = filteredSessions.filter(s => s.name === user.name);
-    let totalOvertimeMinutes = 0;
-
-    sessions.forEach(s => {
-      if (s.type !== 'work') return;
-      const checkIn = new Date(s.checkIn);
-      const checkOut = new Date(s.checkOut);
-      const workedMinutes = Math.floor((checkOut - checkIn) / 60000);
-      const adjustedWorked = Math.max(0, workedMinutes - 60);
-      const overtime = adjustedWorked - 480;
-      if (overtime > 0) totalOvertimeMinutes += overtime;
-    });
-
-    user.totalOvertime = `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`;
-    user.remainingLeave = leaveBalanceMap.get(user.name) || '0d 0h';
-  }));
-
-  populateEmployeesTable(filteredUsers);
 }
 
 function populateEmployeesTable(users) {

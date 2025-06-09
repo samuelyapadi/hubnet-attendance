@@ -668,4 +668,80 @@ function getValidGrantedLeaveHours(user, asOfDate = new Date()) {
   return Math.min(totalHours, 320); // Cap at 40 days
 }
 
+router.get('/employees-summary', async (req, res) => {
+  const { dept, year, month, startDate, endDate } = req.query;
+
+  if (!dept) return res.status(400).json({ success: false, message: 'Department required' });
+
+  try {
+    const users = await User.find({ department: dept });
+
+    const allSessions = await Attendance.find({ checkIn: { $ne: null }, checkOut: { $ne: null } });
+    const allLeaves = await Leave.find({}); // used for paid leave manual entries
+
+    const filteredSessions = allSessions.filter(session => {
+      const checkIn = new Date(session.checkIn);
+      if (year && checkIn.getFullYear() !== Number(year)) return false;
+      if (month && checkIn.getMonth() !== Number(month)) return false;
+
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : null;
+
+      if (start && checkIn < start) return false;
+      if (end && checkIn > end) return false;
+
+      return true;
+    });
+
+    const now = new Date();
+    const result = [];
+
+    for (const user of users) {
+      const userSessions = filteredSessions.filter(s => s.name === user.name && s.type === 'work');
+
+      let totalOvertimeMinutes = 0;
+      for (const s of userSessions) {
+        const checkIn = new Date(s.checkIn);
+        const checkOut = new Date(s.checkOut);
+        const workedMinutes = Math.floor((checkOut - checkIn) / 60000);
+        const adjustedWorked = Math.max(0, workedMinutes - 60); // 1h break
+        const overtime = adjustedWorked - 480; // subtract 8h
+        if (overtime > 0) totalOvertimeMinutes += overtime;
+      }
+
+      const totalEntitled = getValidGrantedLeaveHours(user, now);
+
+      const paidLeaveSessions = filteredSessions.filter(s =>
+        s.name === user.name && s.type === 'paid_leave'
+      );
+      const paidLeaveHours = paidLeaveSessions.reduce((sum, s) => {
+        const ms = new Date(s.checkOut) - new Date(s.checkIn);
+        return sum + Math.min(ms / 3600000, 8);
+      }, 0);
+
+      const manualLeaves = allLeaves.filter(l =>
+        l.userId.toString() === user._id.toString() && l.type === 'paid'
+      );
+      const manualHours = manualLeaves.reduce((sum, l) => sum + (l.hours || 0), 0);
+
+      const usedHours = Math.round((paidLeaveHours + manualHours + Number.EPSILON) * 2) / 2;
+      const remainingHours = Math.max(0, totalEntitled - usedHours);
+      const days = Math.floor(remainingHours / 8);
+      const hours = Math.round((remainingHours % 8 + Number.EPSILON) * 2) / 2;
+
+      result.push({
+        name: user.name,
+        department: user.department,
+        totalOvertime: `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`,
+        remainingLeave: `${days}d ${hours}h`
+      });
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error('Employee summary error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;

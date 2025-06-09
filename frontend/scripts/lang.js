@@ -131,7 +131,15 @@ export function applyTranslations(defaultSection = 'index') {
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const fullKey = el.getAttribute('data-i18n');
-    const [section, key] = fullKey.includes('.') ? fullKey.split('.') : [defaultSection, fullKey];
+
+    let section = defaultSection;
+    let key = fullKey;
+
+    if (fullKey.includes('.')) {
+      const parts = fullKey.split('.');
+      section = parts[0];
+      key = parts.slice(1).join('.');
+    }
 
     const translation = translations[section]?.[lang]?.[key];
     if (translation) {

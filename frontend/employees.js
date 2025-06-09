@@ -206,7 +206,7 @@ function populateEmployeesTable(users) {
         <button onclick="deleteUser('${userId}')" data-i18n="employees.delete">${translate('employees.delete')}</button>
       </td>
     `;
-    
+
     tbody.appendChild(row);
   });
 }
@@ -231,14 +231,14 @@ function populateFilters(users, sessions) {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  yearSelect.innerHTML = '<option value="">All</option>' +
+  yearSelect.innerHTML = `<option value="">${translate('employees.all')}</option>` +
     [...yearSet].sort((a, b) => b - a).map(y => `<option value="${y}">${y}</option>`).join('');
 
-  monthSelect.innerHTML = '<option value="">All</option>' +
+  monthSelect.innerHTML = `<option value="">${translate('employees.all')}</option>` + 
     [...monthSet].sort((a, b) => a - b).map(m => `<option value="${m}">${monthNames[m]}</option>`).join('');
 
   const depts = [...new Set(users.map(u => u.department).filter(Boolean))].sort();
-  deptFilter.innerHTML = `<option value="">${translate('all')}</option>`;
+  deptFilter.innerHTML = `<option value="">${translate('employees.all')}</option>`;
   depts.forEach(dept => {
     const opt = document.createElement('option');
     opt.value = dept;
@@ -260,7 +260,7 @@ export function updateNameFilterOptions() {
       .map(u => u.name)
   )].sort();
 
-  nameFilter.innerHTML = `<option value="">${translate('all')}</option>`;
+  nameFilter.innerHTML = `<option value="">${translate('employees.all')}</option>`;
   names.forEach(name => {
     const opt = document.createElement('option');
     opt.value = name;

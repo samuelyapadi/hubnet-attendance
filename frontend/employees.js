@@ -133,7 +133,6 @@ async function applyCombinedFilters() {
     return !hasResigned && u.department === dept;
   });
 
-  const name = document.getElementById('employeeNameFilter')?.value;
   if (name) {
     filteredUsers = filteredUsers.filter(u => u.name === name);
   }

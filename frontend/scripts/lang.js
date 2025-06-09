@@ -39,7 +39,7 @@ const translations = {
 
   register: {
     en: {
-      registerTitle: 'Register New Employee',
+      title: 'Register New Employee',
       name: 'Name:',
       department: 'Department:',
       joinDate: 'Join Date:',
@@ -53,7 +53,7 @@ const translations = {
       branding: 'HUBNET Attendance'
     },
     ja: {
-      registerTitle: '新しい社員の登録',
+      title: '新しい社員の登録',
       name: '名前:',
       department: '部署:',
       joinDate: '入社日:',
@@ -114,7 +114,7 @@ const translations = {
       delete: '削除'
     }
   },
-  
+
   admin: {
   en: {
     title: 'Admin Panel – Currently Logged-In Employees',

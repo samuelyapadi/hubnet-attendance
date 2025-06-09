@@ -39,7 +39,7 @@ const translations = {
 
   register: {
     en: {
-      title: 'Register New Employee',
+      registerTitle: 'Register New Employee',
       name: 'Name:',
       department: 'Department:',
       joinDate: 'Join Date:',
@@ -53,7 +53,7 @@ const translations = {
       branding: 'HUBNET Attendance'
     },
     ja: {
-      title: '新しい社員の登録',
+      registerTitle: '新しい社員の登録',
       name: '名前:',
       department: '部署:',
       joinDate: '入社日:',
@@ -113,7 +113,56 @@ const translations = {
       save: '保存',
       delete: '削除'
     }
+  },
+  
+  admin: {
+  en: {
+    title: 'Admin Panel – Currently Logged-In Employees',
+    branding: 'HUBNET Attendance',
+    employeeList: 'Employees List',
+    leaveManagement: '+ Input Work / Leave',
+    activeSessions: 'Current Active Sessions',
+    sortByDept: 'Sort by Department:',
+    all: 'All',
+    name: 'Name',
+    department: 'Department',
+    checkInTime: 'Check-In Time',
+    backToHome: '← Back to Home',
+    manualInputTitle: 'Input Work / Leave',
+    employee: 'Employee:',
+    checkIn: 'Check-In:',
+    checkOut: 'Check-Out:',
+    type: 'Type:',
+    work: 'Work',
+    paidLeave: 'Paid Leave',
+    unpaidLeave: 'Unpaid Leave',
+    submit: 'Submit',
+    cancel: 'Cancel'
+  },
+  ja: {
+    title: '管理画面 – 現在出勤中の社員',
+    branding: 'HUBNET勤怠管理',
+    employeeList: '社員リスト',
+    leaveManagement: '勤務・休暇を入力',
+    activeSessions: '現在の出勤状況',
+    sortByDept: '部署で並び替え:',
+    all: '全て',
+    name: '名前',
+    department: '部署',
+    checkInTime: '出勤時間',
+    backToHome: '← ホームに戻る',
+    manualInputTitle: '勤務・休暇の入力',
+    employee: '社員:',
+    checkIn: '出勤:',
+    checkOut: '退勤:',
+    type: '種別:',
+    work: '勤務',
+    paidLeave: '有給休暇',
+    unpaidLeave: '無給休暇',
+    submit: '送信',
+    cancel: 'キャンセル'
   }
+}
 };
 
 export function setLanguage(lang) {

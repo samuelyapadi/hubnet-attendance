@@ -4,39 +4,39 @@
   <link rel="stylesheet" href="styles/styles.css" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel – Currently Logged-In Employees</title>
+  <title data-i18n="title">Admin Panel – Currently Logged-In Employees</title>
 </head>
 <body>
   <!-- 🔝 Sticky Navigation Bar -->
   <header class="top-nav">
     <img src="images/hubnetblack.jpg" alt="Logo" class="logo" />
-    <h1>HUBNET Attendance</h1>
+    <h1 data-i18n="branding" class="logo-title">HUBNET Attendance</h1>
   </header>
 
   <div style="height: 24px;"></div>
 
   <!-- 🔘 Navigation -->
   <div style="margin-bottom: 2rem;">
-    <a href="employees.html" class="btn">Employees List</a><br><br>
-    <button id="inputWorkLeaveBtn" class="btn">+ Input Work / Leave</button>
+    <a href="employees.html" class="btn" data-i18n="employeeList">Employees List</a><br><br>
+    <button id="inputWorkLeaveBtn" class="btn" data-i18n="leaveManagement">+ Input Work / Leave</button>
   </div>
 
   <!-- 📊 Attendance Tab -->
   <div id="attendanceTab" class="tab-section active">
     <section>
-      <h2>Current Active Sessions</h2>
+      <h2 data-i18n="activeSessions">Current Active Sessions</h2>
       <label style="margin-bottom: 1rem; display: inline-block;">
-        Sort by Department:
+        <span data-i18n="sortByDept">Sort by Department:</span>
         <select id="sortDepartment" style="font-size: 14px; padding: 4px 8px;">
-          <option value="">All</option>
+          <option value="" data-i18n="all">All</option>
         </select>
       </label>
       <table id="activeTable">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Department</th>
-            <th>Check-In Time</th>
+            <th data-i18n="name">Name</th>
+            <th data-i18n="department">Department</th>
+            <th data-i18n="checkInTime">Check-In Time</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -46,7 +46,7 @@
 
   <!-- 🔙 Back to Home -->
   <div style="text-align: center; margin-top: 2rem;">
-    <a href="index.html" style="
+    <a href="index.html" class="btn" style="
       font-size: 14px;
       padding: 6px 12px;
       background: black;
@@ -54,46 +54,52 @@
       border: 1px solid #000;
       border-radius: 6px;
       text-decoration: none;
-      display: inline-block;">
+      display: inline-block;" data-i18n="backToHome">
       ← Back to Home
     </a>
   </div>
 
   <!-- 📝 Modal for Input -->
   <div id="manualInputModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
-    <h3>Input Work / Leave</h3>
+    <h3 data-i18n="manualInputTitle">Input Work / Leave</h3>
     <form id="manualInputForm">
-      <label style="display: flex; align-items: center; gap: 1rem;">Employee:
+      <label style="display: flex; align-items: center; gap: 1rem;">
+        <span data-i18n="employee">Employee:</span>
         <select id="manualName" required style="flex: 1;"></select>
       </label><br><br>
-      <label>Check-In:
+
+      <label><span data-i18n="checkIn">Check-In:</span>
         <input type="datetime-local" id="manualCheckIn" required>
       </label><br><br>
-      <label>Check-Out:
+
+      <label><span data-i18n="checkOut">Check-Out:</span>
         <input type="datetime-local" id="manualCheckOut" required>
       </label><br><br>
-      <label>Type:
+
+      <label><span data-i18n="type">Type:</span>
         <select id="manualType">
-          <option value="work">Work</option>
-          <option value="paid_leave">Paid Leave</option>
-          <option value="unpaid_leave">Unpaid Leave</option>
+          <option value="work" data-i18n="work">Work</option>
+          <option value="paid_leave" data-i18n="paidLeave">Paid Leave</option>
+          <option value="unpaid_leave" data-i18n="unpaidLeave">Unpaid Leave</option>
         </select>
       </label><br><br>
 
-      <button type="submit" class="btn">Submit</button>
-      <button type="button" class="btn" onclick="document.getElementById('manualInputModal').style.display='none'">Cancel</button>
+      <button type="submit" class="btn" data-i18n="submit">Submit</button>
+      <button type="button" class="btn" onclick="document.getElementById('manualInputModal').style.display='none'" data-i18n="cancel">Cancel</button>
     </form>
   </div>
 
   <!-- 🧠 JS Modules -->
   <script type="module">
     import { fetchAndRenderAttendance, setupActiveTableSorting } from './attendance.js';
+    import { applyTranslations } from './scripts/lang.js';
 
     window.fetchAndRenderAttendance = fetchAndRenderAttendance;
     window.setupActiveTableSorting = setupActiveTableSorting;
 
     document.addEventListener('DOMContentLoaded', async () => {
-      const manualType = document.getElementById('manualType');
+      const lang = localStorage.getItem('lang') || 'en';
+      applyTranslations('admin', lang);
 
       setupActiveTableSorting();
       fetchAndRenderAttendance();

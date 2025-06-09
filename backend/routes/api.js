@@ -5,7 +5,7 @@ const Attendance = require('../models/Attendance');
 const Leave = require('../models/Leave');
 const Admin = require('../models/Admin');
 
-router.post('/api/admins/grant', async (req, res) => {
+router.post('/admins/grant', async (req, res) => {
   const { userId, username, password } = req.body;
   if (!userId || !username || !password) {
     return res.status(400).json({ success: false, message: 'Missing fields' });
@@ -30,7 +30,7 @@ router.post('/api/admins/grant', async (req, res) => {
 });
 
 // Reset admin password
-router.patch('/api/admins/reset-password', async (req, res) => {
+router.patch('/admins/reset-password', async (req, res) => {
   const { userId, password } = req.body;
   if (!userId || !password) {
     return res.status(400).json({ success: false, message: 'Missing fields' });
@@ -52,7 +52,7 @@ router.patch('/api/admins/reset-password', async (req, res) => {
 });
 
 // Admin login
-router.post('/api/admins/login', async (req, res) => {
+router.post('/admins/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ success: false, message: 'Missing credentials' });

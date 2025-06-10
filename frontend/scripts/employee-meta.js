@@ -2,36 +2,49 @@
 import { toLocalDatetimeString, toISOStringLocal } from './utils-datetime.js';
 
 export function setupMetaListeners(employeeId, employeeName) {
-  document.getElementById('editIsShiftWorker').addEventListener('change', () => {
-    const isShift = document.getElementById('editIsShiftWorker').value === '1';
-    document.getElementById('monthlyShiftContainer').style.display = isShift ? 'block' : 'none';
-  });
+  const shiftSelect = document.getElementById('editIsShiftWorker');
+  if (shiftSelect) {
+    shiftSelect.addEventListener('change', () => {
+      const isShift = shiftSelect.value === '1';
+      const container = document.getElementById('monthlyShiftContainer');
+      if (container) container.style.display = isShift ? 'block' : 'none';
+    });
+  }
 
-  document.getElementById('shiftMonth')?.addEventListener('change', () => {
-    const month = document.getElementById('shiftMonth').value;
-    if (!employeeId || !month) return;
+  const shiftMonth = document.getElementById('shiftMonth');
+  if (shiftMonth) {
+    shiftMonth.addEventListener('change', () => {
+      const month = shiftMonth.value;
+      if (!employeeId || !month) return;
 
-    fetch(`/api/shifts/${employeeId}/${month}`)
-      .then(res => res.json())
-      .then(data => {
-        if (!data?.shifts) return;
-        document.getElementById('shiftMon').value = data.shifts.Mon || '';
-        document.getElementById('shiftTue').value = data.shifts.Tue || '';
-        document.getElementById('shiftWed').value = data.shifts.Wed || '';
-        document.getElementById('shiftThu').value = data.shifts.Thu || '';
-        document.getElementById('shiftFri').value = data.shifts.Fri || '';
-        document.getElementById('shiftSat').value = data.shifts.Sat || '';
-        document.getElementById('shiftSun').value = data.shifts.Sun || '';
-      });
-  });
+      fetch(`/api/shifts/${employeeId}/${month}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data?.shifts) return;
+          document.getElementById('shiftMon')?.value = data.shifts.Mon || '';
+          document.getElementById('shiftTue')?.value = data.shifts.Tue || '';
+          document.getElementById('shiftWed')?.value = data.shifts.Wed || '';
+          document.getElementById('shiftThu')?.value = data.shifts.Thu || '';
+          document.getElementById('shiftFri')?.value = data.shifts.Fri || '';
+          document.getElementById('shiftSat')?.value = data.shifts.Sat || '';
+          document.getElementById('shiftSun')?.value = data.shifts.Sun || '';
+        });
+    });
+  }
 
-  document.getElementById('saveEmployeeBtn')?.addEventListener('click', () => {
-    saveEmployeeInfo(employeeId, employeeName);
-  });
+  const saveEmployeeBtn = document.getElementById('saveEmployeeBtn');
+  if (saveEmployeeBtn) {
+    saveEmployeeBtn.addEventListener('click', () => {
+      saveEmployeeInfo(employeeId, employeeName);
+    });
+  }
 
-  document.getElementById('saveShiftBtn')?.addEventListener('click', () => {
-    saveMonthlyShift(employeeId);
-  });
+  const saveShiftBtn = document.getElementById('saveShiftBtn');
+  if (saveShiftBtn) {
+    saveShiftBtn.addEventListener('click', () => {
+      saveMonthlyShift(employeeId);
+    });
+  }
 }
 
 function saveEmployeeInfo(employeeId, employeeName) {

@@ -6,76 +6,104 @@ import { toLocalDatetimeString } from './utils-datetime.js';
 
 let employeeId = null;
 
-const params = new URLSearchParams(window.location.search);
-const employeeName = params.get('name');
-document.getElementById('employeeName').textContent = `Logs for: ${employeeName}`;
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const employeeName = params.get('name');
+  const employeeNameEl = document.getElementById('employeeName');
+  if (employeeNameEl) employeeNameEl.textContent = `Logs for: ${employeeName}`;
 
-fetch('/api/users')
-  .then(res => res.json())
-  .then(users => {
-    const match = users.find(u => decodeURIComponent(u.name.trim()) === decodeURIComponent(employeeName.trim()));
-    if (!match) return;
-    employeeId = match._id;
-    window.employeeId = employeeId; // ✅ Make employeeId globally accessible
-    return fetch(`/api/users/${employeeId}`);
-  })
-  .then(res => res.json())
-  .then(user => {
-    if (!user) return;
+  fetch('/api/users')
+    .then(res => res.json())
+    .then(users => {
+      const match = users.find(u => decodeURIComponent(u.name.trim()) === decodeURIComponent(employeeName.trim()));
+      if (!match) return;
+      employeeId = match._id;
+      window.employeeId = employeeId;
+      return fetch(`/api/users/${employeeId}`);
+    })
+    .then(res => res.json())
+    .then(user => {
+      if (!user) return;
 
-    const userDefaultStartTime = user.defaultStartTime || null;
-    const userIsShiftWorker = user.isShiftWorker || false;
+      const userDefaultStartTime = user.defaultStartTime || null;
+      const userIsShiftWorker = user.isShiftWorker || false;
 
-    window.userDefaultStartTime = userDefaultStartTime;
-    window.userIsShiftWorker = userIsShiftWorker;
+      window.userDefaultStartTime = userDefaultStartTime;
+      window.userIsShiftWorker = userIsShiftWorker;
 
-    if (user.joinDate) {
-      document.getElementById('editJoinDate').value = new Date(user.joinDate).toISOString().slice(0, 10);
-    }
+      const joinDateEl = document.getElementById('editJoinDate');
+      if (joinDateEl && user.joinDate) {
+        joinDateEl.value = new Date(user.joinDate).toISOString().slice(0, 10);
+      }
 
-    document.getElementById('employmentTypeDisplay').textContent = user.isPartTime ? 'Part-Time' : 'Full-Time';
-    document.getElementById('editIsPartTime').value = user.isPartTime ? "1" : "0";
+      const employmentTypeDisplayEl = document.getElementById('employmentTypeDisplay');
+      if (employmentTypeDisplayEl) {
+        employmentTypeDisplayEl.textContent = user.isPartTime ? 'Part-Time' : 'Full-Time';
+      }
 
-    document.getElementById('defaultStartTime').value = user.defaultStartTime || '';
+      const isPartTimeEl = document.getElementById('editIsPartTime');
+      if (isPartTimeEl) {
+        isPartTimeEl.value = user.isPartTime ? "1" : "0";
+      }
 
-    if (user.isPartTime) {
-      document.getElementById('editWorkingDaysContainer').style.display = 'block';
-      document.getElementById('editWeeklyWorkingDays').value = user.weeklyWorkingDays || "1";
-    } else {
-      document.getElementById('editWorkingDaysContainer').style.display = 'none';
-    }
+      const defaultStartTimeEl = document.getElementById('defaultStartTime');
+      if (defaultStartTimeEl) {
+        defaultStartTimeEl.value = user.defaultStartTime || '';
+      }
 
-    document.getElementById('shiftWorkerDisplay').textContent = user.isShiftWorker ? 'Yes' : 'No';
-    document.getElementById('editIsShiftWorker').value = user.isShiftWorker ? "1" : "0";
-    document.getElementById('monthlyShiftContainer').style.display = user.isShiftWorker ? 'block' : 'none';
+      const workingDaysContainer = document.getElementById('editWorkingDaysContainer');
+      const workingDaysInput = document.getElementById('editWeeklyWorkingDays');
+      if (workingDaysContainer && workingDaysInput) {
+        if (user.isPartTime) {
+          workingDaysContainer.style.display = 'block';
+          workingDaysInput.value = user.weeklyWorkingDays || "1";
+        } else {
+          workingDaysContainer.style.display = 'none';
+        }
+      }
 
-    return fetch('/api/sessions/all');
-  })
-  .then(res => res.json())
-  .then(data => {
-    const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-    populateYearMonthFilters(allRecords);
+      const shiftWorkerDisplayEl = document.getElementById('shiftWorkerDisplay');
+      if (shiftWorkerDisplayEl) {
+        shiftWorkerDisplayEl.textContent = user.isShiftWorker ? 'Yes' : 'No';
+      }
 
-    renderLogTable(allRecords);
+      const isShiftWorkerEl = document.getElementById('editIsShiftWorker');
+      if (isShiftWorkerEl) {
+        isShiftWorkerEl.value = user.isShiftWorker ? "1" : "0";
+      }
 
-    // Register button and shift listeners
-    setupMetaListeners(employeeId, employeeName);
+      const monthlyShiftContainer = document.getElementById('monthlyShiftContainer');
+      if (monthlyShiftContainer) {
+        monthlyShiftContainer.style.display = user.isShiftWorker ? 'block' : 'none';
+      }
 
-    // Make accessible for inline handlers in employee-details.js
-    window.allRecords = allRecords;
-    window.employeeName = employeeName;
-    window.applyFilterAndRender = () => applyFilterAndRender(allRecords);
+      return fetch('/api/sessions/all');
+    })
+    .then(res => res.json())
+    .then(data => {
+      const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
+      populateYearMonthFilters(allRecords);
 
-    return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
-  })
-  .catch(err => {
-    console.error('[Employee Load Error]', err);
-    document.getElementById('leaveBalance').textContent = '-';
-  });
+      renderLogTable(allRecords);
+      setupMetaListeners(employeeId, employeeName);
+
+      window.allRecords = allRecords;
+      window.employeeName = employeeName;
+      window.applyFilterAndRender = () => applyFilterAndRender(allRecords);
+
+      return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
+    })
+    .then(res => res.json())
+    .then(data => {
+      const leaveEl = document.getElementById('leaveBalance');
+      if (leaveEl) leaveEl.textContent = data.formatted || '0d 0h';
+    })
+    .catch(err => {
+      console.error('[Employee Load Error]', err);
+      const leaveEl = document.getElementById('leaveBalance');
+      if (leaveEl) leaveEl.textContent = '-';
+    });
+});
 
 function populateYearMonthFilters(records) {
   const yearSet = new Set();
@@ -94,23 +122,27 @@ function populateYearMonthFilters(records) {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  yearSelect.innerHTML = `<option value="">All Years</option>` +
-    [...yearSet].sort((a, b) => b - a).map(y => `<option value="${y}">${y}</option>`).join('');
+  if (yearSelect) {
+    yearSelect.innerHTML = `<option value="">All Years</option>` +
+      [...yearSet].sort((a, b) => b - a).map(y => `<option value="${y}">${y}</option>`).join('');
+    yearSelect.addEventListener('change', () => applyFilterAndRender(records));
+  }
 
-  monthSelect.innerHTML = `<option value="">All Months</option>` +
-    [...monthSet].sort((a, b) => a - b)
-      .map(m => `<option value="${m}">${monthNames[m]}</option>`)
-      .join('');
+  if (monthSelect) {
+    monthSelect.innerHTML = `<option value="">All Months</option>` +
+      [...monthSet].sort((a, b) => a - b)
+        .map(m => `<option value="${m}">${monthNames[m]}</option>`)
+        .join('');
+    monthSelect.addEventListener('change', () => applyFilterAndRender(records));
+  }
 
-  yearSelect.addEventListener('change', () => applyFilterAndRender(records));
-  monthSelect.addEventListener('change', () => applyFilterAndRender(records));
   document.getElementById('startDate')?.addEventListener('change', () => applyFilterAndRender(records));
   document.getElementById('endDate')?.addEventListener('change', () => applyFilterAndRender(records));
 }
 
 function applyFilterAndRender(records) {
-  const year = document.getElementById('yearFilter').value;
-  const month = document.getElementById('monthFilter').value;
+  const year = document.getElementById('yearFilter')?.value;
+  const month = document.getElementById('monthFilter')?.value;
   const startDateVal = document.getElementById('startDate')?.value;
   const endDateVal = document.getElementById('endDate')?.value;
   const startDate = startDateVal ? new Date(startDateVal) : null;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employee Check-In Records</title>
+  <title data-i18n="employee-details.pageTitle">Employee Check-In Records</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -58,57 +58,59 @@
   <!-- 🔍 Filter Summary -->
   <div class="summary">
     <div>
-      <label for="yearFilter">Year:</label>
+      <label for="yearFilter" data-i18n="employee-details.year"></label>
       <select id="yearFilter"></select>
 
-      <label for="monthFilter">Month:</label>
+      <label for="monthFilter" data-i18n="employee-details.month"></label>
       <select id="monthFilter"></select>
 
-      <label for="startDate">Start Date:</label>
+      <label for="startDate" data-i18n="employee-details.startDate"></label>
       <input type="date" id="startDate">
 
-      <label for="endDate">End Date:</label>
+      <label for="endDate" data-i18n="employee-details.endDate"></label>
       <input type="date" id="endDate">
     </div>
-    <p>Total sessions: <span id="sessionCount">0</span></p>
-    <p>Total overtime: <span id="overtimeCount">0h 0m</span></p>
+    <p><span data-i18n="employee-details.totalSessions"></span> <span id="sessionCount">0</span></p>
+    <p><span data-i18n="employee-details.totalOvertime"></span> <span id="overtimeCount">0h 0m</span></p>
   </div>
 
   <!-- 📊 Session Table -->
    <!-- ➕ Toggle Create Session -->
 <div style="margin-top: 1rem;">
-  <button id="openCreateSessionModal" class="btn">＋ Create Session</button>
+  <button id="openCreateSessionModal" class="btn" data-i18n="employee-details.openCreateSession"></button>
 </div>
 
 <!-- 📝 Modal for Session Creation -->
 <div id="createSessionModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
-  <h3>Create Manual Session</h3>
-  <label>Type:
-    <select id="sessionType">
-      <option value="work">Work</option>
-      <option value="leave">Paid Leave</option>
-      <option value="unpaid">Unpaid Leave</option>
-    </select>
-  </label><br><br>
-  <label>Check-in:
-    <input type="datetime-local" id="manualCheckIn">
-  </label><br><br>
-  <label>Check-out:
-    <input type="datetime-local" id="manualCheckOut">
-  </label><br><br>
-  <button id="createSessionBtn" class="btn">Submit</button>
-  <button type="button" class="btn" onclick="document.getElementById('createSessionModal').style.display='none'">Cancel</button>
+<h3 data-i18n="employee-details.createSessionTitle"></h3>
+
+<label data-i18n="employee-details.type"></label>
+<select id="sessionType">
+  <option value="work" data-i18n="employee-details.work"></option>
+  <option value="leave" data-i18n="employee-details.paidLeave"></option>
+  <option value="unpaid" data-i18n="employee-details.unpaidLeave"></option>
+</select><br><br>
+
+<label data-i18n="employee-details.checkIn"></label>
+<input type="datetime-local" id="manualCheckIn"><br><br>
+
+<label data-i18n="employee-details.checkOut"></label>
+<input type="datetime-local" id="manualCheckOut"><br><br>
+
+<button id="createSessionBtn" class="btn" data-i18n="employee-details.submit"></button>
+<button type="button" class="btn" data-i18n="employee-details.cancel" onclick="document.getElementById('createSessionModal').style.display='none'"></button>
+
 </div>
   <table>
     <thead>
       <tr>
-        <th>Check In</th>
-        <th>Check Out</th>
-        <th>Worked</th>
-        <th>Overtime</th>
-        <th>Type</th>
-        <th>Night Work</th>
-        <th>Actions</th>
+        <th data-i18n="employee-details.table.checkIn"></th>
+        <th data-i18n="employee-details.table.checkOut"></th>
+        <th data-i18n="employee-details.table.worked"></th>
+        <th data-i18n="employee-details.table.overtime"></th>
+        <th data-i18n="employee-details.table.type"></th>
+        <th data-i18n="employee-details.table.night"></th>
+        <th data-i18n="employee-details.table.actions"></th>
       </tr>
     </thead>
     <tbody id="logTable"></tbody>
@@ -116,49 +118,52 @@
 
   <!-- 🧑‍💼 Employment Info -->
   <section>
-    <h2>Employment Info</h2>
-    <label>Join Date:
+    <h2 data-i18n="employee-details.employmentTitle"></h2>
+
+    <label data-i18n="employee-details.joinDate">
       <input type="date" id="editJoinDate" />
     </label><br/>
 
-    <label>Employment Type:
+    <label data-i18n="employee-details.employmentType">
       <select id="editIsPartTime">
-        <option value="0">Full-Time</option>
-        <option value="1">Part-Time</option>
+        <option value="0" data-i18n="employee-details.fullTime"></option>
+        <option value="1" data-i18n="employee-details.partTime"></option>
       </select>
     </label><br/>
 
     <div id="editWorkingDaysContainer" style="display:none;">
-      <label>Weekly Working Days:
+      <label data-i18n="employee-details.weeklyDays">
         <input type="number" id="editWeeklyWorkingDays" min="1" max="6" />
       </label><br/>
     </div>
 
-    <label>Default Start Time:
+    <label data-i18n="employee-details.defaultStartTime">
       <input type="time" id="defaultStartTime" />
     </label><br/>
 
-    <label>Shift Worker:
+    <label data-i18n="employee-details.shiftWorker">
       <select id="editIsShiftWorker">
-        <option value="0">No</option>
-        <option value="1">Yes</option>
+        <option value="0" data-i18n="employee-details.no"></option>
+        <option value="1" data-i18n="employee-details.yes"></option>
       </select>
     </label><br/>
 
-    <p>Employment Type: <span id="employmentTypeDisplay">-</span></p>
-    <p>Shift Worker: <span id="shiftWorkerDisplay">-</span></p>
-    <p>Leave Balance: <span id="leaveBalance">-</span></p>
+    <p><span data-i18n="employee-details.employmentTypeDisplay"></span> <span id="employmentTypeDisplay">-</span></p>
+    <p><span data-i18n="employee-details.shiftWorkerDisplay"></span> <span id="shiftWorkerDisplay">-</span></p>
+    <p><span data-i18n="employee-details.leaveBalance"></span> <span id="leaveBalance">-</span></p>
 
-    <button id="saveEmployeeBtn" class="btn">💾 Save Info</button>
-  </section>
+    <button id="saveEmployeeBtn" class="btn" data-i18n="employee-details.saveInfo"></button>
+
+      </section>
 
 <!-- 📅 Monthly Shift Setup -->
 <section id="monthlyShiftContainer" style="display:none;">
-  <h2>Monthly Shift Assignment</h2>
-  <label for="shiftMonth">Month:</label>
+  <h2 data-i18n="employee-details.shiftAssignment"></h2>
+
+  <label for="shiftMonth" data-i18n="employee-details.shiftMonth"></label>
   <input type="month" id="shiftMonth"><br/><br/>
 
-  <label for="shiftMon">Monday:</label>
+  <label for="shiftMon" data-i18n="employee-details.monday"></label>
   <select id="shiftMon">
     <option value="">--</option>
     <option value="1">1 - 08:30</option>
@@ -168,7 +173,7 @@
     <option value="5">5 - 23:50</option>
   </select><br>
 
-  <label for="shiftTue">Tuesday:</label>
+  <label for="shiftTue" data-i18n="employee-details.tuesday"></label>
   <select id="shiftTue">
     <option value="">--</option>
     <option value="1">1 - 08:30</option>
@@ -178,7 +183,7 @@
     <option value="5">5 - 23:50</option>
   </select><br>
 
-  <label for="shiftWed">Wednesday:</label>
+  <label for="shiftWed" data-i18n="employee-details.wednesday"></label>
   <select id="shiftWed">
     <option value="">--</option>
     <option value="1">1 - 08:30</option>
@@ -188,7 +193,7 @@
     <option value="5">5 - 23:50</option>
   </select><br>
 
-  <label for="shiftThu">Thursday:</label>
+  <label for="shiftThu" data-i18n="employee-details.thursday"></label>
   <select id="shiftThu">
     <option value="">--</option>
     <option value="1">1 - 08:30</option>
@@ -198,7 +203,7 @@
     <option value="5">5 - 23:50</option>
   </select><br>
 
-  <label for="shiftFri">Friday:</label>
+  <label for="shiftFri" data-i18n="employee-details.friday"></label>
   <select id="shiftFri">
     <option value="">--</option>
     <option value="1">1 - 08:30</option>
@@ -208,7 +213,7 @@
     <option value="5">5 - 23:50</option>
   </select><br>
 
-  <label for="shiftSat">Saturday:</label>
+  <label for="shiftSat" data-i18n="employee-details.saturday"></label>
   <select id="shiftSat">
     <option value="">--</option>
     <option value="1">1 - 08:30</option>
@@ -218,7 +223,7 @@
     <option value="5">5 - 23:50</option>
   </select><br>
 
-  <label for="shiftSun">Sunday:</label>
+  <label for="shiftSun" data-i18n="employee-details.sunday"></label>
   <select id="shiftSun">
     <option value="">--</option>
     <option value="1">1 - 08:30</option>
@@ -228,7 +233,7 @@
     <option value="5">5 - 23:50</option>
   </select><br><br>
 
-  <button id="saveShiftBtn" class="btn">💾 Save Shift</button>
+  <button id="saveShiftBtn" class="btn" data-i18n="employee-details.saveShift"></button>
 </section>
 
   <!-- 📦 Modular Scripts -->

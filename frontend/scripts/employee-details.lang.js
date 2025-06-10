@@ -37,6 +37,8 @@ export const employeeDetailsLang = {
     shiftAssignTitle: "Monthly Shift Assignment",
     shiftMonth: "Month:",
     saveShift: "💾 Save Shift",
+    openCreateSession: "＋ Create Session",
+    pageTitle: "Employee Check-In Records",
     table: {
       checkIn: "Check In",
       checkOut: "Check Out",
@@ -85,6 +87,8 @@ export const employeeDetailsLang = {
     shiftAssignTitle: "月間シフト割当",
     shiftMonth: "対象月:",
     saveShift: "💾 シフト保存",
+    openCreateSession: "＋ 勤務を追加",
+    pageTitle: "社員の勤務記録",
     table: {
       checkIn: "出勤",
       checkOut: "退勤",

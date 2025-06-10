@@ -89,7 +89,8 @@ const translations = {
       actions: 'Actions',
       edit: 'Edit',
       save: 'Save',
-      delete: 'Delete'
+      delete: 'Delete',
+      selectDeptNotice: '⚠️ Please select a department to view employee data.'
     },
     ja: {
       title: '社員一覧',
@@ -111,7 +112,8 @@ const translations = {
       actions: '操作',
       edit: '編集',
       save: '保存',
-      delete: '削除'
+      delete: '削除',
+      selectDeptNotice: '⚠️ 部署を選択してください（社員データを表示するには必要です）'
     }
   },
 

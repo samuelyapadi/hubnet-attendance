@@ -80,7 +80,8 @@ function renderUIContainer() {
 
   const notice = document.createElement('div');
     notice.id = 'deptNotice';
-    notice.textContent = '⚠️ Please select a department to view employee data.';
+    notice.setAttribute('data-i18n', 'employees.selectDeptNotice');
+    notice.textContent = translate('employees.selectDeptNotice');
     notice.style.color = 'red';
     notice.style.marginBottom = '1rem';
     notice.style.display = 'none';

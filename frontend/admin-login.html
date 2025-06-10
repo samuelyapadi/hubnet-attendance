@@ -60,7 +60,7 @@
 
       const result = await res.json();
       if (result.success) {
-        localStorage.setItem('role', 'admin');
+        sessionStorage.setItem('role', 'admin');
         location.href = 'admin.html';
       } else {
         document.getElementById('adminLoginError').style.display = 'block';

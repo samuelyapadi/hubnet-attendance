@@ -61,7 +61,7 @@
   <!-- 🧠 JS Modules -->
   <script type="module">
     // 🔒 Restrict access to admins only
-    if (localStorage.getItem('role') !== 'admin') {
+    if (sessionStorage.getItem('role') !== 'admin') {
       location.href = 'admin-login.html';
     }
 

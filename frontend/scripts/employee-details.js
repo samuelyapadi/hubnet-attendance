@@ -78,7 +78,7 @@ if (userIsShiftWorker) {
       // If late past midnight, add 1440 mins (1 day) to shift time for proper diff
       if (lateMinutes < 0) lateMinutes += 1440;
 
-      lateNote = ` 🚨 Late by ${lateMinutes}m`;
+      lateNote = ' ' + translate('lateNotice', 'employee-details').replace('{min}', lateMinutes);
     }
   }
 } else if (userDefaultStartTime) {
@@ -88,7 +88,7 @@ if (userIsShiftWorker) {
     isLate = checkInMinutes > defaultStartMinutes;
     if (isLate) {
       const lateMinutes = checkInMinutes - defaultStartMinutes;
-      lateNote = ` 🚨 Late by ${lateMinutes}m`;
+      lateNote = ' ' + translate('lateNotice', 'employee-details').replace('{min}', lateMinutes);
     }
     console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);
     console.log('Check-in:', checkIn.toTimeString(), '→', checkInMinutes);
@@ -123,7 +123,7 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
       if (defaultStartMinutes !== null) {
         const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
         const lateMinutes = checkInMinutes - defaultStartMinutes;
-        lateNote = ` 🚨 Late by ${lateMinutes}m`;
+        lateNote = ' ' + translate('lateNotice', 'employee-details').replace('{min}', lateMinutes);
       }
     }
 
@@ -153,16 +153,16 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
       <td class="overtime-cell">${overtime}</td>
       <td>
         <select data-id="${entry._id}" data-type="type" disabled>
-          <option value="work" ${entry.type === 'work' ? 'selected' : ''}>work</option>
-          <option value="leave" ${entry.type === 'leave' ? 'selected' : ''}>leave</option>
-          <option value="unpaid" ${entry.type === 'unpaid' ? 'selected' : ''}>unpaid</option>
+          <option value="work" ${entry.type === 'work' ? 'selected' : ''}>${translate('work', 'employee-details')}</option>
+          <option value="leave" ${entry.type === 'leave' ? 'selected' : ''}>${translate('paidLeave', 'employee-details')}</option>
+          <option value="unpaid" ${entry.type === 'unpaid' ? 'selected' : ''}>${translate('unpaidLeave', 'employee-details')}</option>
         </select>
       </td>
       <td>${nightWork}</td>
       <td>
-        <button class="btn edit-btn" onclick="enableEdit('${entry._id}', this)">✏️ Edit</button>
-        <button class="btn save-btn" onclick="saveSession('${entry._id}')" style="display:none;">📂 Save</button>
-        <button class="btn delete-btn" onclick="deleteSession('${entry._id}')">🗑️ Delete</button>
+        <button class="btn edit-btn" onclick="enableEdit('${entry._id}', this)">✏️ ${translate('edit', 'employees')}</button>
+        <button class="btn save-btn" onclick="saveSession('${entry._id}')" style="display:none;">📂 ${translate('save', 'employees')}</button>
+        <button class="btn delete-btn" onclick="deleteSession('${entry._id}')">🗑️ ${translate('delete', 'employees')}</button>
       </td>
     `;
     tbody.appendChild(row);
@@ -211,7 +211,7 @@ export async function saveSession(sessionId) {
     });
     const result = await res.json();
     if (result.success) {
-      alert('✅ Session updated!');
+    alert(translate('sessionUpdated', 'employee-details'));
       // Update the display values directly without full re-render
       const durationMs = checkOutDate - checkInDate;
       const minutes = Math.max(0, Math.round(durationMs / 60000));

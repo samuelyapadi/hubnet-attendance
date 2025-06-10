@@ -1,6 +1,8 @@
 // lang.js (modularized by page)
+import { employeeDetailsLang } from './employee-details.lang.js';
 
 const translations = {
+  "employee-details": employeeDetailsLang,
   index: {
     en: {
       backToHome: '← Back to Home',

@@ -21,13 +21,11 @@ export function setupMetaListeners(employeeId, employeeName) {
         .then(res => res.json())
         .then(data => {
           if (!data?.shifts) return;
-          document.getElementById('shiftMon')?.value = data.shifts.Mon || '';
-          document.getElementById('shiftTue')?.value = data.shifts.Tue || '';
-          document.getElementById('shiftWed')?.value = data.shifts.Wed || '';
-          document.getElementById('shiftThu')?.value = data.shifts.Thu || '';
-          document.getElementById('shiftFri')?.value = data.shifts.Fri || '';
-          document.getElementById('shiftSat')?.value = data.shifts.Sat || '';
-          document.getElementById('shiftSun')?.value = data.shifts.Sun || '';
+          const dayFields = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+          dayFields.forEach(day => {
+            const input = document.getElementById(`shift${day}`);
+            if (input) input.value = data.shifts[day] || '';
+          });
         });
     });
   }

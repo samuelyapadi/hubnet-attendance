@@ -78,6 +78,14 @@ function renderUIContainer() {
   `;
   app.appendChild(filterBar);
 
+  const notice = document.createElement('div');
+    notice.id = 'deptNotice';
+    notice.textContent = '⚠️ Please select a department to view employee data.';
+    notice.style.color = 'red';
+    notice.style.marginBottom = '1rem';
+    notice.style.display = 'none';
+    app.appendChild(notice);
+
   const table = document.createElement('table');
   table.id = 'employeesTable';
   table.innerHTML = `
@@ -115,11 +123,18 @@ async function applyCombinedFilters() {
   const name = document.getElementById('employeeNameFilter')?.value;
   const startDate = document.getElementById('startDate')?.value;
   const endDate = document.getElementById('endDate')?.value;
+  const notice = document.getElementById('deptNotice');
+  const table = document.getElementById('employeesTable');
 
   if (!dept) {
     populateEmployeesTable([]);
+    if (notice) notice.style.display = 'block';
+    if (table) table.style.opacity = '0.3';
     return;
   }
+
+  if (notice) notice.style.display = 'none';
+  if (table) table.style.opacity = '1';
 
   const params = new URLSearchParams({ dept });
   if (year) params.append('year', year);

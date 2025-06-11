@@ -22,11 +22,27 @@ function populateDepartmentDropdown() {
   const deptSelect = document.getElementById('sortDepartment');
   if (!deptSelect) return;
 
-  const depts = [...new Set(allUsers.map(u => u.department).filter(Boolean))].sort();
-  depts.forEach(dept => {
+  const departments = [
+    'THERMAL', 'SPL', 'IMPORTEXPORT', 'FIELD', 'NARITAOPS',
+    'ART', 'OCEAN', 'BIZDEV', 'IT', 'FINANCE', 'QA', 'HR'
+  ];
+
+  const departmentLabels = {
+    IMPORTEXPORT: '国際航空貨物輸送部',
+    FIELD: 'フィールド部',
+    NARITAOPS: '成田通関部',
+    ART: '美術品輸送部',
+    OCEAN: '海上貨物輸送部',
+    BIZDEV: '事業開発部',
+    FINANCE: '財務経理部',
+    QA: '品質保証部',
+    HR: '人事部'
+  };
+
+  departments.forEach(dept => {
     const opt = document.createElement('option');
     opt.value = dept;
-    opt.textContent = dept;
+    opt.textContent = departmentLabels[dept] || dept;
     deptSelect.appendChild(opt);
   });
 
@@ -42,6 +58,18 @@ function populateActiveTable() {
   if (!selectedDept) {
     return; // Don't render anything until department is selected
   }
+
+  const departmentLabels = {
+    IMPORTEXPORT: '国際航空貨物輸送部',
+    FIELD: 'フィールド部',
+    NARITAOPS: '成田通関部',
+    ART: '美術品輸送部',
+    OCEAN: '海上貨物輸送部',
+    BIZDEV: '事業開発部',
+    FINANCE: '財務経理部',
+    QA: '品質保証部',
+    HR: '人事部'
+  };
 
   const enriched = activeSessions.map(entry => {
     const user = allUsers.find(u => u.name === entry.name);
@@ -62,19 +90,8 @@ function populateActiveTable() {
   sorted.forEach(entry => {
     const row = document.createElement('tr');
     const checkIn = new Date(entry.checkIn);
-    row.innerHTML = `<td>${entry.name}</td><td>${entry.department}</td><td>${checkIn.toLocaleString()}</td>`;
+    const deptLabel = departmentLabels[entry.department] || entry.department;
+    row.innerHTML = `<td>${entry.name}</td><td>${deptLabel}</td><td>${checkIn.toLocaleString()}</td>`;
     tbody.appendChild(row);
-  });
-}
-
-export function setupActiveTableSorting() {
-  const headers = document.querySelectorAll('#activeTable thead th');
-  headers.forEach((th, idx) => {
-    th.style.cursor = 'pointer';
-    th.addEventListener('click', () => {
-      sortKey = idx === 0 ? 'name' : idx === 2 ? 'checkIn' : sortKey;
-      sortDirection = -sortDirection;
-      populateActiveTable();
-    });
   });
 }

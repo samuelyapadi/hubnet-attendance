@@ -117,39 +117,45 @@
   <!-- 🧑‍💼 Employment Info -->
   <section>
     <h2 data-i18n="employee-details.employmentTitle"></h2>
-      <label data-i18n="employee-details.joinDate">
-        <input type="date" id="editJoinDate" />
-      </label><br/>
 
-    <label data-i18n="employee-details.employmentType">
+    <label>
+      <span data-i18n="employee-details.joinDate">Join Date</span>
+      <input type="date" id="editJoinDate" />
+    </label><br/>
+
+    <label>
+      <span data-i18n="employee-details.employmentType">Employment Type</span>
       <select id="editIsPartTime">
-        <option value="0" data-i18n="employee-details.fullTime"></option>
-        <option value="1" data-i18n="employee-details.partTime"></option>
+        <option value="0" data-i18n="employee-details.fullTime">Full-Time</option>
+        <option value="1" data-i18n="employee-details.partTime">Part-Time</option>
       </select>
     </label><br/>
 
     <div id="editWorkingDaysContainer" style="display:none;">
-      <label data-i18n="employee-details.weeklyDays">
+      <label>
+        <span data-i18n="employee-details.weeklyDays">Weekly Working Days</span>
         <input type="number" id="editWeeklyWorkingDays" min="1" max="6" />
       </label><br/>
     </div>
 
-    <label data-i18n="employee-details.defaultStartTime">
+    <label>
+      <span data-i18n="employee-details.defaultStartTime">Default Start Time</span>
       <input type="time" id="defaultStartTime" />
     </label><br/>
 
-    <label data-i18n="employee-details.shiftWorker">
+    <label>
+      <span data-i18n="employee-details.shiftWorker">Shift Worker?</span>
       <select id="editIsShiftWorker">
-        <option value="0" data-i18n="employee-details.no"></option>
-        <option value="1" data-i18n="employee-details.yes"></option>
+        <option value="0" data-i18n="employee-details.no">No</option>
+        <option value="1" data-i18n="employee-details.yes">Yes</option>
       </select>
     </label><br/>
 
-    <p><span data-i18n="employee-details.employmentTypeDisplay"></span> <span id="employmentTypeDisplay">-</span></p>
-    <p><span data-i18n="employee-details.shiftWorkerDisplay"></span> <span id="shiftWorkerDisplay">-</span></p>
-    <p><span data-i18n="employee-details.leaveBalance"></span> <span id="leaveBalance">-</span></p>
+    <p><span data-i18n="employee-details.employmentTypeDisplay">Employment:</span> <span id="employmentTypeDisplay">-</span></p>
+    <p><span data-i18n="employee-details.shiftWorkerDisplay">Shift:</span> <span id="shiftWorkerDisplay">-</span></p>
+    <p><span data-i18n="employee-details.leaveBalance">Paid Leave:</span> <span id="leaveBalance">-</span></p>
 
-    <button id="saveEmployeeBtn" class="btn" data-i18n="employee-details.saveInfo"></button>
+    <button id="saveEmployeeBtn" class="btn" data-i18n="employee-details.saveInfo">Save</button>
   </section>
 
 <!-- 📅 Monthly Shift Setup -->

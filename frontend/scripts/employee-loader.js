@@ -1,5 +1,3 @@
-// employee-loader.js
-
 import { renderLogTable } from './employee-details.js';
 import { setupMetaListeners } from './employee-meta.js';
 import { toLocalDatetimeString } from './utils-datetime.js';
@@ -36,11 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         joinDateEl.value = new Date(user.joinDate).toISOString().slice(0, 10);
       }
 
-      const employmentTypeDisplayEl = document.getElementById('employmentTypeDisplay');
-      if (employmentTypeDisplayEl) {
-        employmentTypeDisplayEl.textContent = user.isPartTime ? 'Part-Time' : 'Full-Time';
-      }
-
       const isPartTimeEl = document.getElementById('editIsPartTime');
       if (isPartTimeEl) {
         isPartTimeEl.value = user.isPartTime ? "1" : "0";
@@ -62,11 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      const shiftWorkerDisplayEl = document.getElementById('shiftWorkerDisplay');
-      if (shiftWorkerDisplayEl) {
-        shiftWorkerDisplayEl.textContent = user.isShiftWorker ? 'Yes' : 'No';
-      }
-
       const isShiftWorkerEl = document.getElementById('editIsShiftWorker');
       if (isShiftWorkerEl) {
         isShiftWorkerEl.value = user.isShiftWorker ? "1" : "0";
@@ -77,18 +65,29 @@ document.addEventListener('DOMContentLoaded', () => {
         monthlyShiftContainer.style.display = user.isShiftWorker ? 'block' : 'none';
       }
 
+      // ✅ Populate Display Fields
+      const employmentTypeDisplayEl = document.getElementById('employmentTypeDisplay');
+      if (employmentTypeDisplayEl) {
+        employmentTypeDisplayEl.textContent = user.isPartTime ? 'Part-Time' : 'Full-Time';
+      }
+
+      const shiftWorkerDisplayEl = document.getElementById('shiftWorkerDisplay');
+      if (shiftWorkerDisplayEl) {
+        shiftWorkerDisplayEl.textContent = user.isShiftWorker ? 'Yes' : 'No';
+      }
+
       return fetch('/api/sessions/all');
     })
     .then(res => res.json())
     .then(data => {
       const allRecords = data.filter(e => e.name === employeeName && e.checkIn && e.checkOut);
-      populateYearMonthFilters(allRecords);
+      window.allRecords = allRecords;
+      window.employeeName = employeeName;
 
+      populateYearMonthFilters(allRecords);
       renderLogTable(allRecords);
       setupMetaListeners(employeeId, employeeName);
 
-      window.allRecords = allRecords;
-      window.employeeName = employeeName;
       window.applyFilterAndRender = () => applyFilterAndRender(allRecords);
 
       return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);

@@ -46,11 +46,11 @@ export function setupMetaListeners(employeeId, employeeName) {
 }
 
 function saveEmployeeInfo(employeeId, employeeName) {
-  const joinDate = document.getElementById('editJoinDate').value;
-  const isPartTime = document.getElementById('editIsPartTime').value === '1';
-  const isShiftWorker = document.getElementById('editIsShiftWorker').value === '1';
-  const weeklyWorkingDays = isPartTime ? Number(document.getElementById('editWeeklyWorkingDays').value) : 5;
-  const defaultStartTime = document.getElementById('defaultStartTime').value;
+  const joinDate = document.getElementById('editJoinDate')?.value;
+  const isPartTime = document.getElementById('editIsPartTime')?.value === '1';
+  const isShiftWorker = document.getElementById('editIsShiftWorker')?.value === '1';
+  const weeklyWorkingDays = isPartTime ? Number(document.getElementById('editWeeklyWorkingDays')?.value) || 1 : 5;
+  const defaultStartTime = document.getElementById('defaultStartTime')?.value;
 
   fetch(`/api/users/${employeeId}`, {
     method: 'PATCH',
@@ -59,37 +59,34 @@ function saveEmployeeInfo(employeeId, employeeName) {
   })
     .then(res => res.json())
     .then(result => {
-      if (result.success) {
-        alert('✅ Employment info updated.');
-        return fetch(`/api/users/${employeeId}`);
-      } else {
-        throw new Error('Failed to update');
-      }
+      if (!result.success) throw new Error('Failed to update employee info');
+      alert('✅ Employment info updated.');
+      return fetch(`/api/users/${employeeId}`);
     })
     .then(res => res.json())
     .then(updatedUser => {
       document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
       document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
 
+      const workingDaysContainer = document.getElementById('editWorkingDaysContainer');
+      const workingDaysInput = document.getElementById('editWeeklyWorkingDays');
+
       if (updatedUser.isPartTime) {
-        document.getElementById('editWorkingDaysContainer').style.display = 'block';
-        document.getElementById('editWeeklyWorkingDays').value = updatedUser.weeklyWorkingDays || '1';
+        workingDaysContainer.style.display = 'block';
+        if (workingDaysInput) workingDaysInput.value = updatedUser.weeklyWorkingDays || '1';
       } else {
-        document.getElementById('editWorkingDaysContainer').style.display = 'none';
+        workingDaysContainer.style.display = 'none';
       }
 
-      if (updatedUser.defaultStartTime) {
-        document.getElementById('defaultStartTime').value = updatedUser.defaultStartTime;
-      }
+      document.getElementById('editIsPartTime').value = updatedUser.isPartTime ? '1' : '0';
+      document.getElementById('editIsShiftWorker').value = updatedUser.isShiftWorker ? '1' : '0';
+      document.getElementById('defaultStartTime').value = updatedUser.defaultStartTime || '';
 
       return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
     })
     .then(res => res.json())
     .then(data => {
-      if (data) {
-        document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
-      }
-      // 🔁 Re-analyze sessions to reflect new shift rules or start time
+      document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
       if (typeof window.analyzeAndRenderSessions === 'function') {
         window.analyzeAndRenderSessions(window.allRecordsRaw || []);
       }
@@ -101,17 +98,17 @@ function saveEmployeeInfo(employeeId, employeeName) {
 }
 
 function saveMonthlyShift(employeeId) {
-  const month = document.getElementById('shiftMonth').value;
+  const month = document.getElementById('shiftMonth')?.value;
   if (!month) return alert('❌ Please select a month');
 
   const shifts = {
-    Mon: document.getElementById('shiftMon').value,
-    Tue: document.getElementById('shiftTue').value,
-    Wed: document.getElementById('shiftWed').value,
-    Thu: document.getElementById('shiftThu').value,
-    Fri: document.getElementById('shiftFri').value,
-    Sat: document.getElementById('shiftSat').value,
-    Sun: document.getElementById('shiftSun').value
+    Mon: document.getElementById('shiftMon')?.value,
+    Tue: document.getElementById('shiftTue')?.value,
+    Wed: document.getElementById('shiftWed')?.value,
+    Thu: document.getElementById('shiftThu')?.value,
+    Fri: document.getElementById('shiftFri')?.value,
+    Sat: document.getElementById('shiftSat')?.value,
+    Sun: document.getElementById('shiftSun')?.value
   };
 
   fetch(`/api/shifts/${employeeId}`, {
@@ -123,7 +120,6 @@ function saveMonthlyShift(employeeId) {
     .then(result => {
       if (result.success) {
         alert('✅ Shift pattern saved!');
-        // 🔁 Immediately re-run analysis
         if (typeof window.analyzeAndRenderSessions === 'function') {
           window.analyzeAndRenderSessions(window.allRecordsRaw || []);
         }

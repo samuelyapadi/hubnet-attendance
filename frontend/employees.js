@@ -173,46 +173,48 @@ function populateEmployeesTable(users) {
     const userId = user._id;
 
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><input type="text" value="${user.name || ''}" disabled></td>
-      <td>
-        <select disabled style="font-size: 13px; padding: 4px 6px;">
-          ${['THERMAL', 'SPL', 'IMPORTEXPORT', 'FIELD', 'NARITAOPS', 'ART', 'OCEAN', 'BIZDEV', 'IT', 'FINANCE', 'QA', 'HR']
-            .map(dept => {
-              const label = ({
-                IMPORTEXPORT: '国際航空貨物輸送部',
-                FIELD: 'フィールド部',
-                NARITAOPS: '成田通関部',
-                ART: '美術品輸送部',
-                OCEAN: '海上貨物輸送部',
-                BIZDEV: '事業開発部',
-                FINANCE: '財務経理部',
-                QA: '品質保証部',
-                HR: '人事部'
-              })[dept] || dept;
-              return `<option value="${dept}" ${user.department === dept ? 'selected' : ''}>${label}</option>`;
-            }).join('')}
-        </select>
-      </td>
-      <td>
-        <button onclick="viewEmployeeLog('${user.name}')" data-i18n="employees.viewLogs">
-          ${translate('viewLogs', section)}
-        </button>
-      </td>
-      <td><input type="text" value="${user.totalOvertime || '0h 0m'}" disabled></td>
-      <td><input type="text" value="${user.remainingLeave || '-'}" disabled></td>
-      <td>
-        <button onclick="enableEdit(this)" data-i18n="employees.edit">
-          ${translate('edit', section)}
-        </button>
-        <button onclick="saveUserEdits('${userId}', this)" style="display:none;" data-i18n="employees.save">
-          ${translate('save', section)}
-        </button>
-        <button onclick="deleteUser('${userId}')" data-i18n="employees.delete">
-          ${translate('delete', section)}
-        </button>
-      </td>
-    `;
+row.setAttribute('data-user-id', userId);
+
+row.innerHTML = `
+  <td><input type="text" value="${user.name || ''}" disabled></td>
+  <td>
+    <select disabled style="font-size: 13px; padding: 4px 6px;">
+      ${['THERMAL', 'SPL', 'IMPORTEXPORT', 'FIELD', 'NARITAOPS', 'ART', 'OCEAN', 'BIZDEV', 'IT', 'FINANCE', 'QA', 'HR']
+        .map(dept => {
+          const label = ({
+            IMPORTEXPORT: '国際航空貨物輸送部',
+            FIELD: 'フィールド部',
+            NARITAOPS: '成田通関部',
+            ART: '美術品輸送部',
+            OCEAN: '海上貨物輸送部',
+            BIZDEV: '事業開発部',
+            FINANCE: '財務経理部',
+            QA: '品質保証部',
+            HR: '人事部'
+          })[dept] || dept;
+          return `<option value="${dept}" ${user.department === dept ? 'selected' : ''}>${label}</option>`;
+        }).join('')}
+    </select>
+  </td>
+  <td>
+    <button onclick="viewEmployeeLog('${user.name}')" data-i18n="employees.viewLogs">
+      ${translate('viewLogs', section)}
+    </button>
+  </td>
+  <td>${user.totalOvertime || '0h 0m'}</td>
+  <td>${user.remainingLeave || '-'}</td>
+  <td>
+    <button onclick="enableEdit(this)" data-i18n="employees.edit">
+      ${translate('edit', section)}
+    </button>
+    <button onclick="saveUserEdits(null, this)" style="display:none;" data-i18n="employees.save">
+      ${translate('save', section)}
+    </button>
+    <button onclick="deleteUser('${userId}')" data-i18n="employees.delete">
+      ${translate('delete', section)}
+    </button>
+  </td>
+`;
 
     tbody.appendChild(row);
   });
@@ -294,16 +296,15 @@ export function enableEdit(button) {
   button.style.display = 'none';
 }
 
-export async function saveUserEdits(userId, button) {
+export async function saveUserEdits(_, button) {
   const row = button.closest('tr');
+  const userId = row.getAttribute('data-user-id');
   const nameInput = row.querySelector('td:nth-child(1) input');
   const deptSelect = row.querySelector('td:nth-child(2) select');
-  const overtimeInput = row.querySelector('td:nth-child(4) input');
 
   const payload = {
     name: nameInput?.value,
-    department: deptSelect?.value,
-    overtime: overtimeInput?.value
+    department: deptSelect?.value
   };
 
   try {

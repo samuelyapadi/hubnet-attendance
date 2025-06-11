@@ -1,3 +1,4 @@
+//api.js
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -380,10 +381,11 @@ router.patch('/sessions/:id', async (req, res) => {
 });
 
 // Update user fields
-// PATCH: Update user fields including employment and shift status
 router.patch('/users/:id', async (req, res) => {
   const { id } = req.params;
   const {
+    name,
+    department,
     joinDate,
     isPartTime,
     weeklyWorkingDays,
@@ -394,6 +396,9 @@ router.patch('/users/:id', async (req, res) => {
   try {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    if (typeof name === 'string') user.name = name;
+    if (typeof department === 'string') user.department = department;
 
     if (joinDate && !isNaN(Date.parse(joinDate))) {
       user.joinDate = new Date(joinDate);

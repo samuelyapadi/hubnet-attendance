@@ -1,12 +1,21 @@
+//leave.js
 let currentEmployeeId = null;
 let currentEmployeeName = null;
+
+function formatLeaveDisplay(hours) {
+  if (hours % 8 === 0) {
+    return `${hours / 8}d`;
+  } else {
+    return `${hours}h`;
+  }
+}
 
 function renderLeaveTable(leaves) {
   const tbody = document.querySelector('#leaveTable tbody');
   tbody.innerHTML = '';
 
   leaves.forEach(leave => {
-    const displayValue = leave.hours % 1 === 0 ? `${leave.hours / 8}d` : `${leave.hours}h`;
+    const displayValue = formatLeaveDisplay(leave.hours);
 
     const tr = document.createElement('tr');
     tr.innerHTML = `

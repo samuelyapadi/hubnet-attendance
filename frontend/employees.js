@@ -172,7 +172,7 @@ function populateEmployeesTable(users) {
   users.forEach(user => {
     const userId = user._id;
 
-    const row = document.createElement('tr');
+const row = document.createElement('tr');
 row.setAttribute('data-user-id', userId);
 
 row.innerHTML = `
@@ -215,6 +215,7 @@ row.innerHTML = `
     </button>
   </td>
 `;
+row.setAttribute('data-user-id', userId);
 
     tbody.appendChild(row);
   });

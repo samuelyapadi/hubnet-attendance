@@ -3,11 +3,14 @@ let currentEmployeeId = null;
 let currentEmployeeName = null;
 
 function formatLeaveDisplay(hours) {
-  if (hours % 8 === 0) {
-    return `${hours / 8}d`;
-  } else {
-    return `${hours}h`;
-  }
+  const fullDays = Math.floor(hours / 8);
+  const remainingHours = +(hours % 8).toFixed(2); // rounds to 2 decimal places
+
+  let result = '';
+  if (fullDays > 0) result += `${fullDays}d`;
+  if (remainingHours > 0) result += `${result ? ' ' : ''}${remainingHours}h`;
+
+  return result || '0h';
 }
 
 function renderLeaveTable(leaves) {

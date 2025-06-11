@@ -735,6 +735,7 @@ router.get('/employees-summary', async (req, res) => {
       const hours = Math.round((remainingHours % 8 + Number.EPSILON) * 2) / 2;
 
       result.push({
+        _id: user._id,
         name: user.name,
         department: user.department,
         totalOvertime: `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`,

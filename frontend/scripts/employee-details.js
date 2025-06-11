@@ -1,7 +1,8 @@
 // employee-details.js
 
 import { toLocalDatetimeString, parseTimeString } from './utils-datetime.js';
-import { applyTranslations, translate } from './lang.js';
+import { employeeDetailsLang } from './employee-details.lang.js';
+import { registerTranslations, applyTranslations } from './lang.js';
 
 export async function renderLogTable(records) {
   const userDefaultStartTime = window.userDefaultStartTime || null;
@@ -352,4 +353,5 @@ window.analyzeAndRenderSessions = () => {
   renderLogTable(window.allRecords);
 };
 
+registerTranslations('employee-details', employeeDetailsLang);
 applyTranslations("employee-details");

@@ -173,10 +173,21 @@ export function setLanguage(lang) {
   localStorage.setItem('lang', lang);
 }
 
+export function registerTranslations(section, obj) {
+  translations[section] = obj;
+}
+
 export function translate(key, section = 'index') {
   const lang = localStorage.getItem('lang') || 'en';
-  const [maybeSection, maybeKey] = key.includes('.') ? key.split('.') : [section, key];
-  return translations[maybeSection]?.[lang]?.[maybeKey] || key;
+  const keys = key.split('.');
+  let value = translations[section]?.[lang];
+
+  for (const k of keys) {
+    if (!value) return key;
+    value = value[k];
+  }
+
+  return value || key;
 }
 
 export function applyTranslations(defaultSection = 'index') {
@@ -194,9 +205,14 @@ export function applyTranslations(defaultSection = 'index') {
       key = parts.slice(1).join('.');
     }
 
-    const translation = translations[section]?.[lang]?.[key];
-    if (translation) {
-      el.textContent = translation;
+    const keys = key.split('.');
+    let value = translations[section]?.[lang];
+
+    for (const k of keys) {
+      if (!value) break;
+      value = value[k];
     }
+
+    if (value) el.textContent = value;
   });
 }

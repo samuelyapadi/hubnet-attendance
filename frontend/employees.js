@@ -247,12 +247,25 @@ function populateFilters(users, sessions) {
   monthSelect.innerHTML = `<option value="">${translate('all', section)}</option>` + 
     [...monthSet].sort((a, b) => a - b).map(m => `<option value="${m}">${monthNames[m]}</option>`).join('');
 
+  // 🆕 Translated department labels
+  const departmentLabels = {
+    IMPORTEXPORT: '国際航空貨物輸送部',
+    FIELD: 'フィールド部',
+    NARITAOPS: '成田通関部',
+    ART: '美術品輸送部',
+    OCEAN: '海上貨物輸送部',
+    BIZDEV: '事業開発部',
+    FINANCE: '財務経理部',
+    QA: '品質保証部',
+    HR: '人事部'
+  };
+
   const depts = [...new Set(users.map(u => u.department).filter(Boolean))].sort();
   deptFilter.innerHTML = `<option value="">${translate('all', section)}</option>`;
   depts.forEach(dept => {
     const opt = document.createElement('option');
     opt.value = dept;
-    opt.textContent = dept;
+    opt.textContent = departmentLabels[dept] || dept;
     deptFilter.appendChild(opt);
   });
 

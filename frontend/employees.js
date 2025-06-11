@@ -2,7 +2,7 @@
 
 import { translate, applyTranslations } from './scripts/lang.js';
 
-const lang = localStorage.getItem('lang') || 'en';
+const section = 'employees';
 document.addEventListener('DOMContentLoaded', () => {
   applyTranslations('employees', lang);
 });
@@ -39,7 +39,7 @@ function renderUIContainer() {
 
   const header = document.createElement('h1');
   header.setAttribute('data-i18n', 'employees.title');
-  header.textContent = translate('employees.title');
+  header.textContent = translate('title', section);
   app.appendChild(header);
 
   const filterBar = document.createElement('div');
@@ -49,39 +49,41 @@ function renderUIContainer() {
   filterBar.style.gap = '1rem';
   filterBar.style.marginBottom = '1rem';
   filterBar.style.alignItems = 'center';
+
   filterBar.innerHTML = `
-    <label data-i18n="employees.startDate">${translate('employees.startDate')}:
-      <input type="date" id="startDate" />
-    </label>
-    <label data-i18n="employees.endDate">${translate('employees.endDate')}:
-      <input type="date" id="endDate" />
-    </label>
-    <label data-i18n="employees.year">${translate('employees.year')}:
-      <select id="yearSelect"></select>
-    </label>
-    <label data-i18n="employees.month">${translate('employees.month')}:
-      <select id="monthSelect"></select>
-    </label>
-    <label data-i18n="employees.department">${translate('employees.department')}:
-      <select id="employeeDeptFilter">
-        <option value="">${translate('employees.all')}</option>
-      </select>
-    </label>
-    <label data-i18n="employees.name">${translate('employees.name')}:
-      <select id="employeeNameFilter">
-        <option value="">${translate('employees.all')}</option>
-      </select>
-    </label>
-    <button onclick="resetEmployeeFilters()" data-i18n="employees.clearAll">
-      ${translate('employees.clearAll')}
-    </button>
-  `;
+  <label data-i18n="${section}.startDate">${translate('startDate', section)}:
+    <input type="date" id="startDate" />
+  </label>
+  <label data-i18n="${section}.endDate">${translate('endDate', section)}:
+    <input type="date" id="endDate" />
+  </label>
+  <label data-i18n="${section}.year">${translate('year', section)}:
+    <select id="yearSelect"></select>
+  </label>
+  <label data-i18n="${section}.month">${translate('month', section)}:
+    <select id="monthSelect"></select>
+  </label>
+  <label data-i18n="${section}.department">${translate('department', section)}:
+    <select id="employeeDeptFilter">
+      <option value="">${translate('all', section)}</option>
+    </select>
+  </label>
+  <label data-i18n="${section}.name">${translate('name', section)}:
+    <select id="employeeNameFilter">
+      <option value="">${translate('all', section)}</option>
+    </select>
+  </label>
+  <button onclick="resetEmployeeFilters()" data-i18n="${section}.clearAll">
+    ${translate('clearAll', section)}
+  </button>
+`;
+
   app.appendChild(filterBar);
 
   const notice = document.createElement('div');
     notice.id = 'deptNotice';
     notice.setAttribute('data-i18n', 'employees.selectDeptNotice');
-    notice.textContent = translate('employees.selectDeptNotice');
+    notice.textContent = translate('selectDeptNotice', section);
     notice.style.color = 'red';
     notice.style.marginBottom = '1rem';
     notice.style.display = 'none';
@@ -90,16 +92,16 @@ function renderUIContainer() {
   const table = document.createElement('table');
   table.id = 'employeesTable';
   table.innerHTML = `
-    <thead>
-      <tr>
-        <th data-i18n="employees.name">${translate('employees.name')}</th>
-        <th data-i18n="employees.department">${translate('employees.department')}</th>
-        <th data-i18n="employees.workHours">${translate('employees.workHours')}</th>
-        <th data-i18n="employees.totalOvertime">${translate('employees.totalOvertime')}</th>
-        <th data-i18n="employees.paidLeaveLeft">${translate('employees.paidLeaveLeft')}</th>
-        <th data-i18n="employees.actions">${translate('employees.actions')}</th>
-      </tr>
-    </thead>
+  <thead>
+    <tr>
+      <th data-i18n="employees.name">${translate('name', section)}</th>
+      <th data-i18n="employees.department">${translate('department', section)}</th>
+      <th data-i18n="employees.workHours">${translate('workHours', section)}</th>
+      <th data-i18n="employees.totalOvertime">${translate('totalOvertime', section)}</th>
+      <th data-i18n="employees.paidLeaveLeft">${translate('paidLeaveLeft', section)}</th>
+      <th data-i18n="employees.actions">${translate('actions', section)}</th>
+    </tr>
+  </thead>
     <tbody></tbody>
   `;
   app.appendChild(table);
@@ -163,6 +165,8 @@ function populateEmployeesTable(users) {
   if (!tbody) return;
   tbody.innerHTML = '';
 
+  const section = 'employees';
+
   users.forEach(user => {
     const userId = user._id;
 
@@ -188,13 +192,23 @@ function populateEmployeesTable(users) {
             }).join('')}
         </select>
       </td>
-      <td><button onclick="viewEmployeeLog('${user.name}')" data-i18n="employees.viewLogs">${translate('employees.viewLogs')}</button></td>
+      <td>
+        <button onclick="viewEmployeeLog('${user.name}')" data-i18n="employees.viewLogs">
+          ${translate('viewLogs', section)}
+        </button>
+      </td>
       <td><input type="text" value="${user.totalOvertime || '0h 0m'}" disabled></td>
       <td><input type="text" value="${user.remainingLeave || '-'}" disabled></td>
       <td>
-        <button onclick="enableEdit(this)" data-i18n="employees.edit">${translate('employees.edit')}</button>
-        <button onclick="saveUserEdits('${userId}', this)" style="display:none;" data-i18n="employees.save">${translate('employees.save')}</button>
-        <button onclick="deleteUser('${userId}')" data-i18n="employees.delete">${translate('employees.delete')}</button>
+        <button onclick="enableEdit(this)" data-i18n="employees.edit">
+          ${translate('edit', section)}
+        </button>
+        <button onclick="saveUserEdits('${userId}', this)" style="display:none;" data-i18n="employees.save">
+          ${translate('save', section)}
+        </button>
+        <button onclick="deleteUser('${userId}')" data-i18n="employees.delete">
+          ${translate('delete', section)}
+        </button>
       </td>
     `;
 

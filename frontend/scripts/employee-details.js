@@ -2,7 +2,7 @@
 
 import { toLocalDatetimeString, parseTimeString } from './utils-datetime.js';
 import { employeeDetailsLang } from './employee-details.lang.js';
-import { registerTranslations, applyTranslations } from './lang.js';
+import { registerTranslations, applyTranslations, translate } from './lang.js'; 
 
 export async function renderLogTable(records) {
   const userDefaultStartTime = window.userDefaultStartTime || null;

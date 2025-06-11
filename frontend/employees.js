@@ -2,6 +2,8 @@
 
 import { translate, applyTranslations } from './scripts/lang.js';
 
+const lang = localStorage.getItem('lang') || 'en';
+
 const section = 'employees';
 document.addEventListener('DOMContentLoaded', () => {
   applyTranslations('employees', lang);
@@ -236,14 +238,14 @@ function populateFilters(users, sessions) {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  yearSelect.innerHTML = `<option value="">${translate('employees.all')}</option>` +
+  yearSelect.innerHTML = `<option value="">${translate('all', section)}</option>` +
     [...yearSet].sort((a, b) => b - a).map(y => `<option value="${y}">${y}</option>`).join('');
 
-  monthSelect.innerHTML = `<option value="">${translate('employees.all')}</option>` + 
+  monthSelect.innerHTML = `<option value="">${translate('all', section)}</option>` + 
     [...monthSet].sort((a, b) => a - b).map(m => `<option value="${m}">${monthNames[m]}</option>`).join('');
 
   const depts = [...new Set(users.map(u => u.department).filter(Boolean))].sort();
-  deptFilter.innerHTML = `<option value="">${translate('employees.all')}</option>`;
+  deptFilter.innerHTML = `<option value="">${translate('all', section)}</option>`;
   depts.forEach(dept => {
     const opt = document.createElement('option');
     opt.value = dept;
@@ -265,7 +267,7 @@ export function updateNameFilterOptions() {
       .map(u => u.name)
   )].sort();
 
-  nameFilter.innerHTML = `<option value="">${translate('employees.all')}</option>`;
+  nameFilter.innerHTML = `<option value="">${translate('all', section)}</option>`;
   names.forEach(name => {
     const opt = document.createElement('option');
     opt.value = name;

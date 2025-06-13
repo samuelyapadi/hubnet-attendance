@@ -1,4 +1,12 @@
 //leave.js
+import { leaveLang } from './leave.lang.js';
+import { registerTranslations, applyTranslations } from './lang.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  registerTranslations('leave', leaveLang);
+  applyTranslations('leave');
+});
+
 let currentEmployeeId = null;
 let currentEmployeeName = null;
 
@@ -25,7 +33,9 @@ function renderLeaveTable(leaves) {
       <td><input type="date" value="${leave.date.split('T')[0]}" data-id="${leave._id}" class="leave-date"></td>
       <td>
         <select data-id="${leave._id}" class="leave-type">
-          ${["paid","unpaid","substitute","childcare","maternity","bereavement","summer","care","injury","other"].map(t => `<option value="${t}" ${leave.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+          ${["paid","unpaid","substitute","childcare","maternity","bereavement","summer","care","injury","other"]
+          .map(t => `<option value="${t}" ${leave.type === t ? 'selected' : ''}>${leaveLang[localStorage.getItem('lang') || 'en'].typeOptions[t]}</option>`)
+          .join('')}
         </select>
       </td>
       <td><input type="text" value="${displayValue}" data-id="${leave._id}" class="leave-hours" style="width:60px;"></td>

@@ -1,3 +1,6 @@
+// register.js
+
+import * as faceapi from 'https://cdn.skypack.dev/face-api.js';
 import { euclideanDistance } from './utils.js';
 import { sendToAPI } from './storage.js';
 
@@ -13,7 +16,6 @@ const workingDaysContainer = document.getElementById('workingDaysContainer');
 const photoCount = document.getElementById('photoCount');
 const status = document.getElementById('status');
 
-// 🔊 Sound elements
 const soundSuccess = new Audio('sounds/success.mp3');
 const soundFail = new Audio('sounds/fail.mp3');
 
@@ -21,6 +23,7 @@ let descriptors = [];
 let snapshots = [];
 let isCapturing = false;
 
+// ✅ Load models before anything
 await Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
   faceapi.nets.faceLandmark68Net.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),

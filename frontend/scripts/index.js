@@ -31,17 +31,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("✅ Face API models loaded");
 
     // Load only what the page needs
-    await import('./scripts/utils.js');
-    await import('./scripts/storage.js');
+    await import('./utils.js');
+    await import('./storage.js');
 
     if (document.getElementById('loginBtn')) {
       console.log("🔐 Loading login logic...");
-      await import('./scripts/login.js');
+      await import('./login.js');
     }
 
     if (document.getElementById('saveUserBtn')) {
       console.log("📝 Loading registration logic...");
-      await import('./scripts/register.js');
+      await import('./register.js');
     }
 
     cameraInitialized = true;

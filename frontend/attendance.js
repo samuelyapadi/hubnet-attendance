@@ -142,6 +142,8 @@ const headers = {
     checkIn: 'Check-In',
     checkOut: 'Check-Out',
     worked: 'Worked (h)',
+    overtime: 'Overtime',
+    nightWork: 'Night Work (h)',
     late: 'Late (min)',
     type: 'Type'
   },
@@ -151,6 +153,8 @@ const headers = {
     checkIn: '出勤時間',
     checkOut: '退勤時間',
     worked: '勤務時間 (h)',
+    overtime: '残業区分',
+    nightWork: '深夜勤務 (h)',
     late: '遅刻 (分)',
     type: '種別'
   }
@@ -162,6 +166,8 @@ const rows = filtered.map(s => ({
   [headers.checkIn]: new Date(s.checkIn).toLocaleString(),
   [headers.checkOut]: s.checkOut ? new Date(s.checkOut).toLocaleString() : '',
   [headers.worked]: s.workedHours ?? '',
+  [headers.overtime]: s.overtimeHours ?? '',
+  [headers.nightWork]: s.nightHours ?? '',
   [headers.late]: s.lateMinutes ?? '',
   [headers.type]: s.type ?? '',
 }));

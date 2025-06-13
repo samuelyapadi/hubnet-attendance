@@ -133,19 +133,43 @@ document.getElementById('downloadExcel')?.addEventListener('click', async () => 
     );
   });
 
-  const rows = filtered.map(s => ({
-    Name: s.name,
-    Department: users.find(u => u.name === s.name)?.department || '',
-    'Check-In': new Date(s.checkIn).toLocaleString(),
-    'Check-Out': s.checkOut ? new Date(s.checkOut).toLocaleString() : '',
-    'Worked (h)': s.workedHours ?? '',
-    'Late (min)': s.lateMinutes ?? '',
-    'Type': s.type ?? '',
-  }));
+const lang = localStorage.getItem('lang') || 'en';
+
+const headers = {
+  en: {
+    name: 'Name',
+    department: 'Department',
+    checkIn: 'Check-In',
+    checkOut: 'Check-Out',
+    worked: 'Worked (h)',
+    late: 'Late (min)',
+    type: 'Type'
+  },
+  ja: {
+    name: '名前',
+    department: '部署',
+    checkIn: '出勤時間',
+    checkOut: '退勤時間',
+    worked: '勤務時間 (h)',
+    late: '遅刻 (分)',
+    type: '種別'
+  }
+}[lang];
+
+const rows = filtered.map(s => ({
+  [headers.name]: s.name,
+  [headers.department]: users.find(u => u.name === s.name)?.department || '',
+  [headers.checkIn]: new Date(s.checkIn).toLocaleString(),
+  [headers.checkOut]: s.checkOut ? new Date(s.checkOut).toLocaleString() : '',
+  [headers.worked]: s.workedHours ?? '',
+  [headers.late]: s.lateMinutes ?? '',
+  [headers.type]: s.type ?? '',
+}));
 
   const sheet = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, sheet, 'Sessions');
 
-  XLSX.writeFile(wb, `Attendance_${Date.now()}.xlsx`);
+const filenamePrefix = lang === 'ja' ? '勤怠記録' : 'Attendance';
+XLSX.writeFile(wb, `${filenamePrefix}_${Date.now()}.xlsx`);
 });

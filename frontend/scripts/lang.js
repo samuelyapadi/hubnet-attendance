@@ -141,7 +141,11 @@ const translations = {
     paidLeave: 'Paid Leave',
     unpaidLeave: 'Unpaid Leave',
     submit: 'Submit',
-    cancel: 'Cancel'
+    cancel: 'Cancel',
+    exportStart: 'Start Date:',
+    exportEnd: 'End Date:',
+    exportDept: 'Department:',
+    exportExcel: '📥 Export Excel'
   },
   ja: {
     title: '管理画面 – 現在出勤中の社員',
@@ -164,7 +168,11 @@ const translations = {
     paidLeave: '有給休暇',
     unpaidLeave: '無給休暇',
     submit: '送信',
-    cancel: 'キャンセル'
+    cancel: 'キャンセル',
+    exportStart: '開始日:',
+    exportEnd: '終了日:',
+    exportDept: '部署:',
+    exportExcel: '📥 エクセル出力'
   }
 }
 };

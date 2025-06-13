@@ -1,3 +1,4 @@
+<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +8,14 @@
   <title data-i18n="title">Admin Panel – Currently Logged-In Employees</title>
 </head>
 <body>
+
+  <!-- 🔒 Admin Access Check -->
+  <script>
+    if (sessionStorage.getItem('role') !== 'admin') {
+      location.href = 'admin-login.html';
+    }
+  </script>
+
   <!-- 🔝 Sticky Navigation Bar -->
   <header class="top-nav">
     <img src="images/hubnetblack.jpg" alt="Logo" class="logo" />
@@ -60,11 +69,6 @@
 
   <!-- 🧠 JS Modules -->
   <script type="module">
-    // 🔒 Restrict access to admins only
-    if (sessionStorage.getItem('role') !== 'admin') {
-      location.href = 'admin-login.html';
-    }
-
     import { fetchAndRenderAttendance, setupActiveTableSorting } from './attendance.js';
     import { applyTranslations } from './scripts/lang.js';
 
@@ -78,6 +82,6 @@
       setupActiveTableSorting();
       fetchAndRenderAttendance();
     });
-</script>
+  </script>
 </body>
 </html>

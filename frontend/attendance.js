@@ -95,3 +95,18 @@ function populateActiveTable() {
     tbody.appendChild(row);
   });
 }
+
+export function setupActiveTableSorting() {
+  const table = document.getElementById('activeTable');
+  if (!table) return;
+
+  const headers = table.querySelectorAll('th');
+  headers.forEach((th, index) => {
+    th.style.cursor = 'pointer';
+    th.addEventListener('click', () => {
+      sortKey = index === 0 ? 'name' : 'checkIn';
+      sortDirection *= -1;
+      populateActiveTable();
+    });
+  });
+}

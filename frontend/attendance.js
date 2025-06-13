@@ -55,10 +55,6 @@ function populateActiveTable() {
 
   const selectedDept = document.getElementById('sortDepartment')?.value;
 
-  if (!selectedDept) {
-    return; // Don't render anything until department is selected
-  }
-
   const departmentLabels = {
     IMPORTEXPORT: '国際航空貨物輸送部',
     FIELD: 'フィールド部',
@@ -79,7 +75,9 @@ function populateActiveTable() {
     };
   });
 
-  const filtered = enriched.filter(e => e.department === selectedDept);
+  const filtered = selectedDept
+    ? enriched.filter(e => e.department === selectedDept)
+    : enriched;
 
   const sorted = [...filtered].sort((a, b) => {
     const aValue = sortKey === 'checkIn' ? new Date(a.checkIn) : a.name.toLowerCase();

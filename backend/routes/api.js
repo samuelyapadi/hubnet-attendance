@@ -750,4 +750,77 @@ router.get('/employees-summary', async (req, res) => {
   }
 });
 
+const ExcelJS = require('exceljs');
+
+router.get('/export-attendance', async (req, res) => {
+  const { dept, year, month, startDate, endDate } = req.query;
+
+  try {
+    const query = {};
+    if (dept) query.department = dept;
+
+    const users = await User.find(query);
+    const userMap = {};
+    users.forEach(user => {
+      userMap[user.name] = user;
+    });
+
+    const sessions = await Attendance.find({ checkIn: { $ne: null }, checkOut: { $ne: null } });
+
+    const filtered = sessions.filter(s => {
+      const checkIn = new Date(s.checkIn);
+      if (year && checkIn.getFullYear() !== Number(year)) return false;
+      if (month && checkIn.getMonth() !== Number(month)) return false;
+
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : null;
+
+      if (start && checkIn < start) return false;
+      if (end && checkIn > end) return false;
+
+      return true;
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Attendance');
+
+    sheet.columns = [
+      { header: 'Name', key: 'name', width: 20 },
+      { header: 'Department', key: 'department', width: 20 },
+      { header: 'Check In', key: 'checkIn', width: 25 },
+      { header: 'Check Out', key: 'checkOut', width: 25 },
+      { header: 'Worked Hours', key: 'worked', width: 15 },
+      { header: 'Type', key: 'type', width: 15 },
+      { header: 'Late (min)', key: 'late', width: 12 },
+    ];
+
+    for (const s of filtered) {
+      const user = userMap[s.name];
+      const checkIn = new Date(s.checkIn);
+      const checkOut = new Date(s.checkOut);
+      const ms = checkOut - checkIn;
+      const worked = Math.round((ms / 3600000) * 10) / 10;
+
+      sheet.addRow({
+        name: s.name,
+        department: user?.department || '',
+        checkIn: checkIn.toLocaleString(),
+        checkOut: checkOut.toLocaleString(),
+        worked,
+        type: s.type || 'work',
+        late: s.lateMinutes || 0
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=attendance.xlsx');
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error('[EXPORT ERROR]', err);
+    res.status(500).json({ error: 'Failed to export Excel' });
+  }
+});
+
 module.exports = router;

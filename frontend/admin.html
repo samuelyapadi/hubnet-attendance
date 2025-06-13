@@ -33,6 +33,31 @@
   <div id="attendanceTab" class="tab-section active">
     <section>
       <h2 data-i18n="activeSessions">Current Active Sessions</h2>
+      <div style="margin: 1rem 0;">
+        <label for="exportStart">Start Date:</label>
+        <input type="date" id="exportStart" />
+        <label for="exportEnd">End Date:</label>
+        <input type="date" id="exportEnd" />
+
+        <label for="exportDept">Department:</label>
+          <select id="exportDept">
+            <option value="">All</option>
+            <option value="THERMAL">THERMAL</option>
+            <option value="SPL">SPL</option>
+            <option value="IMPORTEXPORT">IMPORTEXPORT</option>
+            <option value="FIELD">FIELD</option>
+            <option value="NARITAOPS">NARITAOPS</option>
+            <option value="ART">ART</option>
+            <option value="OCEAN">OCEAN</option>
+            <option value="BIZDEV">BIZDEV</option>
+            <option value="IT">IT</option>
+            <option value="FINANCE">FINANCE</option>
+            <option value="QA">QA</option>
+            <option value="HR">HR</option>
+          </select>
+      
+          <button id="downloadExcel" class="btn">📥 Export Excel</button>
+      </div>
       <label style="margin-bottom: 1rem; display: inline-block;">
         <span data-i18n="sortByDept">Sort by Department:</span>
         <select id="sortDepartment" style="font-size: 14px; padding: 4px 8px;">
@@ -68,6 +93,7 @@
   </div>
 
   <!-- 🧠 JS Modules -->
+   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script type="module">
     import { fetchAndRenderAttendance, setupActiveTableSorting } from './attendance.js';
     import { applyTranslations } from './scripts/lang.js';

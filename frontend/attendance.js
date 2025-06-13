@@ -108,3 +108,44 @@ export function setupActiveTableSorting() {
     });
   });
 }
+
+document.getElementById('downloadExcel')?.addEventListener('click', async () => {
+  const start = new Date(document.getElementById('exportStart').value);
+  const end = new Date(document.getElementById('exportEnd').value);
+  const dept = document.getElementById('exportDept').value;
+
+  const [sessionsRes, usersRes] = await Promise.all([
+    fetch('/api/sessions/all'),
+    fetch('/api/users')
+  ]);
+
+  const sessions = await sessionsRes.json();
+  const users = await usersRes.json();
+
+  const filtered = sessions.filter(session => {
+    const checkIn = new Date(session.checkIn);
+    const user = users.find(u => u.name === session.name);
+    const userDept = user?.department || '';
+    return (
+      (!dept || userDept === dept) &&
+      (!isNaN(start) ? checkIn >= start : true) &&
+      (!isNaN(end) ? checkIn <= end : true)
+    );
+  });
+
+  const rows = filtered.map(s => ({
+    Name: s.name,
+    Department: users.find(u => u.name === s.name)?.department || '',
+    'Check-In': new Date(s.checkIn).toLocaleString(),
+    'Check-Out': s.checkOut ? new Date(s.checkOut).toLocaleString() : '',
+    'Worked (h)': s.workedHours ?? '',
+    'Late (min)': s.lateMinutes ?? '',
+    'Type': s.type ?? '',
+  }));
+
+  const sheet = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, sheet, 'Sessions');
+
+  XLSX.writeFile(wb, `Attendance_${Date.now()}.xlsx`);
+});

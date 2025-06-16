@@ -784,18 +784,16 @@ router.get('/export-attendance', async (req, res) => {
       const checkOut = new Date(s.checkOut);
       const user = userMap[s.name]; // ✅ FIXED: lookup now works
 
-      const durationMs = checkOut - checkIn;
-      const totalMinutes = Math.floor(durationMs / 60000);
-      const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
-
       const toDecimalFormat = (minutes) => {
         const h = Math.floor(minutes / 60);
         const m = minutes % 60;
         return `${h}.${m.toString().padStart(2, '0')}`;
       };
 
-      const workedMinutes = Math.floor((checkOut - checkIn) / 60000);
-      const adjustedMinutes = workedMinutes > 360 ? workedMinutes - 60 : workedMinutes;
+      const durationMs = checkOut - checkIn;
+      const totalMinutes = Math.floor(durationMs / 60000);
+      const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
+
       const workedHours = toDecimalFormat(adjustedMinutes);
       const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
       const overtimeHours = toDecimalFormat(overtimeMinutes);

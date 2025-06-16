@@ -320,10 +320,11 @@ router.get('/sessions/all', async (req, res) => {
     const userMap = {};
     users.forEach(u => userMap[u.name] = u);
 
-    const toTimeAsDecimal = (minutes) => {
+    // ✅ Format minutes as HH.MM
+    const toHHDotMM = (minutes) => {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
-      return `${h}.${String(m).padStart(2, '0')}`;
+      return `${h}.${m.toString().padStart(2, '0')}`;
     };
 
     const enriched = sessions.map(s => {
@@ -334,18 +335,16 @@ router.get('/sessions/all', async (req, res) => {
       const totalMinutes = Math.floor(durationMs / 60000);
       const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
 
-      const workedHours = toTimeAsDecimal(adjustedMinutes);
+      const workedHours = toHHDotMM(adjustedMinutes);
       const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
-      const overtimeHours = toTimeAsDecimal(overtimeMinutes);
+      const overtimeHours = toHHDotMM(overtimeMinutes);
 
-      // ✅ FIX: Only count minutes in night hours (22:00–04:59)
       let nightMinutes = 0;
       for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
-        const dt = new Date(ts);
-        const h = dt.getHours();
-        if (h >= 22 || h < 5) nightMinutes++;
+        const hour = new Date(ts).getHours();
+        if (hour >= 22 || hour < 5) nightMinutes++;
       }
-      const nightHours = toTimeAsDecimal(nightMinutes);
+      const nightHours = toHHDotMM(nightMinutes);
 
       const user = userMap[s.name];
       let lateMinutes = 0;

@@ -7,6 +7,10 @@ const Leave = require('../models/Leave');
 const Admin = require('../models/Admin');
 const bcrypt = require('bcrypt');
 
+function roundToTwoDecimals(mins) {
+  return Math.round((mins / 60) * 100) / 100;
+}
+
 router.post('/admins/grant', async (req, res) => {
   const { userId, username, password } = req.body;
   if (!userId || !username || !password) {
@@ -321,18 +325,19 @@ router.get('/sessions/all', async (req, res) => {
       const checkOut = new Date(s.checkOut);
 
       const durationMs = checkOut - checkIn;
-      const totalMinutes = Math.max(0, Math.round(durationMs / 60000));
+      const totalMinutes = Math.floor(durationMs / 60000);
       const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
 
-      const workedHours = +(adjustedMinutes / 60).toFixed(2);
-      const overtimeHours = adjustedMinutes > 480 ? +((adjustedMinutes - 480) / 60).toFixed(2) : 0;
+      const workedHours = roundToTwoDecimals(adjustedMinutes);
+      const overtimeHours = roundToTwoDecimals(Math.max(0, adjustedMinutes - 480));
 
       let nightMinutes = 0;
-      for (let t = new Date(checkIn); t < checkOut; t.setMinutes(t.getMinutes() + 1)) {
-        const hour = t.getHours();
-        if (hour >= 22 || hour < 5) nightMinutes++;
+      for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
+        const h = new Date(ts).getHours();
+        if (h >= 22 || h < 5) nightMinutes++;
       }
-      const nightHours = +(nightMinutes / 60).toFixed(2);
+      const nightHours = roundToTwoDecimals(nightMinutes);
+
 
       const user = userMap[s.name];
       let lateMinutes = 0;

@@ -339,11 +339,11 @@ router.get('/sessions/all', async (req, res) => {
       const overtimeHours = toDecimalFormat(overtimeMinutes);
 
       // Accurate night work calculation
-      let nightMinutes = 0;
-      for (let t = new Date(checkIn); t < checkOut; t.setMinutes(t.getMinutes() + 1)) {
-        const hour = t.getHours();
-        if (hour >= 22 || hour < 5) nightMinutes++;
-      }
+    let nightMinutes = 0;
+    for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
+      const hour = new Date(ts).getHours();
+      if (hour >= 22 || hour < 5) nightMinutes++;
+    }
       const nightHours = toDecimalFormat(nightMinutes);
 
       const user = userMap[s.name];

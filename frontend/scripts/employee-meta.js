@@ -65,31 +65,40 @@ function saveEmployeeInfo(employeeId, employeeName) {
     })
     .then(res => res.json())
     .then(updatedUser => {
-      document.getElementById('employmentTypeDisplay').textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
-      document.getElementById('shiftWorkerDisplay').textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
+      const employmentTypeEl = document.getElementById('employmentTypeDisplay');
+      if (employmentTypeEl)
+        employmentTypeEl.textContent = updatedUser.isPartTime ? 'Part-Time' : 'Full-Time';
+
+      const shiftWorkerEl = document.getElementById('shiftWorkerDisplay');
+      if (shiftWorkerEl)
+        shiftWorkerEl.textContent = updatedUser.isShiftWorker ? 'Yes' : 'No';
 
       const workingDaysContainer = document.getElementById('editWorkingDaysContainer');
       const workingDaysInput = document.getElementById('editWeeklyWorkingDays');
 
       if (updatedUser.isPartTime) {
-        workingDaysContainer.style.display = 'block';
+        if (workingDaysContainer) workingDaysContainer.style.display = 'block';
         if (workingDaysInput) workingDaysInput.value = updatedUser.weeklyWorkingDays || '1';
       } else {
-        workingDaysContainer.style.display = 'none';
+        if (workingDaysContainer) workingDaysContainer.style.display = 'none';
       }
 
-      document.getElementById('editIsPartTime').value = updatedUser.isPartTime ? '1' : '0';
-      document.getElementById('editIsShiftWorker').value = updatedUser.isShiftWorker ? '1' : '0';
-      document.getElementById('defaultStartTime').value = updatedUser.defaultStartTime || '';
+      const isPartTimeEl = document.getElementById('editIsPartTime');
+      if (isPartTimeEl) isPartTimeEl.value = updatedUser.isPartTime ? '1' : '0';
+
+      const isShiftEl = document.getElementById('editIsShiftWorker');
+      if (isShiftEl) isShiftEl.value = updatedUser.isShiftWorker ? '1' : '0';
+
+      const defaultTimeEl = document.getElementById('defaultStartTime');
+      if (defaultTimeEl) defaultTimeEl.value = updatedUser.defaultStartTime || '';
 
       return fetch(`/api/users/${encodeURIComponent(employeeName)}/leave-balance`);
     })
     .then(res => res.json())
     .then(data => {
       const balanceEl = document.getElementById('leaveBalance');
-      if (balanceEl) {
-        balanceEl.textContent = data.formatted || '0d 0h';
-      }
+      if (balanceEl) balanceEl.textContent = data.formatted || '0d 0h';
+
       if (typeof window.analyzeAndRenderSessions === 'function') {
         window.analyzeAndRenderSessions(window.allRecordsRaw || []);
       }

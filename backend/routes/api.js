@@ -320,6 +320,10 @@ router.get('/sessions/all', async (req, res) => {
     const userMap = {};
     users.forEach(u => userMap[u.name] = u);
 
+    const toTimeAsDecimal = (hours, minutes) => {
+      return +(hours + '.' + String(minutes).padStart(2, '0'));
+    };
+
     const enriched = sessions.map(s => {
       const checkIn = new Date(s.checkIn);
       const checkOut = new Date(s.checkOut);
@@ -328,16 +332,16 @@ router.get('/sessions/all', async (req, res) => {
       const totalMinutes = Math.floor(durationMs / 60000);
       const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
 
-      const workedHours = roundToTwoDecimals(adjustedMinutes);
-      const overtimeHours = roundToTwoDecimals(Math.max(0, adjustedMinutes - 480));
+      const workedHours = toTimeAsDecimal(Math.floor(adjustedMinutes / 60), adjustedMinutes % 60);
+      const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
+      const overtimeHours = toTimeAsDecimal(Math.floor(overtimeMinutes / 60), overtimeMinutes % 60);
 
       let nightMinutes = 0;
       for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
         const h = new Date(ts).getHours();
         if (h >= 22 || h < 5) nightMinutes++;
       }
-      const nightHours = roundToTwoDecimals(nightMinutes);
-
+      const nightHours = toTimeAsDecimal(Math.floor(nightMinutes / 60), nightMinutes % 60);
 
       const user = userMap[s.name];
       let lateMinutes = 0;

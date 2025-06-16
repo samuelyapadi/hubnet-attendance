@@ -346,15 +346,19 @@ router.get('/sessions/all', async (req, res) => {
     }
       const nightHours = toDecimalFormat(nightMinutes);
 
-      const user = userMap[s.name];
-      let lateMinutes = 0;
-      if (user?.defaultStartTime) {
-        const [h, m] = user.defaultStartTime.split(':').map(Number);
-        const expectedStart = new Date(checkIn);
-        expectedStart.setHours(h, m, 0, 0);
-        const diff = Math.round((checkIn - expectedStart) / 60000);
-        if (diff > 5) lateMinutes = diff;
-      }
+    let user = userMap[s.employeeId?.toString()];
+    if (!user) {
+      user = users.find(u => u.name === s.name); // fallback if employeeId is missing
+    }
+
+    let lateMinutes = 0;
+    if (user?.defaultStartTime) {
+      const [h, m] = user.defaultStartTime.split(':').map(Number);
+      const expectedStart = new Date(checkIn);
+      expectedStart.setHours(h, m, 0, 0);
+      const diff = Math.round((checkIn - expectedStart) / 60000);
+      if (diff > 0) lateMinutes = diff;
+    }
 
       return {
         ...s,
@@ -817,7 +821,7 @@ router.get('/export-attendance', async (req, res) => {
     const users = await User.find(query);
     const userMap = {};
     users.forEach(user => {
-      userMap[user.name] = user;
+      userMap[user._id.toString()] = user;
     });
 
     const sessions = await Attendance.find({ checkIn: { $ne: null }, checkOut: { $ne: null } });

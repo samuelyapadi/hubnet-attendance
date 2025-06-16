@@ -115,24 +115,14 @@ document.getElementById('downloadExcel')?.addEventListener('click', async () => 
   const dept = document.getElementById('exportDept').value;
 
   const [sessionsRes, usersRes] = await Promise.all([
-    fetch('/api/sessions/all'),
+    fetch('/api/sessions/all'),  // enriched with calculated fields
     fetch('/api/users')
   ]);
 
   const sessions = await sessionsRes.json();
   const users = await usersRes.json();
 
-  const enriched = sessions.map(s => {
-    return {
-      ...s,
-      workedHours: s.worked,
-      overtimeHours: s.overtime,
-      nightHours: s.night,
-      lateMinutes: s.late,
-    };
-  });
-
-  const filtered = enriched.filter(session => {
+  const filtered = sessions.filter(session => {
     const checkIn = new Date(session.checkIn);
     const user = users.find(u => u.name === session.name);
     const userDept = user?.department || '';
@@ -143,49 +133,50 @@ document.getElementById('downloadExcel')?.addEventListener('click', async () => 
     );
   });
 
-const lang = localStorage.getItem('lang') || 'en';
+  const lang = localStorage.getItem('lang') || 'en';
 
-const headers = {
-  en: {
-    name: 'Name',
-    department: 'Department',
-    checkIn: 'Check-In',
-    checkOut: 'Check-Out',
-    worked: 'Worked (h)',
-    overtime: 'Overtime',
-    nightWork: 'Night Work (h)',
-    late: 'Late (min)',
-    type: 'Type'
-  },
-  ja: {
-    name: '名前',
-    department: '部署',
-    checkIn: '出勤時間',
-    checkOut: '退勤時間',
-    worked: '勤務時間 (h)',
-    overtime: '残業区分',
-    nightWork: '深夜勤務 (h)',
-    late: '遅刻 (分)',
-    type: '種別'
-  }
-}[lang];
+  const headers = {
+    en: {
+      name: 'Name',
+      department: 'Department',
+      checkIn: 'Check-In',
+      checkOut: 'Check-Out',
+      worked: 'Worked (h)',
+      overtime: 'Overtime',
+      nightWork: 'Night Work (h)',
+      late: 'Late (min)',
+      type: 'Type'
+    },
+    ja: {
+      name: '名前',
+      department: '部署',
+      checkIn: '出勤時間',
+      checkOut: '退勤時間',
+      worked: '勤務時間 (h)',
+      overtime: '残業区分',
+      nightWork: '深夜勤務 (h)',
+      late: '遅刻 (分)',
+      type: '種別'
+    }
+  }[lang];
 
-const rows = filtered.map(s => ({
-  [headers.name]: s.name,
-  [headers.department]: users.find(u => u.name === s.name)?.department || '',
-  [headers.checkIn]: new Date(s.checkIn).toLocaleString(),
-  [headers.checkOut]: s.checkOut ? new Date(s.checkOut).toLocaleString() : '',
-  [headers.worked]: s.workedHours ?? '',
-  [headers.overtime]: s.overtimeHours ?? '',
-  [headers.nightWork]: s.nightHours ?? '',
-  [headers.late]: s.lateMinutes ?? '',
-  [headers.type]: s.type ?? '',
-}));
+  const rows = filtered.map(s => ({
+    [headers.name]: s.name,
+    [headers.department]: users.find(u => u.name === s.name)?.department || '',
+    [headers.checkIn]: new Date(s.checkIn).toLocaleString(),
+    [headers.checkOut]: s.checkOut ? new Date(s.checkOut).toLocaleString() : '',
+    [headers.worked]: s.workedHours ?? '',
+    [headers.overtime]: s.overtimeHours ?? '',
+    [headers.nightWork]: s.nightHours ?? '',
+    [headers.late]: s.lateMinutes ?? '',
+    [headers.type]: s.type ?? '',
+  }));
 
   const sheet = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, sheet, 'Sessions');
 
-const filenamePrefix = lang === 'ja' ? '勤怠記録' : 'Attendance';
-XLSX.writeFile(wb, `${filenamePrefix}_${Date.now()}.xlsx`);
+  const filenamePrefix = lang === 'ja' ? '勤怠記録' : 'Attendance';
+  XLSX.writeFile(wb, `${filenamePrefix}_${Date.now()}.xlsx`);
 });
+

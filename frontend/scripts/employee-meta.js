@@ -86,7 +86,10 @@ function saveEmployeeInfo(employeeId, employeeName) {
     })
     .then(res => res.json())
     .then(data => {
-      document.getElementById('leaveBalance').textContent = data.formatted || '0d 0h';
+      const balanceEl = document.getElementById('leaveBalance');
+      if (balanceEl) {
+        balanceEl.textContent = data.formatted || '0d 0h';
+      }
       if (typeof window.analyzeAndRenderSessions === 'function') {
         window.analyzeAndRenderSessions(window.allRecordsRaw || []);
       }

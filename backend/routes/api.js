@@ -840,32 +840,59 @@ router.get('/export-attendance', async (req, res) => {
     const sheet = workbook.addWorksheet('Attendance');
 
     sheet.columns = [
-      { header: 'Name', key: 'name', width: 20 },
-      { header: 'Department', key: 'department', width: 20 },
-      { header: 'Check In', key: 'checkIn', width: 25 },
-      { header: 'Check Out', key: 'checkOut', width: 25 },
-      { header: 'Worked Hours', key: 'worked', width: 15 },
-      { header: 'Type', key: 'type', width: 15 },
-      { header: 'Late (min)', key: 'late', width: 12 },
+      { header: '名前', key: 'name', width: 20 },
+      { header: '部署', key: 'department', width: 20 },
+      { header: '出勤時間', key: 'checkIn', width: 25 },
+      { header: '退勤時間', key: 'checkOut', width: 25 },
+      { header: '勤務時間 (h)', key: 'worked', width: 15 },
+      { header: '残業区分', key: 'overtime', width: 15 },
+      { header: '深夜勤務 (h)', key: 'night', width: 15 },
+      { header: '遅刻 (分)', key: 'late', width: 15 },
+      { header: '種別', key: 'type', width: 10 },
     ];
 
-    for (const s of filtered) {
-      const user = userMap[s.name];
-      const checkIn = new Date(s.checkIn);
-      const checkOut = new Date(s.checkOut);
-      const ms = checkOut - checkIn;
-      const worked = Math.round((ms / 3600000) * 10) / 10;
+for (const s of filtered) {
+  const user = userMap[s.name];
+  const checkIn = new Date(s.checkIn);
+  const checkOut = new Date(s.checkOut);
 
-      sheet.addRow({
-        name: s.name,
-        department: user?.department || '',
-        checkIn: checkIn.toLocaleString(),
-        checkOut: checkOut.toLocaleString(),
-        worked,
-        type: s.type || 'work',
-        late: s.lateMinutes || 0
-      });
-    }
+  const workedMinutesRaw = Math.floor((checkOut - checkIn) / 60000);
+  const adjustedMinutes = workedMinutesRaw > 360 ? workedMinutesRaw - 60 : workedMinutesRaw;
+  const workedHours = Math.round((adjustedMinutes / 60) * 100) / 100;
+
+  const overtimeMinutes = Math.max(0, adjustedMinutes - 480); // Over 8h
+  const overtimeHours = Math.round((overtimeMinutes / 60) * 100) / 100;
+
+  // Night work between 22:00–05:00
+  let nightMinutes = 0;
+  for (let t = new Date(checkIn); t < checkOut; t = new Date(t.getTime() + 60000)) {
+    const h = t.getHours();
+    if (h >= 22 || h < 5) nightMinutes++;
+  }
+  const nightHours = Math.round((nightMinutes / 60) * 100) / 100;
+
+  // Lateness from default start time
+  let lateMinutes = 0;
+  if (user?.defaultStartTime) {
+    const [h, m] = user.defaultStartTime.split(':').map(Number);
+    const expected = new Date(checkIn);
+    expected.setHours(h, m, 0, 0);
+    const diff = Math.round((checkIn - expected) / 60000);
+    if (diff > 0) lateMinutes = diff;
+  }
+
+  sheet.addRow({
+    name: s.name,
+    department: user?.department || '',
+    checkIn: checkIn.toLocaleString(),
+    checkOut: checkOut.toLocaleString(),
+    worked: workedHours,
+    overtime: overtimeHours,
+    night: nightHours,
+    late: lateMinutes,
+    type: s.type || 'work',
+  });
+}
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=attendance.xlsx');

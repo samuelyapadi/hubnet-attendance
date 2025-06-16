@@ -7,10 +7,6 @@ const Leave = require('../models/Leave');
 const Admin = require('../models/Admin');
 const bcrypt = require('bcrypt');
 
-function roundToTwoDecimals(mins) {
-  return Math.round((mins / 60) * 100) / 100;
-}
-
 router.post('/admins/grant', async (req, res) => {
   const { userId, username, password } = req.body;
   if (!userId || !username || !password) {
@@ -311,71 +307,13 @@ router.get('/sessions/active', async (req, res) => {
 });
 
 // Get all sessions
-// ✅ Enhanced session export with overtime, night work, lateness
 router.get('/sessions/all', async (req, res) => {
   try {
-    const sessions = await Attendance.find({ checkIn: { $exists: true }, checkOut: { $exists: true } }).lean();
-
-    const users = await User.find({});
-    const userMap = {};
-    users.forEach(u => userMap[u.name] = u);
-
-    const toDecimalFormat = (minutes) => {
-      const h = Math.floor(minutes / 60);
-      const m = minutes % 60;
-      return `${h}.${m.toString().padStart(2, '0')}`;
-    };
-
-    const enriched = sessions.map(s => {
-      const checkIn = new Date(s.checkIn);
-      const checkOut = new Date(s.checkOut);
-
-      const durationMs = checkOut - checkIn;
-      const totalMinutes = Math.floor(durationMs / 60000);
-      const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
-
-      const workedHours = toDecimalFormat(adjustedMinutes);
-      const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
-      const overtimeHours = toDecimalFormat(overtimeMinutes);
-
-      // Accurate night work calculation
-    let nightMinutes = 0;
-    for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
-      const hour = new Date(ts).getHours();
-      if (hour >= 22 || hour < 5) nightMinutes++;
-    }
-      const nightHours = toDecimalFormat(nightMinutes);
-
-    let user = userMap[s.employeeId?.toString()];
-    if (!user) {
-      user = users.find(u => u.name === s.name); // fallback if employeeId is missing
-    }
-
-    let lateMinutes = 0;
-
-    if (typeof s.lateMinutes === 'number') {
-      lateMinutes = s.lateMinutes;
-    } else if (user?.defaultStartTime) {
-      const [h, m] = user.defaultStartTime.split(':').map(Number);
-      const expected = new Date(checkIn);
-      expected.setHours(h, m, 0, 0);
-      const diff = Math.round((checkIn - expected) / 60000);
-      if (diff > 5) lateMinutes = diff;
-    }
-
-      return {
-        ...s,
-        workedHours,
-        overtimeHours,
-        nightHours,
-        lateMinutes
-      };
-    });
-
-    res.json(enriched);
+    const allSessions = await Attendance.find({}).sort({ checkIn: -1 });
+    res.json(allSessions);
   } catch (err) {
-    console.error('[ENRICHED SESSIONS ERROR]', err);
-    res.status(500).json({ error: 'Failed to fetch enriched sessions.' });
+    console.error('[SESSIONS/ALL ERROR]', err);
+    res.status(500).json({ error: 'Failed to fetch session logs.' });
   }
 });
 
@@ -735,6 +673,85 @@ function getValidGrantedLeaveHours(user, asOfDate = new Date()) {
   return Math.min(totalHours, 320); // Cap at 40 days
 }
 
+router.get('/employees-summary', async (req, res) => {
+  const { dept, year, month, startDate, endDate } = req.query;
+
+  if (!dept) return res.status(400).json({ success: false, message: 'Department required' });
+
+  try {
+    const users = await User.find({ department: dept });
+
+    const allSessions = await Attendance.find({ checkIn: { $ne: null }, checkOut: { $ne: null } });
+    const allLeaves = await Leave.find({}); // used for paid leave manual entries
+
+    const filteredSessions = allSessions.filter(session => {
+      const checkIn = new Date(session.checkIn);
+      if (year && checkIn.getFullYear() !== Number(year)) return false;
+      if (month && checkIn.getMonth() !== Number(month)) return false;
+
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : null;
+
+      if (start && checkIn < start) return false;
+      if (end && checkIn > end) return false;
+
+      return true;
+    });
+
+    const now = new Date();
+    const result = [];
+
+    for (const user of users) {
+      const userSessions = filteredSessions.filter(s => s.name === user.name && s.type === 'work');
+
+      let totalOvertimeMinutes = 0;
+      for (const s of userSessions) {
+        const checkIn = new Date(s.checkIn);
+        const checkOut = new Date(s.checkOut);
+        const workedMinutes = Math.floor((checkOut - checkIn) / 60000);
+        const adjustedWorked = Math.max(0, workedMinutes - 60); // 1h break
+        const overtime = adjustedWorked - 480; // subtract 8h
+        if (overtime > 0) totalOvertimeMinutes += overtime;
+      }
+
+      const totalEntitled = getValidGrantedLeaveHours(user, now);
+
+      const paidLeaveSessions = filteredSessions.filter(s =>
+        s.name === user.name && s.type === 'paid_leave'
+      );
+      const paidLeaveHours = paidLeaveSessions.reduce((sum, s) => {
+        const ms = new Date(s.checkOut) - new Date(s.checkIn);
+        return sum + Math.min(ms / 3600000, 8);
+      }, 0);
+
+      const manualLeaves = allLeaves.filter(l =>
+        l.userId.toString() === user._id.toString() && l.type === 'paid'
+      );
+      const manualHours = manualLeaves.reduce((sum, l) => sum + (l.hours || 0), 0);
+
+      const usedHours = Math.round((paidLeaveHours + manualHours + Number.EPSILON) * 2) / 2;
+      const remainingHours = Math.max(0, totalEntitled - usedHours);
+      const days = Math.floor(remainingHours / 8);
+      const hours = Math.round((remainingHours % 8 + Number.EPSILON) * 2) / 2;
+
+      result.push({
+        _id: user._id,
+        name: user.name,
+        department: user.department,
+        totalOvertime: `${Math.floor(totalOvertimeMinutes / 60)}h ${totalOvertimeMinutes % 60}m`,
+        remainingLeave: `${days}d ${hours}h`
+      });
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error('Employee summary error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+const ExcelJS = require('exceljs');
+
 router.get('/export-attendance', async (req, res) => {
   const { dept, year, month, startDate, endDate } = req.query;
 
@@ -745,7 +762,7 @@ router.get('/export-attendance', async (req, res) => {
     const users = await User.find(query);
     const userMap = {};
     users.forEach(user => {
-      userMap[user.name] = user; // ✅ FIX: store by name, not by _id
+      userMap[user.name] = user;
     });
 
     const sessions = await Attendance.find({ checkIn: { $ne: null }, checkOut: { $ne: null } });
@@ -768,62 +785,30 @@ router.get('/export-attendance', async (req, res) => {
     const sheet = workbook.addWorksheet('Attendance');
 
     sheet.columns = [
-      { header: '名前', key: 'name', width: 20 },
-      { header: '部署', key: 'department', width: 20 },
-      { header: '出勤時間', key: 'checkIn', width: 25 },
-      { header: '退勤時間', key: 'checkOut', width: 25 },
-      { header: '勤務時間 (h)', key: 'worked', width: 15 },
-      { header: '残業区分', key: 'overtime', width: 15 },
-      { header: '深夜勤務 (h)', key: 'night', width: 15 },
-      { header: '遅刻 (分)', key: 'late', width: 15 },
-      { header: '種別', key: 'type', width: 10 },
+      { header: 'Name', key: 'name', width: 20 },
+      { header: 'Department', key: 'department', width: 20 },
+      { header: 'Check In', key: 'checkIn', width: 25 },
+      { header: 'Check Out', key: 'checkOut', width: 25 },
+      { header: 'Worked Hours', key: 'worked', width: 15 },
+      { header: 'Type', key: 'type', width: 15 },
+      { header: 'Late (min)', key: 'late', width: 12 },
     ];
 
     for (const s of filtered) {
+      const user = userMap[s.name];
       const checkIn = new Date(s.checkIn);
       const checkOut = new Date(s.checkOut);
-      const user = userMap[s.name]; // ✅ FIXED: lookup now works
-
-      const toDecimalFormat = (minutes) => {
-        const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
-        return `${h}.${m.toString().padStart(2, '0')}`;
-      };
-
-      const durationMs = checkOut - checkIn;
-      const totalMinutes = Math.floor(durationMs / 60000);
-      const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
-
-      const workedHours = toDecimalFormat(adjustedMinutes);
-      const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
-      const overtimeHours = toDecimalFormat(overtimeMinutes);
-
-      let nightMinutes = 0;
-      for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
-        const hour = new Date(ts).getHours();
-        if (hour >= 22 || hour < 5) nightMinutes++;
-      }
-      const nightHours = toDecimalFormat(nightMinutes);
-
-      let lateMinutes = 0;
-      if (user?.defaultStartTime) {
-        const [h, m] = user.defaultStartTime.split(':').map(Number);
-        const expected = new Date(checkIn);
-        expected.setHours(h, m, 0, 0);
-        const diff = Math.round((checkIn - expected) / 60000);
-        if (diff > 5) lateMinutes = diff;
-      }
+      const ms = checkOut - checkIn;
+      const worked = Math.round((ms / 3600000) * 10) / 10;
 
       sheet.addRow({
         name: s.name,
         department: user?.department || '',
-        checkIn: checkIn.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
-        checkOut: checkOut.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
-        worked: workedHours,
-        overtime: overtimeHours,
-        night: nightHours,
-        late: lateMinutes,
+        checkIn: checkIn.toLocaleString(),
+        checkOut: checkOut.toLocaleString(),
+        worked,
         type: s.type || 'work',
+        late: s.lateMinutes || 0
       });
     }
 

@@ -307,13 +307,56 @@ router.get('/sessions/active', async (req, res) => {
 });
 
 // Get all sessions
+// ✅ Enhanced session export with overtime, night work, lateness
 router.get('/sessions/all', async (req, res) => {
   try {
-    const allSessions = await Attendance.find({}).sort({ checkIn: -1 });
-    res.json(allSessions);
+    const sessions = await Attendance.find({ checkIn: { $exists: true }, checkOut: { $exists: true } }).lean();
+
+    const users = await User.find({});
+    const userMap = {};
+    users.forEach(u => userMap[u.name] = u);
+
+    const enriched = sessions.map(s => {
+      const checkIn = new Date(s.checkIn);
+      const checkOut = new Date(s.checkOut);
+
+      const durationMs = checkOut - checkIn;
+      const totalMinutes = Math.max(0, Math.round(durationMs / 60000));
+      const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
+
+      const workedHours = +(adjustedMinutes / 60).toFixed(2);
+      const overtimeHours = adjustedMinutes > 480 ? +((adjustedMinutes - 480) / 60).toFixed(2) : 0;
+
+      let nightMinutes = 0;
+      for (let t = new Date(checkIn); t < checkOut; t.setMinutes(t.getMinutes() + 1)) {
+        const hour = t.getHours();
+        if (hour >= 22 || hour < 5) nightMinutes++;
+      }
+      const nightHours = +(nightMinutes / 60).toFixed(2);
+
+      const user = userMap[s.name];
+      let lateMinutes = 0;
+      if (user?.defaultStartTime) {
+        const [h, m] = user.defaultStartTime.split(':').map(Number);
+        const expectedStart = new Date(checkIn);
+        expectedStart.setHours(h, m, 0, 0);
+        const diff = Math.round((checkIn - expectedStart) / 60000);
+        if (diff > 5) lateMinutes = diff;
+      }
+
+      return {
+        ...s,
+        workedHours,
+        overtimeHours,
+        nightHours,
+        lateMinutes
+      };
+    });
+
+    res.json(enriched);
   } catch (err) {
-    console.error('[SESSIONS/ALL ERROR]', err);
-    res.status(500).json({ error: 'Failed to fetch session logs.' });
+    console.error('[ENRICHED SESSIONS ERROR]', err);
+    res.status(500).json({ error: 'Failed to fetch enriched sessions.' });
   }
 });
 

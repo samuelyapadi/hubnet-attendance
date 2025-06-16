@@ -358,29 +358,38 @@ document.getElementById('openCreateSessionModal')?.addEventListener('click', () 
 window.analyzeAndRenderSessions = () => {
   renderLogTable(window.allRecords);
 };
-window.exportEmployeeRecords = async () => {
-  const lang = localStorage.getItem('lang') || 'en';  // Get language from localStorage
-  const res = await fetch(`/api/export-employee-details`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: window.employeeName,
-      records: window.allRecords,
-      lang // pass lang in the request body
-    }),
-  });
 
-  if (!res.ok) {
-    return alert('❌ Export failed.');
+document.getElementById('exportExcelBtn')?.addEventListener('click', async () => {
+  if (!window.allRecords || window.allRecords.length === 0) {
+    return alert('⚠️ No records to export.');
   }
 
-  const blob = await res.blob();
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${window.employeeName}_attendance.xlsx`;
-  a.click();
-};
+  const lang = localStorage.getItem('lang') || 'en';
+
+  try {
+    const res = await fetch('/api/export-employee-details', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: window.employeeName,
+        records: window.allRecords,
+        lang
+      })
+    });
+
+    if (!res.ok) throw new Error('Export failed');
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${window.employeeName}_attendance.xlsx`;
+    a.click();
+  } catch (err) {
+    console.error('[Export Error]', err);
+    alert('❌ Export failed.');
+  }
+});
 
 registerTranslations('employee-details', employeeDetailsLang);
 applyTranslations("employee-details");

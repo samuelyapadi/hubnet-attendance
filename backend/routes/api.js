@@ -792,9 +792,9 @@ router.post('/api/export-employee-details', async (req, res) => {
       name: r.name || '',
       checkIn: new Date(r.checkIn).toLocaleString(),
       checkOut: new Date(r.checkOut).toLocaleString(),
-      worked: r.workedTime || '',
-      overtime: r.overtime || '',
-      nightWork: r.nightWork || '',
+      worked: r.workedHours || '',
+      overtime: r.overtimeHours || '',
+      nightWork: r.nightHours || '',
       late: r.lateMinutes != null ? r.lateMinutes : '',
       type: r.type || '',
     });

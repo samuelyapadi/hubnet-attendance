@@ -39,6 +39,7 @@ export async function renderLogTable(records) {
     let isLate = false;
     let nightWorkMinutes = 0;
     let lateNote = '';
+    let lateMinutes = 0;
 
     try {
 if (userIsShiftWorker) {

@@ -320,8 +320,7 @@ router.get('/sessions/all', async (req, res) => {
     const userMap = {};
     users.forEach(u => userMap[u.name] = u);
 
-    // ✅ Format minutes as HH.MM
-    const toHHDotMM = (minutes) => {
+    const toDecimalFormat = (minutes) => {
       const h = Math.floor(minutes / 60);
       const m = minutes % 60;
       return `${h}.${m.toString().padStart(2, '0')}`;
@@ -335,16 +334,17 @@ router.get('/sessions/all', async (req, res) => {
       const totalMinutes = Math.floor(durationMs / 60000);
       const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
 
-      const workedHours = toHHDotMM(adjustedMinutes);
+      const workedHours = toDecimalFormat(adjustedMinutes);
       const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
-      const overtimeHours = toHHDotMM(overtimeMinutes);
+      const overtimeHours = toDecimalFormat(overtimeMinutes);
 
+      // Accurate night work calculation
       let nightMinutes = 0;
-      for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
-        const hour = new Date(ts).getHours();
+      for (let t = new Date(checkIn); t < checkOut; t.setMinutes(t.getMinutes() + 1)) {
+        const hour = t.getHours();
         if (hour >= 22 || hour < 5) nightMinutes++;
       }
-      const nightHours = toHHDotMM(nightMinutes);
+      const nightHours = toDecimalFormat(nightMinutes);
 
       const user = userMap[s.name];
       let lateMinutes = 0;

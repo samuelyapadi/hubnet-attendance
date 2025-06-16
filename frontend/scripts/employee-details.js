@@ -138,6 +138,11 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
 
     const nightWork = nightWorkMinutes > 0 ? `${Math.floor(nightWorkMinutes / 60)}h ${nightWorkMinutes % 60}m` : '';
 
+    entry.workedHours = workedTime;        // formatted string like "8h 0m"
+    entry.overtimeHours = overtime;        // formatted string like "1h 0m"
+    entry.nightHours = nightWork;          // formatted string like "0h 30m"
+    entry.lateMinutes = isLate ? lateMinutes : 0;  // number
+
     const row = document.createElement('tr');
     if (isLate && nightWorkMinutes > 0) {
       row.style.backgroundColor = '#f0e5ff'; // Light purple = both late + night
@@ -353,16 +358,20 @@ window.analyzeAndRenderSessions = () => {
   renderLogTable(window.allRecords);
 };
 window.exportEmployeeRecords = async () => {
-  const res = await fetch('/api/export-employee-details', {
+  const lang = localStorage.getItem('lang') || 'en';  // Get language from localStorage
+  const res = await fetch(`/api/export-employee-details`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       name: window.employeeName,
       records: window.allRecords,
+      lang // pass lang in the request body
     }),
   });
 
-  if (!res.ok) return alert('❌ Export failed.');
+  if (!res.ok) {
+    return alert('❌ Export failed.');
+  }
 
   const blob = await res.blob();
   const url = window.URL.createObjectURL(blob);

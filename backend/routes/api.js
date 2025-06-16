@@ -752,77 +752,59 @@ router.get('/employees-summary', async (req, res) => {
 
 const ExcelJS = require('exceljs');
 
-router.get('/export-attendance', async (req, res) => {
-  const { dept, year, month, startDate, endDate } = req.query;
+router.post('/api/export-employee-details', async (req, res) => {
+  const { name, records, lang = 'en' } = req.body;
 
-  try {
-    const query = {};
-    if (dept) query.department = dept;
+  if (!records || !Array.isArray(records)) {
+    return res.status(400).json({ error: 'Invalid data format' });
+  }
 
-    const users = await User.find(query);
-    const userMap = {};
-    users.forEach(user => {
-      userMap[user.name] = user;
-    });
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('Employee Attendance');
 
-    const sessions = await Attendance.find({ checkIn: { $ne: null }, checkOut: { $ne: null } });
-
-    const filtered = sessions.filter(s => {
-      const checkIn = new Date(s.checkIn);
-      if (year && checkIn.getFullYear() !== Number(year)) return false;
-      if (month && checkIn.getMonth() !== Number(month)) return false;
-
-      const start = startDate ? new Date(startDate) : null;
-      const end = endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : null;
-
-      if (start && checkIn < start) return false;
-      if (end && checkIn > end) return false;
-
-      return true;
-    });
-
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Attendance');
-
-    sheet.columns = [
+  const headers = {
+    en: [
       { header: 'Name', key: 'name', width: 20 },
-      { header: 'Department', key: 'department', width: 20 },
-      { header: 'Check In', key: 'checkIn', width: 25 },
-      { header: 'Check Out', key: 'checkOut', width: 25 },
-      { header: 'Worked Hours', key: 'worked', width: 15 },
-      { header: 'Type', key: 'type', width: 15 },
-      { header: 'Late (min)', key: 'late', width: 12 },
-    ];
+      { header: 'Check-In Time', key: 'checkIn', width: 25 },
+      { header: 'Check-Out Time', key: 'checkOut', width: 25 },
+      { header: 'Worked (h)', key: 'worked', width: 20 },
+      { header: 'Overtime', key: 'overtime', width: 15 },
+      { header: 'Night Work (h)', key: 'nightWork', width: 15 },
+      { header: 'Late (min)', key: 'late', width: 15 },
+      { header: 'Type', key: 'type', width: 10 },
+    ],
+    ja: [
+      { header: '名前', key: 'name', width: 20 },
+      { header: '出勤時間', key: 'checkIn', width: 25 },
+      { header: '退勤時間', key: 'checkOut', width: 25 },
+      { header: '勤務時間 (h)', key: 'worked', width: 20 },
+      { header: '残業区分', key: 'overtime', width: 15 },
+      { header: '深夜勤務 (h)', key: 'nightWork', width: 15 },
+      { header: '遅刻 (分)', key: 'late', width: 15 },
+      { header: '種別', key: 'type', width: 10 },
+    ]
+  };
 
-    for (const s of filtered) {
-      const user = userMap[s.name];
-      const checkIn = new Date(s.checkIn);
-      const checkOut = new Date(s.checkOut);
-      const ms = checkOut - checkIn;
-      const worked = Math.round((ms / 3600000) * 10) / 10;
+  sheet.columns = headers[lang] || headers.en;
 
+  for (const r of records) {
     sheet.addRow({
-      name: s.name,
-      department: user?.department || '',
-      checkIn: checkIn.toLocaleString(),
-      checkOut: checkOut.toLocaleString(),
-      worked: workedHours.toLocaleString(),
-      overtime: overtimeHours.toLocaleString(),
-      night: nightHours.toLocaleString(),
-      late: lateMinutes.toLocaleString(),
-      type: s.type || 'work',
+      name: r.name || '',
+      checkIn: new Date(r.checkIn).toLocaleString(),
+      checkOut: new Date(r.checkOut).toLocaleString(),
+      worked: r.workedTime || '',
+      overtime: r.overtime || '',
+      nightWork: r.nightWork || '',
+      late: r.lateMinutes != null ? r.lateMinutes : '',
+      type: r.type || '',
     });
   }
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=attendance.xlsx');
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename=${name}_attendance.xlsx`);
 
-    await workbook.xlsx.write(res);
-    res.end();
-  } catch (err) {
-    console.error('[EXPORT ERROR]', err);
-    res.status(500).json({ error: 'Failed to export Excel' });
-  }
+  await workbook.xlsx.write(res);
+  res.end();
 });
 
 module.exports = router;

@@ -852,33 +852,32 @@ router.get('/export-attendance', async (req, res) => {
     ];
 
 for (const s of filtered) {
-  const user = userMap[s.name];
   const checkIn = new Date(s.checkIn);
   const checkOut = new Date(s.checkOut);
+  const user = userMap[s.name];
 
-  const workedMinutesRaw = Math.floor((checkOut - checkIn) / 60000);
-  const adjustedMinutes = workedMinutesRaw > 360 ? workedMinutesRaw - 60 : workedMinutesRaw;
+  const durationMs = checkOut - checkIn;
+  const totalMinutes = Math.floor(durationMs / 60000);
+  const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
+
   const workedHours = Math.round((adjustedMinutes / 60) * 100) / 100;
-
-  const overtimeMinutes = Math.max(0, adjustedMinutes - 480); // Over 8h
+  const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
   const overtimeHours = Math.round((overtimeMinutes / 60) * 100) / 100;
 
-  // Night work between 22:00–05:00
   let nightMinutes = 0;
-  for (let t = new Date(checkIn); t < checkOut; t = new Date(t.getTime() + 60000)) {
-    const h = t.getHours();
-    if (h >= 22 || h < 5) nightMinutes++;
+  for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
+    const hour = new Date(ts).getHours();
+    if (hour >= 22 || hour < 5) nightMinutes++;
   }
   const nightHours = Math.round((nightMinutes / 60) * 100) / 100;
 
-  // Lateness from default start time
   let lateMinutes = 0;
   if (user?.defaultStartTime) {
     const [h, m] = user.defaultStartTime.split(':').map(Number);
     const expected = new Date(checkIn);
     expected.setHours(h, m, 0, 0);
     const diff = Math.round((checkIn - expected) / 60000);
-    if (diff > 0) lateMinutes = diff;
+    if (diff > 5) lateMinutes = diff;
   }
 
   sheet.addRow({

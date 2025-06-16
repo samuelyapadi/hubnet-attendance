@@ -817,8 +817,8 @@ router.get('/export-attendance', async (req, res) => {
       sheet.addRow({
         name: s.name,
         department: user?.department || '',
-        checkIn: checkIn.toLocaleString(),
-        checkOut: checkOut.toLocaleString(),
+        checkIn: checkIn.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
+        checkOut: checkOut.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
         worked: workedHours,
         overtime: overtimeHours,
         night: nightHours,

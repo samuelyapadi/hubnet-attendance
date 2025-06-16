@@ -882,6 +882,7 @@ for (const s of filtered) {
     expected.setHours(h, m, 0, 0);
     const diff = Math.round((checkIn - expected) / 60000);
     if (diff > 5) lateMinutes = diff;
+      console.log('[EXCEL] name:', s.name, '| defaultStartTime:', user.defaultStartTime, '| checkIn:', checkIn, '| diff:', diff, '| lateMinutes:', lateMinutes);
   }
 
   sheet.addRow({

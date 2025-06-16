@@ -102,6 +102,7 @@ function saveEmployeeInfo(employeeId, employeeName) {
       if (typeof window.analyzeAndRenderSessions === 'function') {
         window.analyzeAndRenderSessions(window.allRecordsRaw || []);
       }
+        location.reload();
     })
     .catch(err => {
       console.error('[Update Error]', err);

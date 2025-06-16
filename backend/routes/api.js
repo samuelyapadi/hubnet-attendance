@@ -801,16 +801,18 @@ router.get('/export-attendance', async (req, res) => {
       const ms = checkOut - checkIn;
       const worked = Math.round((ms / 3600000) * 10) / 10;
 
-      sheet.addRow({
-        name: s.name,
-        department: user?.department || '',
-        checkIn: checkIn.toLocaleString(),
-        checkOut: checkOut.toLocaleString(),
-        worked,
-        type: s.type || 'work',
-        late: s.lateMinutes || 0
-      });
-    }
+    sheet.addRow({
+      name: s.name,
+      department: user?.department || '',
+      checkIn: checkIn.toLocaleString(),
+      checkOut: checkOut.toLocaleString(),
+      worked: workedHours.toLocaleString(),
+      overtime: overtimeHours.toLocaleString(),
+      night: nightHours.toLocaleString(),
+      late: lateMinutes.toLocaleString(),
+      type: s.type || 'work',
+    });
+  }
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=attendance.xlsx');

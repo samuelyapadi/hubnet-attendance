@@ -788,16 +788,24 @@ router.get('/export-attendance', async (req, res) => {
       const totalMinutes = Math.floor(durationMs / 60000);
       const adjustedMinutes = totalMinutes > 360 ? totalMinutes - 60 : totalMinutes;
 
-      const workedHours = Math.round((adjustedMinutes / 60) * 100) / 100;
+      const toDecimalFormat = (minutes) => {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return `${h}.${m.toString().padStart(2, '0')}`;
+      };
+
+      const workedMinutes = Math.floor((checkOut - checkIn) / 60000);
+      const adjustedMinutes = workedMinutes > 360 ? workedMinutes - 60 : workedMinutes;
+      const workedHours = toDecimalFormat(adjustedMinutes);
       const overtimeMinutes = Math.max(0, adjustedMinutes - 480);
-      const overtimeHours = Math.round((overtimeMinutes / 60) * 100) / 100;
+      const overtimeHours = toDecimalFormat(overtimeMinutes);
 
       let nightMinutes = 0;
       for (let ts = checkIn.getTime(); ts < checkOut.getTime(); ts += 60000) {
         const hour = new Date(ts).getHours();
         if (hour >= 22 || hour < 5) nightMinutes++;
       }
-      const nightHours = Math.round((nightMinutes / 60) * 100) / 100;
+      const nightHours = toDecimalFormat(nightMinutes);
 
       let lateMinutes = 0;
       if (user?.defaultStartTime) {
@@ -806,7 +814,6 @@ router.get('/export-attendance', async (req, res) => {
         expected.setHours(h, m, 0, 0);
         const diff = Math.round((checkIn - expected) / 60000);
         if (diff > 5) lateMinutes = diff;
-        console.log('[EXCEL]', s.name, '| defaultStartTime:', user.defaultStartTime, '| checkIn:', checkIn, '| diff:', diff);
       }
 
       sheet.addRow({

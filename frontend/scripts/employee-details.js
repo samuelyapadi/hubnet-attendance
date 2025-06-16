@@ -352,6 +352,25 @@ document.getElementById('openCreateSessionModal')?.addEventListener('click', () 
 window.analyzeAndRenderSessions = () => {
   renderLogTable(window.allRecords);
 };
+window.exportEmployeeRecords = async () => {
+  const res = await fetch('/api/export-employee-details', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: window.employeeName,
+      records: window.allRecords,
+    }),
+  });
+
+  if (!res.ok) return alert('❌ Export failed.');
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${window.employeeName}_attendance.xlsx`;
+  a.click();
+};
 
 registerTranslations('employee-details', employeeDetailsLang);
 applyTranslations("employee-details");

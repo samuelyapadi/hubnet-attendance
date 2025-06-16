@@ -122,7 +122,17 @@ document.getElementById('downloadExcel')?.addEventListener('click', async () => 
   const sessions = await sessionsRes.json();
   const users = await usersRes.json();
 
-  const filtered = sessions.filter(session => {
+  const enriched = sessions.map(s => {
+    return {
+      ...s,
+      workedHours: s.worked,
+      overtimeHours: s.overtime,
+      nightHours: s.night,
+      lateMinutes: s.late,
+    };
+  });
+
+  const filtered = enriched.filter(session => {
     const checkIn = new Date(session.checkIn);
     const user = users.find(u => u.name === session.name);
     const userDept = user?.department || '';

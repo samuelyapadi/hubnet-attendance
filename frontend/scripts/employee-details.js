@@ -86,8 +86,10 @@ if (userIsShiftWorker) {
       // If late past midnight, add 1440 mins (1 day) to shift time for proper diff
       if (lateMinutes < 0) lateMinutes += 1440;
 
-      lateNote = ' ' + translate('lateNotice', 'employee-details').replace('{min}', lateMinutes);
-    }
+      lateNote = ' ' + translate('lateNotice', 'employee-details')
+        .replace('{hh}', String(Math.floor(lateMinutes / 60)).padStart(2, '0'))
+        .replace('{mm}', String(lateMinutes % 60).padStart(2, '0'));   
+     }
   }
 } else if (userDefaultStartTime) {
   const defaultStartMinutes = parseTimeString(userDefaultStartTime);
@@ -96,8 +98,10 @@ if (userIsShiftWorker) {
     isLate = checkInMinutes > defaultStartMinutes;
     if (isLate) {
       lateMinutes = checkInMinutes - defaultStartMinutes;
-      lateNote = ' ' + translate('lateNotice', 'employee-details').replace('{min}', lateMinutes);
-    }
+      lateNote = ' ' + translate('lateNotice', 'employee-details')
+        .replace('{hh}', String(Math.floor(lateMinutes / 60)).padStart(2, '0'))
+        .replace('{mm}', String(lateMinutes % 60).padStart(2, '0'));
+  }
     console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);
     console.log('Check-in:', checkIn.toTimeString(), '→', checkInMinutes);
     console.log('Late?', isLate);
@@ -131,8 +135,9 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
       if (defaultStartMinutes !== null) {
         const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
         const lateMinutes = checkInMinutes - defaultStartMinutes;
-        lateNote = ' ' + translate('lateNotice', 'employee-details').replace('{min}', lateMinutes);
-      }
+      lateNote = ' ' + translate('lateNotice', 'employee-details')
+        .replace('{hh}', String(Math.floor(lateMinutes / 60)).padStart(2, '0'))
+        .replace('{mm}', String(lateMinutes % 60).padStart(2, '0'));      }
     }
 
     const workedTime = entry.type === 'work'

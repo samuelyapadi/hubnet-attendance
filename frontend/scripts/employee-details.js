@@ -371,6 +371,25 @@ window.analyzeAndRenderSessions = () => {
   renderLogTable(window.allRecords);
 };
 
+function getFilteredRecords() {
+  const year = document.getElementById('yearFilter')?.value;
+  const month = document.getElementById('monthFilter')?.value;
+  const startDateVal = document.getElementById('startDate')?.value;
+  const endDateVal = document.getElementById('endDate')?.value;
+
+  const startDate = startDateVal ? new Date(startDateVal) : null;
+  const endDate = endDateVal ? new Date(new Date(endDateVal).setHours(23, 59, 59, 999)) : null;
+
+  return window.allRecords.filter(entry => {
+    const d = new Date(entry.checkIn);
+    const matchYear = !year || d.getFullYear().toString() === year;
+    const matchMonth = month === '' || d.getMonth().toString() === month;
+    const matchStart = !startDate || d >= startDate;
+    const matchEnd = !endDate || d <= endDate;
+    return matchYear && matchMonth && matchStart && matchEnd;
+  });
+}
+
 document.getElementById('exportExcelBtn')?.addEventListener('click', async () => {
   if (!window.allRecords || window.allRecords.length === 0) {
     return alert('⚠️ No records to export.');
@@ -384,7 +403,7 @@ document.getElementById('exportExcelBtn')?.addEventListener('click', async () =>
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: window.employeeName,
-        records: window.allRecords,
+        records: getFilteredRecords(),
         lang
       })
     });

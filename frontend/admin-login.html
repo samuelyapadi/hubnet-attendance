@@ -1,4 +1,4 @@
-<!-- ✅ Updated admin-login.html with translation support and back to home button -->
+<!--Updated admin-login.html with translation support and back to home button -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,49 +46,49 @@
     <span id="langLoading" style="margin-left: 8px; display: none;">⏳</span>
   </div>
 
-  <script type="module">
-    import { setLanguage, applyTranslations } from './scripts/lang.js';
+<script type="module">
+  import { setLanguage, applyTranslations } from './scripts/lang.js';
 
-    window.setLanguageUI = (lang) => {
-      setLanguage(lang);
-      location.reload();
-    };
+  window.setLanguageUI = (lang) => {
+    setLanguage(lang);
+    location.reload();
+  };
 
-    applyTranslations('admin-login');
+  applyTranslations('adminLogin'); 
 
-    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('adminUsername').value.trim();
-      const password = document.getElementById('adminPassword').value.trim();
+  document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value.trim();
 
-      try {
-        const res = await fetch('/api/admins/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
+    try {
+      const res = await fetch('/api/admins/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-        const result = await res.json();
-        if (result.success) {
-          sessionStorage.setItem('role', 'admin');
-          location.href = 'admin.html';
-        } else {
-          document.getElementById('adminLoginError').style.display = 'block';
-        }
-      } catch (err) {
-        console.error('Login failed:', err);
+      const result = await res.json();
+      if (result.success) {
+        sessionStorage.setItem('role', 'admin');
+        location.href = 'admin.html';
+      } else {
         document.getElementById('adminLoginError').style.display = 'block';
       }
-    });
+    } catch (err) {
+      console.error('Login failed:', err);
+      document.getElementById('adminLoginError').style.display = 'block';
+    }
+  });
 
-    document.getElementById('manageAdminsBtn').addEventListener('click', () => {
-      const superPassword = prompt('Enter super-admin password:');
-      if (superPassword === 'hubnetroot') {
-        location.href = 'admin-manage.html';
-      } else {
-        document.getElementById('superAuthError').style.display = 'block';
-      }
-    });
-  </script>
+  document.getElementById('manageAdminsBtn').addEventListener('click', () => {
+    const superPassword = prompt('Enter super-admin password:');
+    if (superPassword === 'hubnetroot') {
+      location.href = 'admin-manage.html';
+    } else {
+      document.getElementById('superAuthError').style.display = 'block';
+    }
+  });
+</script>
 </body>
 </html>

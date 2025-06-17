@@ -170,13 +170,15 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
       <td><input type="datetime-local" value="${toLocalDatetimeString(entry.checkOut)}" data-id="${entry._id}" data-type="checkOut" disabled></td>
       <td class="worked-cell">${workedTime}</td>
       <td class="overtime-cell">${overtime}</td>
-      <td>
-        <select data-id="${entry._id}" data-type="type" disabled>
-          <option value="work" ${entry.type === 'work' ? 'selected' : ''}>${translate('work', 'employee-details')}</option>
-          <option value="leave" ${entry.type === 'leave' ? 'selected' : ''}>${translate('paidLeave', 'employee-details')}</option>
-          <option value="unpaid" ${entry.type === 'unpaid' ? 'selected' : ''}>${translate('unpaidLeave', 'employee-details')}</option>
-        </select>
-      </td>
+    <td class="session-type-cell">
+      ${
+        entry.type === 'work'
+          ? translate('work', 'employee-details')
+          : entry.type === 'leave'
+          ? translate('paidLeave', 'employee-details')
+          : translate('unpaidLeave', 'employee-details')
+      }
+    </td>
       <td>${nightWork}</td>
       <td>
         <button class="btn edit-btn" onclick="enableEdit('${entry._id}', this)">✏️ ${translate('edit', 'employees')}</button>

@@ -259,6 +259,7 @@ export async function saveSession(sessionId) {
   }
 }
 
+
 export async function deleteSession(sessionId) {
   if (!confirm('Are you sure you want to delete this session?')) return;
     try {

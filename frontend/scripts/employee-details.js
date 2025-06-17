@@ -195,7 +195,10 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
 
 export function enableEdit(sessionId, button) {
   const row = button.closest('tr');
-  row.querySelectorAll('input, select').forEach(input => input.disabled = false);
+  row.querySelectorAll('input').forEach(input => input.disabled = false);
+  row.querySelectorAll('select').forEach(select => {
+    if (select.dataset.type !== 'type') select.disabled = false;
+  });
   row.querySelector('.save-btn').style.display = 'inline-flex';
   button.style.display = 'none';
 }

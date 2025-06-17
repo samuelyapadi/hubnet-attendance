@@ -243,11 +243,13 @@ export async function saveSession(sessionId) {
       row.querySelector('.worked-cell').textContent = workedText;
       row.querySelector('.overtime-cell').textContent = overtimeText;
 
-      checkInInput.disabled = true;
-      checkOutInput.disabled = true;
-      typeSelect.disabled = true;
-      row.querySelector('.save-btn').style.display = 'none';
-      row.querySelector('.edit-btn').style.display = 'inline-flex';
+      // Refresh full records and re-render to reflect new lateness, background color, etc.
+      const refreshed = await fetch('/api/sessions/all').then(res => res.json());
+      window.allRecords = refreshed.filter(
+        e => e.name === window.employeeName && e.checkIn && e.checkOut
+    );
+      renderLogTable(getFilteredRecords());
+
     } else {
       alert('❌ Failed to update session.');
     }

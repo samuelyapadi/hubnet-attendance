@@ -795,7 +795,7 @@ router.post('/export-employee-details', async (req, res) => {
       worked: (r.workedHours || '').replace(/🚨.*$/, '').trim(),
       overtime: r.overtimeHours || '',
       nightWork: r.nightHours || '',
-      late: r.lateMinutes != null ? r.lateMinutes : '',
+      late: r.lateMinutes || '',
       type: r.type || '',
     });
   }

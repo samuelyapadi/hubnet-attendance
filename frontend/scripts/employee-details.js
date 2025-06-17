@@ -4,6 +4,12 @@ import { toLocalDatetimeString, parseTimeString } from './utils-datetime.js';
 import { employeeDetailsLang } from './employee-details.lang.js';
 import { registerTranslations, applyTranslations, translate } from './lang.js'; 
 
+function formatToHHMM(mins) {
+  const h = String(Math.floor(mins / 60)).padStart(2, '0');
+  const m = String(mins % 60).padStart(2, '0');
+  return `${h}:${m}`;
+}
+
 export async function renderLogTable(records) {
   const userDefaultStartTime = window.userDefaultStartTime || null;
   const userIsShiftWorker = window.userIsShiftWorker || false;
@@ -130,19 +136,20 @@ nightWorkMinutes = calculateNightWorkMinutes(checkIn, checkOut);
     }
 
     const workedTime = entry.type === 'work'
-      ? `${Math.floor(adjustedWorked / 60)}h ${adjustedWorked % 60}m${lateNote}`
+      ? `${formatToHHMM(adjustedWorked)}${lateNote}`
       : '-';
 
     const overtimeMinutes = entry.type === 'work' ? Math.max(0, adjustedWorked - 480) : 0;
-    const overtime = overtimeMinutes > 0 ? `${Math.floor(overtimeMinutes / 60)}h ${overtimeMinutes % 60}m` : '-';
+    const overtime = overtimeMinutes > 0 ? formatToHHMM(overtimeMinutes) : '-';
+
     if (overtimeMinutes > 0) totalOvertimeMinutes += overtimeMinutes;
 
-    const nightWork = nightWorkMinutes > 0 ? `${Math.floor(nightWorkMinutes / 60)}h ${nightWorkMinutes % 60}m` : '';
+    const nightWork = nightWorkMinutes > 0 ? formatToHHMM(nightWorkMinutes) : '';
 
-    entry.workedHours = workedTime;        // formatted string like "8h 0m"
-    entry.overtimeHours = overtime;        // formatted string like "1h 0m"
-    entry.nightHours = nightWork;          // formatted string like "0h 30m"
-    entry.lateMinutes = isLate ? lateMinutes : 0;  // number
+    entry.workedHours = formatToHHMM(adjustedWorked);
+    entry.overtimeHours = formatToHHMM(overtimeMinutes);
+    entry.nightHours = formatToHHMM(nightWorkMinutes);
+    entry.lateMinutes = isLate ? formatToHHMM(lateMinutes) : '';
 
     const row = document.createElement('tr');
     if (isLate && nightWorkMinutes > 0) {

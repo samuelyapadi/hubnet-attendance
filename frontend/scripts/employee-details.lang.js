@@ -58,6 +58,7 @@ export const employeeDetailsLang = {
     checkOutAfter: "⚠️ Check-out must be after check-in.",
     sessionCreated: "✅ Session created.",
     createFailed: "❌ Failed to create session.",
+    exportExcel: '📥 Export Excel',
     table: {
       checkIn: "Check In",
       checkOut: "Check Out",
@@ -127,6 +128,7 @@ export const employeeDetailsLang = {
     checkOutAfter: "⚠️ 退勤は出勤より後の時刻にしてください。",
     sessionCreated: "✅ セッションを作成しました。",
     createFailed: "❌ セッションの作成に失敗しました。",
+    exportExcel: '📥 エクセル出力',
     table: {
       checkIn: "出勤",
       checkOut: "退勤",

@@ -208,7 +208,7 @@ export function enableEdit(sessionId, button) {
 export async function saveSession(sessionId) {
   const checkInInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkIn']`);
   const checkOutInput = document.querySelector(`input[data-id='${sessionId}'][data-type='checkOut']`);
-  const typeSelect = document.querySelector(`select[data-id='${sessionId}'][data-type='type']`);
+  const type = window.allRecords.find(r => r._id === sessionId)?.type || 'work';
   const row = checkInInput.closest('tr');
 
   const checkInDate = new Date(checkInInput.value);
@@ -223,7 +223,7 @@ export async function saveSession(sessionId) {
   const body = {
     checkIn: checkInDate.toISOString(),
     checkOut: checkOutDate.toISOString(),
-    type: typeSelect.value,
+    type,
     lateMinutes
   };
 

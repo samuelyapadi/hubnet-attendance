@@ -752,7 +752,7 @@ router.get('/employees-summary', async (req, res) => {
 
 const ExcelJS = require('exceljs');
 
-router.post('/api/export-employee-details', async (req, res) => {
+router.post('/export-employee-details', async (req, res) => {
   const { name, records, lang = 'en' } = req.body;
 
   if (!records || !Array.isArray(records)) {

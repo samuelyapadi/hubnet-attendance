@@ -89,7 +89,7 @@ if (userIsShiftWorker) {
     const checkInMinutes = checkIn.getHours() * 60 + checkIn.getMinutes();
     isLate = checkInMinutes > defaultStartMinutes;
     if (isLate) {
-      const lateMinutes = checkInMinutes - defaultStartMinutes;
+      lateMinutes = checkInMinutes - defaultStartMinutes;
       lateNote = ' ' + translate('lateNotice', 'employee-details').replace('{min}', lateMinutes);
     }
     console.log('Default Start:', userDefaultStartTime, '→', defaultStartMinutes);

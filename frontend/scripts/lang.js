@@ -174,7 +174,35 @@ const translations = {
     exportDept: '部署:',
     exportExcel: '📥 エクセル出力'
   }
+},
+
+adminLogin: {
+  en: {
+    adminLoginTitle: "Admin Login",
+    branding: "HUBNET Attendance",
+    backToHome: "← Back to Home",
+    adminLogin: "Admin Login",
+    username: "Username",
+    password: "Password",
+    login: "Login",
+    manageAdmins: "Manage Admins",
+    superAuthError: "❌ Incorrect super password",
+    adminLoginError: "❌ Invalid login"
+  },
+  ja: {
+    adminLoginTitle: "管理者ログイン",
+    branding: "HUBNET勤怠管理",
+    backToHome: "← ホームに戻る",
+    adminLogin: "管理者ログイン",
+    username: "ユーザー名",
+    password: "パスワード",
+    login: "ログイン",
+    manageAdmins: "管理者の管理",
+    superAuthError: "❌ スーパーパスワードが間違っています",
+    adminLoginError: "❌ ログインに失敗しました"
+  }
 }
+
 };
 
 export function setLanguage(lang) {

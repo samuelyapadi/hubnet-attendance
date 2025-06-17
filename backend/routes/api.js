@@ -790,8 +790,8 @@ router.post('/export-employee-details', async (req, res) => {
   for (const r of records) {
     sheet.addRow({
       name: r.name || '',
-      checkIn: new Date(r.checkIn).toLocaleString(),
-      checkOut: new Date(r.checkOut).toLocaleString(),
+      checkIn: new Date(r.checkIn).toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }),
+      checkOut: new Date(r.checkOut).toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }),
       worked: (r.workedHours || '').replace(/🚨.*$/, '').trim(),
       overtime: r.overtimeHours || '',
       nightWork: r.nightHours || '',

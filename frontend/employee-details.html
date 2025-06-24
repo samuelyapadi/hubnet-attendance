@@ -89,19 +89,17 @@
 <!-- 📝 Modal for Session Creation -->
 <div id="createSessionModal" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:white; padding:1.5rem; box-shadow:0 0 12px rgba(0,0,0,0.2); border-radius:8px; z-index:999;">
   <h3 data-i18n="employee-details.createSessionTitle"></h3>
-    <label data-i18n="employee-details.type">
+    <label data-i18n="employee-details.type"></label>
     <select id="sessionType">
       <option value="work" data-i18n="employee-details.work"></option>
       <option value="leave" data-i18n="employee-details.paidLeave"></option>
       <option value="unpaid" data-i18n="employee-details.unpaidLeave"></option>
     </select>
   </label><br><br>
-  <label data-i18n="employee-details.checkIn">
-    <input type="datetime-local" id="manualCheckIn">
-  </label><br><br>
-  <label data-i18n="employee-details.checkOut">
-    <input type="datetime-local" id="manualCheckOut">
-  </label><br><br>
+  <label data-i18n="employee-details.checkIn"></label>
+  <input type="datetime-local" id="manualCheckIn"><br><br>
+  <label data-i18n="employee-details.checkOut"></label>
+  <input type="datetime-local" id="manualCheckOut"><br><br>
   <button id="createSessionBtn" class="btn" data-i18n="employee-details.submit"></button>
   <button type="button" class="btn" onclick="document.getElementById('createSessionModal').style.display='none'" data-i18n="employee-details.cancel"></button>
 </div>

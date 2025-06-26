@@ -163,23 +163,6 @@
   <audio id="sound-success" src="sounds/success.mp3" preload="auto"></audio>
   <audio id="sound-fail" src="sounds/fail.mp3" preload="auto"></audio>
 
-  <!-- 🔄 Global Spinner -->
-<div id="spinner" style="
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(255, 255, 255, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  z-index: 10000;
-">
-  🔄 Please wait...
-</div>
-
   <script type="module">
   import { setLanguage, applyTranslations } from './scripts/lang.js';
   window.setLanguageUI = async (lang) => {

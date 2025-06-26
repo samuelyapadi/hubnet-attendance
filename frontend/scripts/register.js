@@ -94,10 +94,31 @@ capturePhotoBtn?.addEventListener('click', async () => {
     return;
   }
 
-  const detection = await faceapi
+  console.log("🟡 Starting face detection...");
+let detection;
+
+try {
+  const detectionPromise = faceapi
     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks()
     .withFaceDescriptor();
+
+  // Add a timeout fallback: after 3 seconds, reject if not resolved
+  detection = await Promise.race([
+    detectionPromise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Face detection timed out")), 3000)
+    )
+  ]);
+
+} catch (err) {
+  console.error("❌ Face detection failed or timed out:", err);
+  alert("⚠️ Face detection failed or timed out. Try again.");
+  soundFail.play();
+  isCapturing = false;
+  restartCameraWithNotice();
+  return;
+}
 
   if (!detection) {
     alert("No face detected. Try again.");

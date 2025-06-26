@@ -35,12 +35,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     await import('./storage.js');
 
     if (document.getElementById('loginBtn')) {
-      console.log("🔐 Loading login logic...");
+      console.log("Loading login logic...");
       await import('./login.js');
     }
 
     if (document.getElementById('saveUserBtn')) {
-      console.log("📝 Loading registration logic...");
+      console.log("Loading registration logic...");
       await import('./register.js');
     }
 

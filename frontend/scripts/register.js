@@ -93,73 +93,73 @@ capturePhotoBtn?.addEventListener('click', async () => {
   if (isCapturing) return;
   isCapturing = true;
 
-  const username = usernameInput.value.trim();
-  if (!username) {
-    alert("Please enter a name before capturing photos.");
+  try {
+    // all your face detection logic here
+    const username = usernameInput.value.trim();
+    if (!username) {
+      alert("Please enter a name before capturing photos.");
+      return;
+    }
+
+    if (descriptors.length >= 3) {
+      alert("You already have 3 photos. Click 'Save Registered Face'.");
+      return;
+    }
+
+    console.log("🟡 Starting face detection...");
+    let detection;
+
+    try {
+      const detectionPromise = faceapi
+        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      detection = await Promise.race([
+        detectionPromise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Face detection timed out")), 3000)
+        )
+      ]);
+    } catch (err) {
+      console.error("❌ Face detection failed or timed out:", err);
+      alert("⚠️ Face detection failed or timed out. Try again.");
+      soundFail.play();
+      restartCameraWithNotice();
+      return;
+    }
+
+    if (!detection) {
+      alert("No face detected. Try again.");
+      soundFail.play();
+      restartCameraWithNotice();
+      return;
+    }
+
+    const descriptor = Array.from(detection.descriptor);
+    descriptors.push(descriptor);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = canvas.toDataURL('image/jpeg');
+    snapshots.push(imageData);
+
+    photoCount.textContent = descriptors.length;
+    status.textContent = `✅ Photo ${descriptors.length} captured.`;
+    validateFormInputs();
+
+    if (descriptors.length === 3) {
+      saveUserBtn.disabled = false;
+      status.textContent = "✅ 3 photos captured. You can now save.";
+    }
+
+  } finally {
+    // Always re-enable capture even if something fails
     isCapturing = false;
-    return;
   }
-  if (descriptors.length >= 3) {
-    alert("You already have 3 photos. Click 'Save Registered Face'.");
-    isCapturing = false;
-    return;
-  }
-
-  console.log("🟡 Starting face detection...");
-let detection;
-
-try {
-  const detectionPromise = faceapi
-    .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks()
-    .withFaceDescriptor();
-
-  // Add a timeout fallback: after 3 seconds, reject if not resolved
-  detection = await Promise.race([
-    detectionPromise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Face detection timed out")), 3000)
-    )
-  ]);
-
-} catch (err) {
-  console.error("❌ Face detection failed or timed out:", err);
-  alert("⚠️ Face detection failed or timed out. Try again.");
-  soundFail.play();
-  isCapturing = false;
-  restartCameraWithNotice();
-  return;
-}
-
-  if (!detection) {
-    alert("No face detected. Try again.");
-    soundFail.play();
-    isCapturing = false;
-    restartCameraWithNotice();
-    return;
-  }
-
-  const descriptor = Array.from(detection.descriptor);
-  descriptors.push(descriptor);
-
-  const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const imageData = canvas.toDataURL('image/jpeg');
-  snapshots.push(imageData);
-
-  photoCount.textContent = descriptors.length;
-  status.textContent = `✅ Photo ${descriptors.length} captured.`;
-  validateFormInputs();
-
-  if (descriptors.length === 3) {
-    saveUserBtn.disabled = false;
-    status.textContent = "✅ 3 photos captured. You can now save.";
-  }
-
-  isCapturing = false;
 });
 
 saveUserBtn?.addEventListener('click', async () => {

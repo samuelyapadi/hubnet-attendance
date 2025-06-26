@@ -52,8 +52,12 @@ function stopCamera() {
 }
 
 function restartCameraWithNotice() {
+  document.getElementById('spinner').style.display = 'flex';
   stopCamera();
-  setTimeout(startCamera, 500);
+  setTimeout(() => {
+    startCamera();
+    document.getElementById('spinner').style.display = 'none';
+  }, 500);
 }
 
 function validateFormInputs() {
@@ -164,6 +168,7 @@ saveUserBtn?.addEventListener('click', async () => {
     return;
   }
 
+  document.getElementById('spinner').style.display = 'flex';
   const result = await sendToAPI('register', {
     name,
     department,
@@ -174,7 +179,9 @@ saveUserBtn?.addEventListener('click', async () => {
     weeklyWorkingDays
   });
 
+
   if (result.success) {
+    document.getElementById('spinner').style.display = 'none';
     alert(`✅ Face data for '${name}' has been saved to the database.`);
     soundSuccess.play();
     descriptors = [];
@@ -189,6 +196,7 @@ saveUserBtn?.addEventListener('click', async () => {
     weeklyWorkingDaysSelect.value = "1";
     workingDaysContainer.style.display = "none";
   } else {
+    document.getElementById('spinner').style.display = 'none';
     alert(`❌ Failed to register: ${result.error || 'Unknown error'}`);
     soundFail.play();
     restartCameraWithNotice();

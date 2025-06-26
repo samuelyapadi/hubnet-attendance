@@ -93,6 +93,8 @@ capturePhotoBtn?.addEventListener('click', async () => {
   if (isCapturing) return;
   isCapturing = true;
 
+  photoCount.textContent = descriptors.length; // 🧼 force UI sync at click
+
   try {
     // all your face detection logic here
     const username = usernameInput.value.trim();
@@ -106,35 +108,41 @@ capturePhotoBtn?.addEventListener('click', async () => {
       return;
     }
 
-    console.log("🟡 Starting face detection...");
-    let detection;
+console.log("🟡 Starting face detection...");
+let detection;
 
-    try {
-      const detectionPromise = faceapi
-        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptor();
+try {
+  const detectionPromise = faceapi
+    .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+    .withFaceLandmarks()
+    .withFaceDescriptor();
 
-      detection = await Promise.race([
-        detectionPromise,
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Face detection timed out")), 3000)
-        )
-      ]);
-    } catch (err) {
-      console.error("❌ Face detection failed or timed out:", err);
-      alert("⚠️ Face detection failed or timed out. Try again.");
-      soundFail.play();
-      restartCameraWithNotice();
-      return;
-    }
+  detection = await Promise.race([
+    detectionPromise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Face detection timed out")), 3000)
+    )
+  ]);
 
-    if (!detection) {
-      alert("No face detected. Try again.");
-      soundFail.play();
-      restartCameraWithNotice();
-      return;
-    }
+  if (!detection || !detection.descriptor || !Array.isArray(detection.descriptor)) {
+    console.warn("⚠️ No valid face descriptor returned.");
+    alert("No face detected. Try again.");
+    soundFail.play();
+    isCapturing = false; // 🔧 added line
+    restartCameraWithNotice();
+    validateFormInputs(); // 🛠️ keep UI state in sync
+    return;
+  }
+
+} catch (err) {
+  console.error("❌ Face detection failed or timed out:", err);
+  alert("⚠️ Face detection failed or timed out. Try again.");
+  soundFail.play();
+  isCapturing = false; // 🔧 added line
+  restartCameraWithNotice();
+  validateFormInputs(); // 🛠️ keep UI state in sync
+  return;
+}
 
     const descriptor = Array.from(detection.descriptor);
     descriptors.push(descriptor);

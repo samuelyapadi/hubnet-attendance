@@ -31,6 +31,7 @@ await Promise.all([
 ]);
 
 startCamera();
+document.getElementById('spinner').style.display = 'none';
 
 function startCamera() {
   navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {

@@ -124,15 +124,15 @@ try {
     )
   ]);
 
-  if (!detection || !detection.descriptor || !Array.isArray(detection.descriptor)) {
-    console.warn("⚠️ No valid face descriptor returned.");
-    alert("No face detected. Try again.");
-    soundFail.play();
-    isCapturing = false; // 🔧 added line
-    restartCameraWithNotice();
-    validateFormInputs(); // 🛠️ keep UI state in sync
-    return;
-  }
+if (!detection || !detection.descriptor || !Array.isArray(detection.descriptor)) {
+  console.warn("⚠️ No valid face descriptor returned.");
+  alert("No face detected. Try again.");
+  soundFail.play();
+  restartCameraWithNotice();
+  validateFormInputs();
+  isCapturing = false; // 🛠️ allow retries
+  return;
+}
 
 } catch (err) {
   console.error("❌ Face detection failed or timed out:", err);

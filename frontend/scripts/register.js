@@ -53,12 +53,18 @@ function stopCamera() {
 }
 
 function restartCameraWithNotice() {
-  document.getElementById('spinner').style.display = 'flex';
+  const spinner = document.getElementById('spinner');
+  const captureBtn = document.getElementById('capturePhotoBtn');
+  spinner.style.display = 'flex';
+  captureBtn.disabled = true;
+
   stopCamera();
+
   setTimeout(() => {
     startCamera();
-    document.getElementById('spinner').style.display = 'none';
-  }, 500);
+    spinner.style.display = 'none';
+    captureBtn.disabled = false;
+  }, 800); // slightly longer wait for safety
 }
 
 function validateFormInputs() {

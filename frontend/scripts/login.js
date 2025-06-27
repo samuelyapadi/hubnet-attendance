@@ -193,7 +193,7 @@ loginBtn?.addEventListener('click', async () => {
     stopCamera();
     setTimeout(() => {
       startCamera();
-    }, 3000);
+    }, 500);
   } else {
     alert("❌ No match found.");
     soundFail.play();
@@ -255,7 +255,7 @@ logoutBtn?.addEventListener('click', async () => {
     stopCamera();
     setTimeout(() => {
       startCamera();
-    }, 3000);
+    }, 500);
   } else {
     alert(`❌ Logout failed: ${response.error}`);
     soundFail.play();

@@ -1,3 +1,4 @@
+//ShiftAssignment.js
 const mongoose = require('mongoose');
 
 const shiftAssignmentSchema = new mongoose.Schema({

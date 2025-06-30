@@ -9,6 +9,8 @@ const departmentSelect = document.getElementById('department');
 const joinDateInput = document.getElementById('joinDate');
 const photoCount = document.getElementById('photoCount');
 const status = document.getElementById('status');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const loadingText = document.getElementById('loadingText');
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 
@@ -29,6 +31,19 @@ await Promise.all([
 ]);
 
 startCamera();
+
+function getLang() {
+  return localStorage.getItem('lang') || 'en';
+}
+
+function showLoading(texts) {
+  loadingText.textContent = texts[getLang()] || texts.en;
+  loadingSpinner.style.display = 'block';
+}
+
+function hideLoading() {
+  loadingSpinner.style.display = 'none';
+}
 
 function startCamera() {
   navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
@@ -160,14 +175,17 @@ loginBtn?.addEventListener('click', async () => {
   if (isLoggingIn || isLoggingOut) return;
   isLoggingIn = true;
 
+  showLoading({ en: "Logging in...", ja: "ログイン中..." });
+
   const detection = await faceapi
     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks()
     .withFaceDescriptor();
 
   if (!detection) {
-    alert("No face detected. Try again.");
+    alert(getLang() === 'ja' ? "顔が検出されませんでした。もう一度お試しください。" : "No face detected. Try again.");
     soundFail.play();
+    hideLoading();
     isLoggingIn = false;
     restartCameraWithNotice();
     return;
@@ -179,15 +197,18 @@ loginBtn?.addEventListener('click', async () => {
 
   if (matchedName) {
     if (result.alreadyLoggedIn) {
-      alert(`⚠️ You already have an open session.\nPlease log out before logging in again.`);
+      alert(getLang() === 'ja' ? "⚠️ すでに出勤中です。退勤してから再度ログインしてください。" : "⚠️ You already have an open session. Please log out before logging in again.");
       soundFail.play();
     } else {
-      alert(`✅ Welcome back, ${matchedName}!\nLogin time: ${new Date().toLocaleTimeString()}`);
+      alert(getLang() === 'ja'
+        ? `✅ 登録しました、${matchedName} さん！\n出勤時刻: ${new Date().toLocaleTimeString()}`
+        : `✅ Welcome back, ${matchedName}!\nLogin time: ${new Date().toLocaleTimeString()}`
+      );
       soundSuccess.play();
       try {
         await sendToAPI('attendance', { name: matchedName });
       } catch (err) {
-        alert("⚠️ Could not save attendance.");
+        alert(getLang() === 'ja' ? "⚠️ 勤怠記録を保存できませんでした。" : "⚠️ Could not save attendance.");
       }
     }
     stopCamera();
@@ -195,11 +216,12 @@ loginBtn?.addEventListener('click', async () => {
       startCamera();
     }, 500);
   } else {
-    alert("❌ No match found.");
+    alert(getLang() === 'ja' ? "❌ 一致する顔データが見つかりませんでした。" : "❌ No match found.");
     soundFail.play();
     restartCameraWithNotice();
   }
 
+  hideLoading();
   isLoggingIn = false;
 });
 
@@ -207,13 +229,16 @@ logoutBtn?.addEventListener('click', async () => {
   if (isLoggingOut || isLoggingIn) return;
   isLoggingOut = true;
 
+  showLoading({ en: "Logging out...", ja: "ログアウト中..." });
+
   const detection = await faceapi
     .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks()
     .withFaceDescriptor();
 
   if (!detection) {
-    alert("⚠️ No face detected. Try again.");
+    hideLoading();
+    alert(getLang() === 'ja' ? "⚠️ 顔が検出されませんでした。もう一度試してください。" : "⚠️ No face detected. Try again.");
     soundFail.play();
     isLoggingOut = false;
     restartCameraWithNotice();
@@ -227,7 +252,8 @@ logoutBtn?.addEventListener('click', async () => {
   const isLoggedIn = result.alreadyLoggedIn;
 
   if (!matchedName) {
-    alert("❌ No match found.");
+    hideLoading();
+    alert(getLang() === 'ja' ? "❌ 一致する顔が見つかりません。" : "❌ No match found.");
     soundFail.play();
     isLoggingOut = false;
     restartCameraWithNotice();
@@ -235,29 +261,42 @@ logoutBtn?.addEventListener('click', async () => {
   }
 
   if (!isLoggedIn) {
-    alert(`⚠️ ${matchedName} is not currently logged in.`);
+    hideLoading();
+    alert(getLang() === 'ja'
+      ? `⚠️ ${matchedName} は現在ログインしていません。`
+      : `⚠️ ${matchedName} is not currently logged in.`);
     soundFail.play();
     isLoggingOut = false;
     restartCameraWithNotice();
     return;
   }
 
-  const confirmLogout = confirm(`Log out ${matchedName}?`);
+  const confirmLogout = confirm(getLang() === 'ja'
+    ? `${matchedName} をログアウトしますか？`
+    : `Log out ${matchedName}?`);
   if (!confirmLogout) {
+    hideLoading();
     isLoggingOut = false;
     return;
   }
 
   const response = await sendToAPI('logout', { name: matchedName });
+
+  hideLoading();
+
   if (response.success) {
-    alert(`👋 ${matchedName} logged out successfully.`);
+    alert(getLang() === 'ja'
+      ? `👋 ${matchedName} のログアウトが完了しました。`
+      : `👋 ${matchedName} logged out successfully.`);
     soundSuccess.play();
     stopCamera();
     setTimeout(() => {
       startCamera();
     }, 500);
   } else {
-    alert(`❌ Logout failed: ${response.error}`);
+    alert(getLang() === 'ja'
+      ? `❌ ログアウトに失敗しました: ${response.error}`
+      : `❌ Logout failed: ${response.error}`);
     soundFail.play();
     restartCameraWithNotice();
   }

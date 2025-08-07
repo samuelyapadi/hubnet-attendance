@@ -4,8 +4,10 @@ const router = express.Router();
 const User = require('../models/User');
 const Attendance = require('../models/Attendance');
 const Leave = require('../models/Leave');
+const JapaneseHolidays = require('japanese-holidays'); 
 const Admin = require('../models/Admin');
 const bcrypt = require('bcrypt');
+
 
 router.post('/admins/grant', async (req, res) => {
   const { userId, username, password } = req.body;
@@ -117,7 +119,7 @@ router.post('/register', async (req, res) => {
 // Login with a single descriptor
 router.post('/login', async (req, res) => {
   const { descriptor } = req.body;
-  const threshold = 0.55;
+  const threshold = 0.5;
 
   const euclideanDistance = (a, b) =>
     Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
@@ -183,6 +185,11 @@ router.post('/logout', async (req, res) => {
 
     if (!session) {
       return res.status(404).json({ error: 'No active session found.' });
+    }
+
+    const holidayName = JapaneseHolidays.isHoliday(session.checkIn);
+    if (holidayName) {
+      session.holidayName = holidayName;
     }
 
     session.checkOut = new Date();

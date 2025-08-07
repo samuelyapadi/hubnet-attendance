@@ -89,7 +89,17 @@ function populateActiveTable() {
     const row = document.createElement('tr');
     const checkIn = new Date(entry.checkIn);
     const deptLabel = departmentLabels[entry.department] || entry.department;
-    row.innerHTML = `<td>${entry.name}</td><td>${deptLabel}</td><td>${checkIn.toLocaleString()}</td>`;
+
+    // Format the check-in time
+    const checkInTime = checkIn.toLocaleString();
+
+    // Check for a holiday and create a red indicator if it exists
+    const holidayIndicator = entry.holidayName
+      ? ` <span style="color: red; font-weight: bold;">(${entry.holidayName})</span>`
+      : '';
+
+    // Add the holiday indicator to the check-in time cell
+    row.innerHTML = `<td>${entry.name}</td><td>${deptLabel}</td><td>${checkInTime}${holidayIndicator}</td>`;
     tbody.appendChild(row);
   });
 }
